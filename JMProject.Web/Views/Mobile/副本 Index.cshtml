@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = "主页";
+    Layout = "~/Views/Shared/_LayoutMobile.cshtml";
+}
+<div class="easyui-navpanel">
+    <header>
+       <input id="Names" class="easyui-textbox" style="width:100%" data-options="
+                    prompt:'搜索单位名称',
+                    icons: [{
+				        iconCls:'icon-search',
+				        handler: function(e){
+					        BindKH();
+				        }
+			        }]
+                    ">
+    </header>
+    <footer>
+        <div class="m-buttongroup m-buttongroup-justified" style="width:100%">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top',plain:true">客户管理</a>
+            <a href="#p2" class="easyui-linkbutton" data-options="iconCls:'icon-large-clipart',size:'large',iconAlign:'top',plain:true">拜访沟通</a>
+        </div>
+    </footer>
+    <ul id="list" class="m-list">
+        @*<li id="20171231000001">
+            <a class="list-phone" href="tel:17790056123"><img alt="" class="list-image" src="../Image/Phone.png"></a>
+            <a id="20171231000001" class="list-header-a" href="javascript://" onclick="GoToDetails(this);">
+                <div class="list-header">长春市九台区档案局</div>
+                <div class="list-content">马嘉艺 17790056123 档案局</div>
+            </a>
+        </li>*@
+    </ul>
+</div>
+<div id="p2" class="easyui-navpanel">
+    <header>   
+        <input class="easyui-datebox" prompt="上方日期" data-options="editable:false,panelWidth:220,panelHeight:240,iconWidth:30" style="width:100%">
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true"></a>     
+        @*<div class="m-title">
+            啊
+        </div>
+        <div class="m-right">
+            <input class="easyui-datebox" prompt="上方日期" data-options="editable:false,panelWidth:220,panelHeight:240,iconWidth:30" style="width:100%">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true"></a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" onclick="$('#ff').form('reset')" style="width:60px">添加</a>
+        </div>*@
+    </header>
+    <footer>
+        <div class="m-buttongroup m-buttongroup-justified" style="width:100%">
+            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top',plain:true">客户管理</a>
+            <a href="#p2" class="easyui-linkbutton" data-options="iconCls:'icon-large-clipart',size:'large',iconAlign:'top',plain:true">拜访沟通</a>
+        </div>
+    </footer>
+    <ul class="m-list">
+        
+    </ul>
+</div>
+<style scoped>
+    #list li{ padding:5px;}
+    #list .list-left
+    {
+        margin:0;
+        padding:0;
+        margin-right: 5px;
+        width: 26px;
+        height: 26px;
+        float: left;
+    }
+    #list .list-header-a
+    {
+        margin:0;
+        padding:0;
+    }
+    #list .list-header-a::after{ content:normal;}
+    #list .list-phone
+    {
+        margin:0;
+        padding:0;
+        width: 26px;
+        height: 26px;
+        border: 0;
+        display:block;
+    }
+    #list .list-phone::after{ content:normal;}
+    #list .list-image
+    {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        float: left;
+    }
+    #list .list-header
+    {
+        font-size: 15px;
+        font-weight: bold;
+    }
+    #list .list-content
+    {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        min-height:18px;
+    }
+    #list .list-content1
+    {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+
+        BindKH();
+
+    });
+
+    function BindKH() {
+        $("#list").empty();
+        $.ajax({
+            url: "/Mobile/GetCustom",
+            type: "Post",
+            data: { Name: $("#Names").textbox('getValue') },
+            dataType: "json",
+            success: function (data) {
+                if (data.total < 0) {
+                    window.location.href = '/P';
+                }
+                else if (data.total > 0) {
+                    $.each(data.rows, function (index, value) {
+                        var html = '<li>'
+                                 + '    <div class="list-left">'
+                                 + '        <a class="list-phone" href="tel:' + value.Phone + '" ><img alt="" class="list-image" src="../Image/Phone.png" /></a>'
+                                 + '        <a id="' + value.ID + '" class="list-phone" style="margin-top:2px;" href="javascript://" onclick="GoToBfgt(this);" ><img alt="" class="list-image" src="../Image/Hand.png" /></a>'
+                                 + '    </div>'
+                                 + '    <a id="' + value.ID + '" class="list-header-a" href="javascript://" >'
+                                 + '        <div class="list-header">' + value.Name + '</div>'
+                                 + '        <div class="list-content">' + value.Lxr + ' ' + value.Phone + ' ' + value.Address + '</div>'
+                                 + '        <div class="list-content1">合同：' + value.ItemMoney + ' 发票：' + value.Invoicemoney + ' 到账：' + value.Paymentmoney + '</div>'
+                                 + '    </a>'
+                                 + '</li>'
+                        $("#list").append(html);
+                    });
+                }
+            }
+        });
+    }
+
+    function GoToBfgt(p) {
+        //$(p).attr("id");
+        $.mobile.go('#p2');
+    }
+</script>

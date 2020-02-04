@@ -1,0 +1,411 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.FinOrder
+@{
+    ViewBag.Title = "入库单管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    AccountModel Account = (AccountModel)ViewBag.Account; 
+}
+<script type="text/javascript">
+    var editIndex = undefined; //上一次编辑行索引
+
+    function getCurentDateStr() {
+        var now = new Date();
+        var year = now.getFullYear();       //年  
+        var month = now.getMonth() + 1;     //月  
+        var day = now.getDate();            //日  
+        var clock = year + "-";
+        if (month < 10) clock += "0";
+        clock += month + "-";
+        if (day < 10) clock += "0";
+        clock += day;
+        return clock;
+    }
+
+    function getCurrentMonthFirst() {
+        var date = new Date();
+        date.setDate(1);
+        var oneDay = 1000 * 60 * 60 * 24;
+        return new Date(date - oneDay);
+    };
+
+    function getCurrentMonthLast() {
+        var date = new Date();
+        var currentMonth = date.getMonth();
+        var nextMonth = ++currentMonth;
+        var nextMonthFirstDay = new Date(date.getFullYear(), nextMonth, 1);
+        var oneDay = 1000 * 60 * 60 * 24;
+        return new Date(nextMonthFirstDay - oneDay);
+    };
+
+    function BindComb() {
+        $('#SupplierId').combobox({
+            url: '/Financial/GetData_FinSupplier_Comb',
+            valueField: 'Id',
+            textField: 'Name',
+            onLoadSuccess: function (node, data) {
+                $("#SupplierId").combobox('setValue', '@Model.SupplierId');
+            }
+        });
+
+        $('#ProductId').combotree({
+            url: '/Financial/GetTree_FinProductType?all=False',
+            valueField: 'id',
+            textField: 'text',
+            onLoadSuccess: function (node, data) {
+                $("#ProductId").combotree('setValue', '@Model.ProductId');
+            }
+        });
+    };
+
+    function AddRows(rows) {
+        $.each(rows, function (index, item) {
+            $('#grid').datagrid('appendRow', {
+                ModularID: item.ItemID,
+                TypeName: item.ItemName,
+                CbMoney: '0',
+                JcMoney: '0',
+                CsCount: '1',
+                AddCount: '0',
+                AddMoney: '0',
+                SumCount: '1',
+                sumMoney: '0'
+            });
+        });
+    };
+
+    $(function () {
+        BindComb();
+        reload();
+        if ($('#OrderDate').datebox('getValue').length == 0) {
+            $('#OrderDate').datebox('setValue', getCurentDateStr());
+        }
+        //$('#OrderDate').datebox('calendar').calendar({
+        //    validator: function (date) {
+        //        var d1 = getCurrentMonthFirst();
+        //        var d2 = getCurrentMonthLast();
+        //        return date >= d1 && date <= d2;
+        //    }
+        //});
+
+        /*保存*/
+        $("#btnSave").click(function () {
+            if (editIndex != undefined) {
+                $('#grid').datagrid('endEdit', editIndex);
+                editIndex = undefined;
+            }
+            $('#grid').datagrid('clearSelections');
+            var rows = $('#grid').datagrid('getRows');
+            if (rows == null || rows.length < 1) {
+                window.parent.frameReturnByMes('请添加模块');
+                return false;
+            }
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("#Id").val()
+                    , OrderDate: $('#OrderDate').datebox('getValue')//日期
+                    , SupplierId: $("#SupplierId").combobox('getValue')//供应商
+                    , ProductId: $("input[name='ProductId']").val()//产品分类
+                    , PkeyStart: $("input[name='PkeyStart']").val()//序列号段(起)
+                    , PkeyEnd: $("input[name='PkeyEnd']").val()//序列号段(终)
+                    , UserId: $("input[name='UserId']").attr("Uid")//经手人
+                    , Remake: $("input[name='Remake']").val()//描述
+                    , Products: JSON.stringify(rows)//
+                    , AddType: $("#AddType").val()//
+                };
+                $.ajax({
+                    url: "/Financial/Create_FinOrder",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMesAlert(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+
+        /*添加产品*/
+        $("#btnAdd").click(function () {
+            window.parent.OpenProduct();
+        });
+
+        /*删除产品*/
+        $("#btnRemove").click(function () {
+            if (editIndex == undefined) {
+                window.parent.frameReturnByMes('@Suggestion.PlaseChoose');
+                return;
+            }
+            $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                if (r) {
+                    $('#grid').datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+                    editIndex = undefined;
+                }
+            });
+        });
+
+        /*拆分产品*/
+        $("#btnSplit").click(function () {
+            if (editIndex == undefined) {
+                window.parent.frameReturnByMesAlert('@Suggestion.PlaseChoose');
+                return;
+            }
+            $('#grid').datagrid('endEdit', editIndex);
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                count = row.ItemCount;
+                if (count <= 1) {
+                    window.parent.frameReturnByMesAlert('数量不足无法拆分');
+                    editIndex = undefined;
+                    return;
+                }
+                row.ItemCount = 1;
+                row.ItemMoney = row.ItemPrice;
+                $('#grid').datagrid('refreshRow', editIndex);
+
+                for (var i = 0; i < count - 1; i++) {
+                    $('#grid').datagrid('appendRow', {
+                        ModularID: row.ModularID,
+                        TypeName: row.TypeName,
+                        CbMoney: row.CbMoney,
+                        JcMoney: row.JcMoney,
+                        CsCount: row.CsCount,
+                        AddCount: row.AddCount,
+                        AddMoney: row.AddMoney,
+                        SumCount: row.SumCount,
+                        sumMoney: row.sumMoney
+                    });
+                }
+            };
+            editIndex = undefined;
+        });
+
+        function reload() {
+            var queryData = {
+                Id: $("#Id").val()
+            };
+            InitGrid(queryData);
+            $('#grid').datagrid('clearSelections');
+        };
+
+        function InitGrid(queryData) {
+            $('#grid').datagrid({
+                url: '/Financial/GetData_FinOrderItem',
+                width: 784,
+                methord: 'post',
+                height: 300,
+                fitColumns: false,
+                idField: 'ItemID',
+                sortName: 'ItemID',
+                sortOrder: 'asc',
+                pagination: false,
+                striped: true, //奇偶行是否区分
+                singleSelect: true, //单选模式
+                queryParams: queryData,
+                columns: [[
+                    { field: 'TypeName', title: '模块名称', width: 100 },
+                    { field: 'CbMoney', title: '成本价', width: 110, editor: { type: 'numberbox', options: { precision: 2}} },
+                    { field: 'JcMoney', title: '基础价', width: 100, editor: { type: 'numberbox', options: { precision: 2}} },
+                    { field: 'CsCount', title: '初始用户数', width: 70, editor: { type: 'numberbox', options: { precision: 0}} },
+                    { field: 'AddCount', title: '增加用户数', width: 70, editor: { type: 'numberbox', options: { precision: 0}} },
+                    { field: 'AddMoney', title: '增加金额', width: 80, editor: { type: 'numberbox', options: { precision: 0}} },
+                    { field: 'SumCount', title: '用户数合计', width: 100, editor: { type: 'numberbox', options: { precision: 0}} },
+                    { field: 'sumMoney', title: '金额合计', width: 120, editor: { type: 'numberbox', options: { precision: 2}} },
+                ]],
+                onClickCell: onClickCell
+            });
+
+            function endEditing() {
+                if (editIndex == undefined) { return true }
+                if ($('#grid').datagrid('validateRow', editIndex)) {
+                    $('#grid').datagrid('endEdit', editIndex);
+                    editIndex = undefined;
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            function onClickCell(index, field) {
+                if (editIndex != index) {
+                    if (endEditing()) {
+                        $('#grid').datagrid('selectRow', index).datagrid('beginEdit', index);
+
+                        var editors = $('#grid').datagrid('getEditors', index);
+                        var CbMoneyEditor = editors[0]; //成本价
+                        var JcMoneyEditor = editors[1]; //基础价
+                        var CsCountEditor = editors[2]; //初始用户数
+                        var AddCountEditor = editors[3]; //增加用户数
+                        var AddMoneyEditor = editors[4]; //增加金额
+                        var SumCountEditor = editors[5]; //用户数合计
+                        var costEditor = editors[6]; //金额合计
+
+                        $(CbMoneyEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(CbMoneyEditor.target).numberbox('setValue', oldValue);
+                                }
+                            }
+                        });
+
+                        $(JcMoneyEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(JcMoneyEditor.target).numberbox('setValue', oldValue);
+                                }
+                                SumJinE();
+                            }
+                        });
+
+                        $(CsCountEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(CsCountEditor.target).numberbox('setValue', oldValue);
+                                }
+                                SumCount();
+                            }
+                        });
+
+                        $(AddCountEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(AddCountEditor.target).numberbox('setValue', oldValue);
+                                }
+                                SumCount();
+                            }
+                        });
+
+                        $(AddMoneyEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(AddMoneyEditor.target).numberbox('setValue', oldValue);
+                                }
+                                SumJinE();
+                            }
+                        });
+
+                        $(SumCountEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                SumCount();
+                            }
+                        });
+
+                        $(costEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                SumJinE();
+                            }
+                        });
+
+                        function SumCount() {
+                            var cost = parseInt(CsCountEditor.target.val()) + parseInt(AddCountEditor.target.val());
+                            $(SumCountEditor.target).numberbox('setValue', cost);
+                        }
+
+                        function SumJinE() {
+                            var cost = parseFloat(JcMoneyEditor.target.val()) + parseFloat(AddMoneyEditor.target.val());
+                            $(costEditor.target).numberbox('setValue', cost);
+                        }
+
+                        var ed = $('#grid').datagrid('getEditor', { index: index, field: field });
+                        if (ed) {
+                            ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                        }
+                        editIndex = index;
+                    } else {
+                        setTimeout(function () {
+                            $('#grid').datagrid('selectRow', editIndex);
+                        }, 0);
+                    }
+                }
+            }
+        };
+    });
+</script>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, true)
+    @Html.ToolButton("btnAdd", "icon-add", "添加行", false)
+    @Html.ToolButton("btnRemove", "icon-remove", "删除行", true)
+    @*@Html.ToolButton("btnSplit", "icon-add", "拆分行", false)*@
+</div>
+<form id="CreateForm" method="post">
+<table class="form_table">
+    <tbody>
+        <tr>
+            <th>
+                日期
+            </th>
+            <td>
+                <input type="text" id="OrderDate" name="OrderDate" class="easyui-datebox" editable="false" maxlength="10" required="true" value="@Model.OrderDate" />
+            </td>
+            <th>
+                供应商
+            </th>
+            <td>
+                <input type="text" id="SupplierId" name="SupplierId" class="easyui-combobox" required="true" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                产品分类
+            </th>
+            <td style="width: 52px;">
+                <input type="text" id="ProductId" name="ProductId" class="easyui-combotree" maxlength="30"
+                    required="true" />
+            </td>
+            <th>
+                序列号段
+            </th>
+            <td>
+                <input type="text" id="PkeyStart" name="PkeyStart" class="easyui-validatebox easyui-numberbox" style="width: 93px;"
+                    maxlength="50" required="true" value="@Model.PkeyStart" />
+                -
+                <input type="text" id="PkeyEnd" name="PkeyEnd" class="easyui-validatebox easyui-numberbox" style="width: 94px;"
+                    maxlength="50" required="true" value="@Model.PkeyEnd" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                描述
+            </th>
+            <td colspan="3">
+                <input type="text" name="Remake" class="easyui-validatebox" maxlength="200" style="width:593px" value="@Model.Remake" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <table id="grid">
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th>
+            </th>
+            <td>
+            </td>
+            <th>
+                经手人
+            </th>
+            <td>
+                <input type="text" name="UserId" class="easyui-validatebox" required="true" readonly value="@Account.ZsName" Uid="@Account.Id" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+</form>

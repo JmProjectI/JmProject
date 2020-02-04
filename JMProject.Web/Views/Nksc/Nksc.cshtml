@@ -1,0 +1,354 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "手册管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script src="@Url.Content("~/Content/My97DatePicker/WdatePicker.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/Nksc.js?v=190307")" type="text/javascript"></script>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false"></div>
+<div id="modalwindowPro" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false"></div>
+<script type="text/javascript">
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('load');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+    function ChooseProduct(rows) {
+        $("#modalwindowPro").window('close');
+        window.frames[0].AddRows(rows);
+    };
+    function OpenProduct() {
+        $("#modalwindowPro").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/FinProductTypeChoose'></iframe>");
+        $("#modalwindowPro").window({ title: '选择商品', width: 1000, height: 610, iconCls: 'icon-add' }).window('open');
+    };
+</script>
+<div class="divtool" style="font-size:12px;height:60px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height:28px;">
+            <td style="min-width:60px">
+                <span>所属单位:</span>
+            </td>
+            <td style="min-width:250px">
+                <input id="NameS" class="easyui-textbox" style="width: 240px;" />
+            </td>
+            <td style="min-width:60px">
+                <span>上报日期:</span>
+            </td>
+            <td style="min-width:250px">
+                <input id="txtNkscSBDateS" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;width: 107px;" />
+                <span>-</span>
+                <input id="txtNkscSBDateE" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;width: 107px;" />
+            </td>
+            <td style="min-width:60px">
+                <span>所属地区:</span>
+            </td>
+            <td style="min-width:130px">
+                <input id="DiQuS" class="easyui-combobox" style="width: 120px;" editable="false" />
+            </td>
+            <td style="min-width:60px">
+                <span>手册状态:</span>
+            </td>
+            <td style="min-width:130px">
+                <select class="easyui-combobox" name="flag" id="ddlflag" style="width: 120px;" panelheight="260">
+                    <option value="0">全部</option>
+                    <option value="1">未提交</option>
+                    <option value="7">已提交</option>
+                    <option value="2">A已初审</option>
+                    <option value="3">B已派工</option>
+                    <option value="5">C已编制完成</option>
+                    <option value="4">D用户核对中</option>
+                    <option value="6">E已定稿</option>
+                    <option value="8">F已装订</option>
+                    <option value="9">G装订修改</option>
+                    <option value="11">I手册已领取</option>
+                    <option value="13">J待定</option>
+                    <option value="n4">非用户核对中</option>
+                </select>
+            </td>
+            <td style="min-width:60px">
+                <span>是否更新:</span>
+            </td>
+            <td style="min-width:130px">
+                <select class="easyui-combobox" name="isupdate" id="dllisupdate" style="width: 120px;">
+                    <option value="0">全部</option>
+                    <option value="1">是</option>
+                    <option value="2">否</option>
+                </select>
+            </td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr style="height:28px;">
+            <td>
+                <span>建档日期:</span>
+            </td>
+            <td>
+                <input id="txtNkscDateS" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;width: 107px;" />
+                <span>-</span>
+                <input id="txtNkscDateE" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;width: 107px;" />
+            </td>
+            <td>
+                <span>装订日期:</span>
+            </td>
+            <td>
+                <input id="txtStart" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;
+                    width: 107px;" />
+                <span>-</span>
+                <input id="txtEnd" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;
+                    width: 107px;" />
+            </td>
+            <td style="min-width:60px">
+                <span>反馈状态:</span>
+            </td>
+            <td style="min-width:130px">
+                <select class="easyui-combobox" name="fkflag" id="fkflagid" style="width: 120px;">
+                    <option value="0">全部</option>
+                    <option value="1">未反馈</option>
+                    <option value="2">已反馈</option>
+                    <option value="3">已处理</option>
+                </select>
+            </td>
+            <td>
+                <span>发送PDF:</span>
+            </td>
+            <td>
+                <select class="easyui-combobox" name="fkpdfflag" id="dllfkpdfflag" style="width: 120px;">
+                    <option value="0">全部</option>
+                    <option value="1">是</option>
+                    <option value="2">否</option>
+                </select>
+            </td>
+            <td>
+                <span>手册版本:</span>
+            </td>
+            <td>
+                <input id="VersionS" class="easyui-combobox" style="width: 120px;" editable="false" />
+            </td>
+            <td>
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="divtool" style="background: #f5f5f5;">
+    <!-- 生成Word文档 -->
+    @Html.ToolButton("btnhyjy", "", "会议纪要", false)
+    @Html.ToolButton("btnCword", "", "生成手册", perm, "Cword", false)
+    @Html.ToolButton("btnCwordB", "", "生成手册(B5)", perm, "CwordB", false)
+    @Html.ToolButton("btnCwordBo", "", "生成(B5小四)", perm, "CwordBo", false)
+    @Html.ToolButton("btnCwordC", "", "生成手册(处室)", perm, "CwordC", true)
+    @Html.ToolButton("btnCwordAny", "", "生成Any", perm, "CwordAny", true)
+    <!-- 附件 -->
+    @Html.ToolButton("btnNksc", "", "查看基础信息", perm, "Nksc", false)
+    @Html.ToolButton("btnDfj", "", "下载附件", perm, "Dfj", true)
+    <!-- 手册状态 -->
+    @Html.ToolButton("btnFlag1", "", "弃审", perm, "Flag1", false)
+    @Html.ToolButton("btnFlagA", "", "A初审", perm, "FlagA", false)
+    @Html.ToolButton("btnFlagB", "", "B派工", perm, "FlagB", false)
+    @Html.ToolButton("btnFlagC", "", "C编制完成", perm, "FlagC", false)
+    @Html.ToolButton("btnFlagD", "", "D用户核对中", perm, "FlagD", false)
+    @Html.ToolButton("btnFlagE", "", "E定稿确认", perm, "FlagE", false)
+    @Html.ToolButton("btnFlagF", "", "F装订完成", perm, "FlagF", false)
+    @Html.ToolButton("btnFlagG", "", "G装订修改", perm, "FlagG", false)
+    @Html.ToolButton("btnFlagI", "", "I手册已领取", perm, "FlagI", false)
+    @Html.ToolButton("btnFlagJ", "", "J待定", perm, "FlagJ", true)
+    <!-- 手册状态 -->
+    @Html.ToolButton("btnFlagCpdf", "", "已生成PDF", perm, "FlagCpdf", false)
+    @Html.ToolButton("btnFlagSpdf", "", "已发送PDF", perm, "FlagSpdf", true)
+    <!-- 问题反馈 -->
+    @Html.ToolButton("btnwtfkFlagA", "", "弃审问题反馈", perm, "wtfkFlagA", false)
+    @Html.ToolButton("btnwtfkFlagB", "", "已处理问题反馈", perm, "wtfkFlagB", true)
+    <!-- 其他 -->
+    @Html.ToolButton("btnDesc", "", "特殊描述", perm, "Desc", false)
+    @Html.ToolButton("btnExport", "", "导出Excel", perm, "Export", false)
+    @Html.ToolButton("btnAddBook", "", "加印", perm, "AddBook", false)
+    @Html.ToolButton("btnUpdate", "", "更新", perm, "Update", false)
+    @Html.ToolButton("btnJCDW", "", "检查单位", perm, "Geng", false)
+</div>
+<table id="grid"></table>
+<!--派工-->
+<div id="dlg" class="easyui-dialog" style="width: 400px; height: 150px; padding: 10px 20px;"
+    closed="true" buttons="#dlg-buttons">
+    <form id="fm" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter">
+        <tr>
+            <td class="dec">
+                派发员工
+            </td>
+            <td class="con">
+                <input name="pfr" class="easyui-validatebox" required="true" />
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlg-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="save()" iconcls="icon-save">
+        保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlg').dialog('close')"
+            iconcls="icon-cancel">取消</a>
+</div>
+<!--反馈文档列表-->
+<div id="dlgFkwd" class="easyui-dialog" style="width: 500px; height: 400px; padding: 10px 20px;" closed="true">
+    <ul id="ulfile" style="list-style-type: none;padding-left:0px;">
+    </ul>
+</div>
+<!--特殊要求描述-->
+<div id="dlgtsyq" class="easyui-dialog" style="width: 600px; height: 370px; padding: 10px 20px;"
+    closed="true" buttons="#dlgtsyq-buttons">
+    <form id="fmtsyq" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter" style="height: 275px;">
+        <tr>
+            <td class="dec">
+                特殊要求描述
+            </td>
+            <td class="con" style="vertical-align: top;">
+                <textarea id="tsyqid" name="tsyqtext" rows="15" class="easyui-validatebox" style="height: 260px;
+                    width: 410px; font-size: 14px;"></textarea>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlgtsyq-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="savetsyq()" iconcls="icon-save">
+        保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgtsyq').dialog('close')"
+            iconcls="icon-cancel">取消</a>
+</div>
+<!--已定稿-->
+<div id="dlgydg" class="easyui-dialog" style="width: 600px; height: 370px; padding: 10px 20px;"
+    closed="true" buttons="#dlgydg-buttons">
+    <form id="fmydg" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter" style="height: 275px;">
+        <tr>
+            <td class="dec">
+                协议装订数量
+            </td>
+            <td class="con" style="vertical-align: middle;">
+                <input id="txtxyzdsum" name="xyzdsum" class="easyui-numberbox" required="true" data-options="min:0" />
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                备注
+            </td>
+            <td class="con" style="vertical-align: top;">
+                <textarea id="bzid" name="nkscbz" rows="15" class="easyui-validatebox" style="height: 225px;
+                    width: 410px; font-size: 14px;"></textarea>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlgydg-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveydg()" iconcls="icon-save">
+        保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgydg').dialog('close')"
+            iconcls="icon-cancel">取消</a>
+</div>
+<!--已装订-->
+<div id="dlgyzd" class="easyui-dialog" style="width: 600px; height: 380px; padding: 10px 20px;"
+    closed="true" buttons="#dlgyzd-buttons">
+    <form id="fmyzd" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter" style="height: 285px;">
+        <tr>
+            <td class="dec">
+                装订日期
+            </td>
+            <td class="con" style="vertical-align: middle;">
+                <input id="txtzddate" name="zddate" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                    style="font-size: 12px;" />
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                总装订数量
+            </td>
+            <td class="con" style="vertical-align: middle;">
+                <input id="txtbczdsum" name="bczdsum" class="easyui-numberbox" required="true" data-options="min:0" />
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                备注
+            </td>
+            <td class="con" style="vertical-align: top;">
+                <textarea id="txtbzid" name="nkscbz" rows="9" class="easyui-validatebox" style="height: 160px;
+                    width: 410px; font-size: 14px;"></textarea>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlgyzd-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveyzd()" iconcls="icon-save">
+        保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgyzd').dialog('close')"
+            iconcls="icon-cancel">取消</a>
+</div>
+<!-- H已发送PDF  I手册已领取 -->
+<div id="dlgfslq" class="easyui-dialog" style="width: 400px; height: 200px; padding: 10px 20px;" closed="true" buttons="#dlgfslq-buttons">
+    <form id="fmfslq" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter">
+        <tr>
+            <td class="dec">
+                日期
+            </td>
+            <td class="con" style="vertical-align: middle;">
+                <input id="txtfslqdate" name="fslqdate" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;" required="true" />
+                <input id="Hidden_fslqflag" type="hidden" />
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                执行人
+            </td>
+            <td class="con" style="vertical-align: middle;">
+                <input id="txtfslqPeo" name="fslqPeo" class="easyui-vlidatebox" required="true"/>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlgfslq-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="savefslq()" iconcls="icon-save">保存</a> 
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgfslq').dialog('close')" iconcls="icon-cancel">取消</a>
+</div>
+<!-- 检查单位 -->
+<div id="dlgjcdw" class="easyui-dialog" style="width: 400px; height: 200px; padding: 10px 20px;" closed="true" buttons="#dlgjcdw-buttons">
+    <form id="fmjcdw" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter">
+        <tr>
+            <td class="dec">
+                检查年份
+            </td>
+            <td class="con" style="vertical-align: middle;">
+                <input id="txtjcnf" name="jcnf" class="easyui-vlidatebox" required="true"/>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlgjcdw-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="savejcdw()" iconcls="icon-save">保存</a> 
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgjcdw').dialog('close')" iconcls="icon-cancel">取消</a>
+</div>
+<!-- 查看订单 -->
+<div id="dlgOrder" class="easyui-dialog" style="width: 1100px; height: 500px; padding: 5px" closed="true">
+    <table id="gridOrder"></table>
+</div>
+<!-- 查看更新 -->
+<div id="dlgUpdate" class="easyui-dialog" style="width: 500px; height: 300px; padding: 5px" closed="true">
+    <table id="gridUpdate"></table>
+</div>

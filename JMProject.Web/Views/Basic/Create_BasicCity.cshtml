@@ -1,0 +1,143 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.BasicCity
+@{
+    ViewBag.Title = "";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<style type="text/css">
+    .form_table th
+    {
+        text-align: left;
+        text-indent: 0.5em;
+    }
+</style>
+<script type="text/javascript">
+    /*下拉框填充*/
+    function bindGroup() {
+        //省份
+        $('#PidID').combobox({
+            url: '/Basic/Get_CombCityPL?pid=',
+            valueField: 'ID',
+            textField: 'Name',
+            onShowPanel: function () {
+                // 动态调整高度  
+                $(this).combobox('panel').height(150);
+            },
+            onLoadSuccess: function (node, data) {
+                if ('@Model.Pid' == "") {
+                    var vdata = $('#PidID').combobox('getData');
+                    $("#PidID").combobox('select', vdata[0].Pid);
+                }
+                else {
+                    $("#PidID").combobox('setValue', '@Model.Pid');
+                }
+            }
+        });
+    }
+
+    $(function () {
+        bindGroup();
+
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Pid: $("#PidID").combobox('getValue')
+                    , ID: $("#ID").val()
+                    , Name: $("input[name='Name']").val()
+                    , Code: $("input[name='Code']").val()
+                    , PostCode: $("input[name='PostCode']").val()
+                    , beizhu: $("textarea[name='beizhu']").val()
+                };
+
+                $.ajax({
+                    url: "/Basic/Create_BasicCity",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<input id="ID" name="ID" type="hidden" value="@Model.ID" />
+<form id="CreateForm" method="post">
+<table class="form_table">
+    <tbody>
+        <tr>
+            <th>
+                上级主管区域
+            </th>
+            <td>
+                <input id="PidID" name="Pid" type="easyui-combobox" style="width: 358px;" class="easyui-combobox"
+                    required="true" editable="false" />
+            </td>
+            <td style="width:95px;">
+            </td>
+        </tr>
+        <tr>
+            <th>
+                地区名称
+            </th>
+            <td colspan="2">
+                <input type="text" name="Name" class="easyui-validatebox" maxlength="30" required="true" style="width:350px;" value="@Model.Name" />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                区号
+            </th>
+            <td colspan="2">
+                <input type="text" name="Code" class="easyui-validatebox" maxlength="10" required="true" style="width:350px;" value="@Model.Code" />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                邮政编码
+            </th>
+            <td colspan="2">
+                <input type="text" name="PostCode" class="easyui-validatebox" maxlength="20" required="true" style="width:350px;" value="@Model.PostCode" />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                备注
+            </th>
+            <td colspan="2">
+                <textarea id="beizhu" name="beizhu" rows="3" class="easyui-validatebox" style="height: 60px;
+                    font-size: 14px; width: 350px;" maxlength="500" >@Model.beizhu</textarea>
+            </td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+</form>

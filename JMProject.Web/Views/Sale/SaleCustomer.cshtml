@@ -1,0 +1,310 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "客户管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<div class="divtool" style="font-size: 12px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height: 28px;">
+            <td style="min-width: 60px">
+                <span>客户名称</span>
+            </td>
+            <td style="min-width: 250px">
+                <input id="NameS" class="easyui-textbox" style="width: 240px;" />
+            </td>
+            <td style="min-width: 60px">
+                <span>所属地区</span>
+            </td>
+            <td style="min-width: 190px">
+                <input id="DiQuS" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td style="min-width: 45px">
+                <span>业务员</span>
+            </td>
+            <td style="min-width: 120px">
+                <input id="userS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                <span>客户等级</span>
+            </td>
+            <td style="min-width: 120px">
+                <input id="dengjS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td style="min-width: 70px">
+                <span>客户重要性</span>
+            </td>
+            <td style="min-width: 120px">
+                <input id="zyxS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td style="min-width: 45px">
+                <span>行业</span>
+            </td>
+            <td style="min-width: 120px">
+                <input id="IndustryID" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td style="min-width: 65px">
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="divtool">
+    @Html.ToolButton("btnCreate", "icon-add", Suggestion.Create, perm, "Create", false)
+    @Html.ToolButton("btnCopy", "icon-add", "复制", perm, "Copy", false)
+    @Html.ToolButton("btnEdit", "icon-edit", Suggestion.Edit, perm, "Edit", false)
+    @Html.ToolButton("btnDelete", "icon-remove", Suggestion.Delete, perm, "Delete", true)
+    @Html.ToolButton("btnCreateSorder", "icon-add", "创建合同", perm, "CreateSorder", false)
+    @Html.ToolButton("btnImport", "pic_164", "导入客户", perm, "Import", true)
+    @Html.ToolButton("btnSimple", "icon-add", "内控速建", perm, "Simple", false)
+    @Html.ToolButton("btnJsKey", "pic_227", "激活决算", perm, "JsKey", false)
+</div>
+<input id="hiduserS" name="hiduserS" type="hidden" value="@ViewBag.userS" />
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="vertical-align: top;">
+            <table id="grid">
+            </table>
+        </td>
+    </tr>
+</table>
+<div id="modalwindowCus" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<div id="modalwindowPro" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<script type="text/javascript">
+    var offwidth = 10;
+    var offheight = 65;
+    function frameReturnClose() {
+        $("#modalwindowCus").window('close');
+    };
+    function frameReturnByClose() {
+        $("#modalwindowCus").window('close');
+    };
+    function frameReturnValuesClose(values) {
+        $("#modalwindowCus").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('reload');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+
+    function ShowCenter(mes) {
+        $.show_alert('@Suggestion.Tip', mes);
+    };
+    function ChooseProduct(rows) {
+        $("#modalwindowPro").window('close');
+        window.frames[0].AddRows(rows);
+    };
+    function OpenProductType() {
+        $("#modalwindowPro").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/FinProductTypeChoose'></iframe>");
+        $("#modalwindowPro").window({ title: '选择商品', width: 1000, height: 610, iconCls: 'icon-add' }).window('open');
+    };
+
+    function BindComb() {
+
+        //地区
+        $("#DiQuS").combobox({
+            url: '/Basic/Get_CombCity?pid=',
+            multiple: true,
+            panelHeight: 600,
+            valueField: 'ID',
+            textField: 'Name',
+            groupField: 'CityPLName'
+        }).combobox('clear');
+
+        //客户等级
+        $('#dengjS').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=003&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+
+            }
+        });
+
+        //客户重要性
+        $('#zyxS').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=008&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+
+            }
+        });
+
+        //业务员
+        $('#userS').combobox({
+            url: '/System/GetComb_Users?All=true',
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                if ($("#hiduserS").val().length > 0) {
+                    $("#userS").combobox('setValue', $("#hiduserS").val());
+                    $("#userS").combobox("disable");
+                }
+                reload();
+            }
+        });
+        //行业
+        $('#IndustryID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=001&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            panelHeight: 600,
+            onLoadSuccess: function (node, data) {
+            }
+        });
+    };
+
+    $(function () {
+        BindComb();
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            });
+        });
+        $("#btnCreate").click(function () {
+            $("#modalwindowCus").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Sale/Create_Customer'></iframe>");
+            $("#modalwindowCus").window({ title: '@Suggestion.Create', width: 1120, height: 700, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnSimple").click(function () {
+            $("#modalwindowCus").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Sale/Create_CustomerSimple'></iframe>");
+            $("#modalwindowCus").window({ title: '创建客户与合同(默认报告按2000元拆分金额)', width: 720, height: 440, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnCopy").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindowCus").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_Customer?Id=" + row.ID + "&Copy=true'></iframe>");
+                $("#modalwindowCus").window({ title: '复制', width: 1120, height: 700, iconCls: 'icon-add' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnEdit").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindowCus").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_Customer?Id=" + row.ID + "'></iframe>");
+                $("#modalwindowCus").window({ title: '@Suggestion.Edit', width: 1120, height: 700, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/Sale/Delete_SaleCustomer?Id=" + row.ID, function (data) {
+                            if (data.type == 1) {
+                                frameReturnByReload(false);
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnCreateSorder").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindowCus").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleOrder?AddType=True&CId=" + row.ID + "'></iframe>");
+                $("#modalwindowCus").window({ title: '创建合同', width: 1150, height: 510, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+
+        $("#btnImport").click(function () {
+            window.parent.addTab('导入Excel', '/Sale/UploadExcel', 'pic_164');
+        });
+
+        $("#btnJsKey").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindowCus").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_JsKey?CId=" + row.ID + "'></iframe>");
+                $("#modalwindowCus").window({ title: '激活决算', width: 720, height: 340, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+    });
+
+    function reload() {
+        var queryData = {
+            Name: $("#NameS").val(),
+            DiQuS: $("#DiQuS").combobox("getValues") + "",
+            userS: $("#userS").combobox("getValues") + "",
+            dengjS: $("#dengjS").combobox("getValues") + "",
+            Industry: $("#IndustryID").combobox("getValues") + "",
+            zyxS: $("#zyxS").combobox("getValues") + ""
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Sale/GetData_SaleCustomer',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - offheight,
+            fitColumns: false,
+            idField: 'ID',
+            sortName: 'ID',
+            sortOrder: 'desc',
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'ID', title: '编号', width: 110 },
+                { field: 'CDate', title: '创建日期', width: 80 },
+                { field: 'Name', title: '单位全称', width: 280 },
+                { field: 'Invoice', title: '发票抬头', width: 280 },
+                {field: 'Code', title: '社会统一信用代码', width: 140 },
+                { field: 'Address', title: '地址', width: 350 },
+                { field: 'HyName', title: '行业', width: 100 },
+                { field: 'UserName', title: '用户名', width: 100 },
+                { field: 'UserPwd', title: '密码', width: 100 },
+                { field: 'Lxr', title: '联系人', width: 100 },
+                { field: 'Phone', title: '手机号', width: 100 },
+                { field: 'QtLxr', title: '内控联系人', width: 100 },
+                { field: 'QtTel', title: '内控电话', width: 100 },
+                { field: 'YwyName', title: '业务员', width: 100 },
+                { field: 'CzjName', title: '行政区域', width: 100 },
+                { field: 'SfName', title: '省份', width: 100 },
+                { field: 'CityName', title: '地区', width: 100 },
+                { field: 'UpName', title: '上级主管区域', width: 100 },
+                { field: 'BmName', title: '部门', width: 100 },
+                { field: 'ZwName', title: '职务', width: 100 },
+                { field: 'XydjName', title: '信用等级', width: 100 },
+                { field: 'GxName', title: '与客户关系', width: 100 },
+                { field: 'ZyxName', title: '重要性', width: 100 },
+                { field: 'Tel', title: '电话', width: 100 },
+                { field: 'QQ', title: 'QQ号', width: 100 },
+                { field: 'Email', title: '邮箱', width: 100 },
+                { field: 'LxrSR', title: '联系人生日', width: 100 },
+                { field: 'Bank', title: '开户行', width: 100 },
+                { field: 'CardNum', title: '账号', width: 100 },
+                { field: 'SuiH', title: '税号', width: 100 },
+                { field: 'Flag', title: '客户状态', width: 100 },
+                { field: 'CjrName', title: '创建 人 ', width: 100 },
+                { field: 'LyName', title: '客户来源', width: 100 },
+                { field: 'TypeName', title: '客户类别', width: 100 },
+                { field: 'DjName', title: '客户等级', width: 100 },
+                { field: 'Desc', title: '信息化构建情况', width: 100 },
+                { field: 'Remark', title: '备注', width: 100 },
+            ]]
+        });
+    }
+</script>

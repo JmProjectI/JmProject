@@ -1,0 +1,178 @@
+﻿@model JMProject.Model.View.View_SaleVisit
+@{
+    ViewBag.Title = "主页";
+    Layout = "~/Views/Shared/_LayoutMui.cshtml";
+    List<JMProject.Model.DictionaryItem> dicXqs = (List<JMProject.Model.DictionaryItem>)ViewBag.viewbagXQ;
+}
+<style>
+    .list-block
+    {
+        margin: 0.05rem 0;
+    }
+    .labforcheck{ margin-right:0.5em;}
+    .kkkk .modal-inner div.modal-text
+    {
+        overflow-y: scroll;height: 300px;
+    }
+</style>
+<input id="hid_id" type="hidden" value="@Model.Id" />
+<input id="hid_cid" type="hidden" value="@Model.SaleCustomID" />
+<input id="hid_year" type="hidden" value="@Model.ContactDate.Substring(0, 4)" />
+<input id="hid_mon" type="hidden" value="@Model.ContactDate.Substring(5, 2)" />
+<input id="hid_day" type="hidden" value="@Model.ContactDate.Substring(8, 2)" />
+<input id="hid_h" type="hidden" value="@Model.ContactTime.Split(':')[0]" />
+<input id="hid_m" type="hidden" value="@Model.ContactTime.Split(':')[1]" />
+<div id="page-createvisit" class="page">
+    <header class="bar bar-nav">
+        <a class="button button-link button-nav pull-left back" href="/Mobile/SaleVisit">
+            <span class="icon icon-left"></span>
+        </a>
+        <h1 class='title'>拜访沟通</h1>
+        <a id="history" class="icon icon-clock pull-right" href="javascript:void(0);"></a>
+    </header>
+    <div class="content">
+        <div class="list-block">
+            <ul>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="datetime-picker">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="Name" type="text" placeholder="客户全称" value="@Model.Name">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="picker_Llfs" placeholder="联络方式" value="@Model.LlfsName"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                @for (int i = 0; i < dicXqs.Count; i++)
+                                {
+                                    JMProject.Model.DictionaryItem item = dicXqs[i];
+                                    <input id="@string.Format("c{0}", i)" name="xq" class="chkxq" type="checkbox" value="@item.ItemID" jvalue="@item.ItemName" @(Model.DemandType.IndexOf(item.ItemID) >= 0 ? "checked='checked'" : "") />
+                                    <label class="labforcheck" for="@string.Format("c{0}", i)">@item.ItemName</label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="picker_Llzt" placeholder="联络状态" value="@Model.LlztName"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="picker_Llqk" placeholder="联络情况" value="@Model.LlqkName"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="picker_yx" placeholder="是否意向" value="@Model.YxName"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="txtAmount" type="text" placeholder="预计成交金额" value="@Model.Amount">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="picker_jd" placeholder="进度" value="@Model.JdName"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="txtOffer" type="text" placeholder="本次报价" value="@Model.Offer">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="align-top">
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <textarea name="RemakeDetails" placeholder="本次联络情况">@Model.ContactDetails</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="align-top">
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <textarea name="RemakeTarget" placeholder="下次联络目标">@Model.ContactTarget</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="txtNextTime" type="date" placeholder="下次联络时间" value="@Model.NextTime">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="picker_zt" type="text" placeholder="状态" value="@Model.ZtName">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="content-block">
+            <div class="row">
+                <div class="col-50">
+                    <a href="/Mobile/SaleVisit" class="button button-big button-fill button-danger back">返回</a></div>
+                <div class="col-50">
+                    <a href="#" class="button button-big button-fill button-success create-visit">提交</a></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>@ViewBag.Title</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+    <link href="@Url.Content("~/Content/esayui1.5.3.0/themes/default/easyui.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/esayui1.5.3.0/themes/icon.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/esayuiDemo.css")" rel="stylesheet" type="text/css" />
+    
+    <script src="@Url.Content("~/Content/esayui1.5.3.0/jquery.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Content/esayui1.5.3.0/jquery.easyui.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Content/esayui1.5.3.0/locale/easyui-lang-zh_CN.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Content/esayui1.5.3.0/jquery.easyui.plus.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.cookie.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+    $(function () {
+        $(document).ajaxError(function (event, jqXHR) {
+            if (jqXHR.status === 403 && jqXHR.getResponseHeader('SessionTimeout') === 'true') {
+                window.top.location.href = '/Admin';
+            }
+        });
+    });
+    </script>
+</head>
+
+<body class="easyui-layout">
+    <div style="padding:5px 5px 0px 5px;">
+        @RenderBody()
+    </div>
+</body>
+</html>

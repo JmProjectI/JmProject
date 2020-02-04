@@ -1,0 +1,313 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "待开发票";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script src="@Url.Content("~/Content/My97DatePicker/WdatePicker.js")" type="text/javascript"></script>
+<div class="divtool" style="font-size: 12px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height: 28px;">
+            <td style="min-width: 60px">
+                <span>客户名称</span>
+            </td>
+            <td style="min-width: 200px">
+                <input id="NameS" class="easyui-textbox" style="width: 190px;" />
+            </td>
+            <td style="min-width: 60px">
+                <span>合同产品</span>
+            </td>
+            <td style="min-width: 260px">
+                <input id="dllOrderItem" name="OrderItem" class="easyui-combotree" style="width:250px;"/>
+            </td>
+            <td style="min-width: 60px">
+                <span>所属地区</span>
+            </td>
+            <td style="min-width: 190px">
+                <input id="DiQuS" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                <span>业务员</span>
+            </td>
+            <td style="min-width: 120px">
+                <input id="userS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td>
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="divtool">
+    @Html.ToolButton("btnInvoice", "pic_34", "开票", perm, "Invoice", false)
+    @Html.ToolButton("btnExport", "pic_163", "导出", false)
+    <input id="Pid" name="Pid" type="hidden" />
+</div>
+<table id="grid">
+</table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<div id="modalwindowPro" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<script type="text/javascript">
+    var offwidth = 12;
+    var offheight = 65;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('reload');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+    function frameReturnByMesAlert(mes) {
+        $.show_alert('@Suggestion.Tip', mes);
+    };
+    function ChooseProduct(rows) {
+        $("#modalwindowPro").window('close');
+        window.frames[0].AddRows(rows);
+    };
+    function OpenProduct(TypeId) {
+        $("#modalwindowPro").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/FinProductChoose?TypeId=" + TypeId + "'></iframe>");
+        $("#modalwindowPro").window({ title: '选择商品', width: 1000, height: 610, iconCls: 'icon-add' }).window('open');
+    };
+
+    function BindComb() {
+        //合同产品
+        $('#dllOrderItem').combotree({
+            url: '/Financial/GetTree_FinProductType?all=false',
+            valueField: 'id',
+            textField: 'text',
+            multiple: true,
+            onSelect: function (node) {
+            },
+            onShowPanel: function () {
+                // 动态调整高度  
+                $(this).combotree('panel').height(600);
+            }
+        });
+
+        //地区
+        $("#DiQuS").combobox({
+            url: '/Basic/Get_CombCity?pid=',
+            multiple: true,
+            panelHeight: 600,
+            valueField: 'ID',
+            textField: 'Name',
+            groupField: 'CityPLName'
+        }).combobox('clear');
+
+        //业务员
+        $('#userS').combobox({
+            url: '/System/GetComb_Users?All=true',
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                reload();
+            }
+        });
+    };
+
+    $(function () {
+        BindComb();
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            });
+        });
+        $("#btnInvoice").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                if (row.InvoiceFlagName == "已开票") {
+                    frameReturnByMesAlert(row.Name + " [" + row.ItemNames + "] 已开票完成，无法开票");
+                    return;
+                }
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOrderInvoice?OrderId=" + row.Id + "&AddType=True'></iframe>");
+                $("#modalwindow").window({ title: '开票', width: 680, height: 340, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+
+        //导出        
+        $("#btnExport").click(function () {
+            var dcsql = "/Financial/FinDkSaleOrderExcel?NameS=" + $("#NameS").val()
+                    + "&ItemNames=" + $("#dllOrderItem").combobox("getText") + ""
+                    + "&DiQuS=" + $("#DiQuS").combobox("getValues") + "" + "&userS=" + $("#userS").combobox("getValues") + "";
+            window.location.href = dcsql;
+        });
+    });
+
+    function reload() {
+        var queryData = {
+            NameS: $("#NameS").val(),
+            DiQuS: $("#DiQuS").combobox("getValues") + "",
+            userS: $("#userS").combobox("getValues") + "",
+            ItemNames: $("#dllOrderItem").combobox('getText') + ""
+        };
+        InitGrid(queryData);
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Financial/GetData_FinDkSaleOrder', //invoice
+            title: '合同管理',
+            width: $(window).width() - offwidth,
+            height: $(window).height() - offheight,
+            methord: 'post',
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'Fp',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 15,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            showFooter: true,  //显示合计行
+            queryParams: queryData,
+            frozenColumns: [[
+                { field: 'Id', title: '编号', width: 80, halign: 'center' },
+                { field: 'Fp', title: '推送日期', width: 70, halign: 'center' },
+                { field: 'CityName', title: '地区', width: 80, halign: 'center' },
+                { field: 'Invoice', title: '发票抬头', width: 180, halign: 'center' },
+            ]],
+            columns: [[
+                { field: 'Code', title: '社会统一信用代码', width: 120, halign: 'center' },
+                { field: 'InvoiceFlagName', title: '发票状态', width: 60, halign: 'center' },
+                { field: 'Remake', title: '备注', width: 110, halign: 'center' },
+                { field: 'Key', title: '账户', width: 40, halign: 'center' },
+                { field: 'SuiH', title: '地址、电话', width: 200, halign: 'center' },
+                { field: 'BankCard', title: '开户行及账户', width: 210, halign: 'center' },
+                { field: 'ItemNames', title: '明细项', width: 550, halign: 'center' },
+                { field: 'ItemMoney', title: '合同总金额', width: 70, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Invoicemoney', title: '开票金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Paymentmoney', title: '回款金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Receivablemoney', title: '应开金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return (parseFloat(row.ItemMoney) - parseFloat(row.Invoicemoney)).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'unTc', title: '应收金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return (parseFloat(row.ItemMoney) - parseFloat(row.Paymentmoney)).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'PaymentFlagName', title: '回款状态', width: 60, halign: 'center' },
+                { field: 'OutStockFlagName', title: '出库状态', width: 60, halign: 'center' },
+                { field: 'Tc', title: '提成状态', width: 60, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row.Tc > 0 && row.unTc > 0) {
+                            return "部分提成";
+                        }
+                        else if (row.Tc > 0 && row.unTc == 0) {
+                            return "已提成";
+                        }
+                        else if (row.Tc == 0 && row.unTc > 0) {
+                            return "未提成";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                { field: 'flagDown', title: '授权状态', width: 60, halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value == "") {
+                            return "";
+                        }
+                        else if (value == "0") {
+                            return "未授权";
+                        }
+                        else if (value == "1") {
+                            return "已授权";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                { field: 'ItemCount', title: '合计数量', width: 70, align: 'right', halign: 'center' },
+                { field: 'OSCount', title: '出库数量', width: 70, align: 'right', halign: 'center' },
+                { field: 'CheckFlagName', title: '审核状态', width: 70, halign: 'center' },
+                { field: 'CheckDate', title: '审核日期', width: 100, halign: 'center' },
+                { field: 'Finshed', title: '已完成', width: 70, halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row.Name == "合计") {
+                            return "";
+                        }
+                        else if (value) {
+                            return "已完成";
+                        }
+                        else {
+                            return "未完成";
+                        }
+                    }
+                },
+                { field: 'SalerName', title: '业务员', width: 70, halign: 'center' },
+                { field: 'TaxMoney', title: '合计税金', width: 100, align: 'right', halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'PresentMoney', title: '礼品金额', width: 100, align: 'right', halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'OtherMoney', title: '其他金额', width: 100, align: 'right', halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'ValidMoney', title: '有效回款', width: 100, align: 'right', halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'ZsName', title: '经手人', width: 70, halign: 'center' },
+            ]]
+        });
+    }
+</script>

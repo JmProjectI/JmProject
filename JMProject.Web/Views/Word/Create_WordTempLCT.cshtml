@@ -1,0 +1,272 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.WordTempLCT
+@{
+    ViewBag.Title = "流程图配置";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="ID" name="ID" type="hidden" value="@Model.ID" />
+<div class="divtool bgb">
+    <a id="btnCreate" href="#" style="float:left" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">@Suggestion.Create</a>
+    <a id="btnEdit" href="#" style="float:left" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">@Suggestion.Edit</a>
+    <a id="btnDelete" href="#" style="float:left" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">@Suggestion.Delete</a>
+    <div class="datagrid-btn-separator"></div>
+    <a id="btnSave" href="#" style="float:left" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true">@Suggestion.Save</a>
+    <a id="btnReturn" href="#" style="float:left" class="easyui-linkbutton" data-options="iconCls:'icon-return',plain:true">取消</a>
+    <a id="btnExit" href="#" style="float:left" class="easyui-linkbutton" data-options="iconCls:'icon-back',plain:true">退出</a>
+</div>
+<form id="CreateForm" method="post">
+<table class="form_table">
+    <tbody>
+        <tr>
+            <th>
+                书签名称
+            </th>
+            <td>
+                <input type="text" name="wkey" class="easyui-validatebox" maxlength="30" readonly="readonly" required="true" value="@Model.wkey" />
+            </td>
+            <th>
+                数据库字段
+            </th>
+            <td>
+                <input type="text" name="dkey" class="easyui-validatebox" maxlength="30" required="true" value="@Model.dkey" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                格式化字符串
+            </th>
+            <td colspan="3">
+                <input type="text" name="formate" class="easyui-validatebox" maxlength="60" required="true" style="width:643px" value="@Model.formate" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                字体名称
+            </th>
+            <td>
+                <input type="text" name="fontName" class="easyui-validatebox" maxlength="60" required="true" value="@Model.fontName" />
+            </td>
+            <th>
+                字体大小
+            </th>
+            <td>
+                <input type="text" name="fontSize" class="easyui-validatebox" maxlength="4" required="true" value="@Model.fontSize" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                x坐标
+            </th>
+            <td>
+                <input type="text" name="x" class="easyui-validatebox" maxlength="4" required="true" value="@Model.x" />
+            </td>
+            <th>
+                y坐标
+            </th>
+            <td>
+                <input type="text" name="y" class="easyui-validatebox" maxlength="4" required="true" value="@Model.y" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                宽度
+            </th>
+            <td>
+                <input type="text" name="w" class="easyui-validatebox" maxlength="4" required="true" value="@Model.w" />
+            </td>
+            <th>
+                高度
+            </th>
+            <td>
+                <input type="text" name="h" class="easyui-validatebox" maxlength="4" required="true" value="@Model.h" />
+            </td>
+        </tr>
+        <tr style="height: 10px;">
+            <td colspan="4">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <table id="grid">
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</form>
+<script type="text/javascript">
+    var offwidth = 3;
+    var offheight = 180;
+
+    $(function () {
+
+        $('#btnSave').linkbutton('disable');
+        $('#btnReturn').linkbutton('disable');
+
+        reload();
+
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            });
+        });
+
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($(this).linkbutton('options').disabled == false) {
+                if ($("#CreateForm").form('validate')) {
+                    var postData = {
+                        ID: $("input[name='ID']").val()
+                    , wkey: $("input[name='wkey']").val()
+                    , dkey: $("input[name='dkey']").val()
+                    , formate: $("input[name='formate']").val()
+                    , fontName: $("input[name='fontName']").val()
+                    , fontSize: $("input[name='fontSize']").val()
+                    , x: $("input[name='x']").val()
+                    , y: $("input[name='y']").val()
+                    , w: $("input[name='w']").val()
+                    , h: $("input[name='h']").val()
+                    , AddType: $("#AddType").val()
+                    };
+
+                    $.ajax({
+                        url: "/Word/Create_WordTempLCT",
+                        type: "Post",
+                        data: postData,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.type == 1) {
+                                $.messageBox5s('@Suggestion.Tip', data.message);
+                                $('#btnSave').linkbutton('disable');
+                                $('#btnReturn').linkbutton('disable');
+                                $('#btnCreate').linkbutton('enable');
+                                $('#btnEdit').linkbutton('enable');
+                                reload();
+                            }
+                            else {
+                                $.show_alert('@Suggestion.Tip', data.message);
+                            }
+                        }
+                    });
+                }
+            }
+            return false;
+        });
+
+        /*取消*/
+        $("#btnReturn").click(function () {
+            $('#btnSave').linkbutton('disable');
+            $('#btnReturn').linkbutton('disable');
+            $('#btnCreate').linkbutton('enable');
+            $('#btnEdit').linkbutton('enable');
+        });
+
+        $("#btnExit").click(function () {
+            window.parent.frameReturnByClose();
+        });
+
+        $("#btnCreate").click(function () {
+            if ($(this).linkbutton('options').disabled == false) {
+                $("#AddType").val(true);
+                $('#btnSave').linkbutton('enable');
+                $('#btnReturn').linkbutton('enable');
+                $('#btnCreate').linkbutton('disable');
+                $('#btnEdit').linkbutton('disable');
+            }
+        });
+        $("#btnEdit").click(function () {
+            if ($(this).linkbutton('options').disabled == false) {
+                var row = $('#grid').datagrid('getSelected');
+                if (row != null) {
+                    $('#btnSave').linkbutton('enable');
+                    $('#btnReturn').linkbutton('enable');
+                    $('#btnCreate').linkbutton('disable');
+                    $('#btnEdit').linkbutton('disable');
+
+                    $("#AddType").val(false);
+                    $("input[name='ID']").val(row.ID)
+                    $("input[name='wkey']").val(row.wkey)
+                    $("input[name='dkey']").val(row.dkey)
+                    $("input[name='formate']").val(row.formate)
+                    $("input[name='fontName']").val(row.fontName)
+                    $("input[name='fontSize']").val(row.fontSize)
+                    $("input[name='x']").val(row.x)
+                    $("input[name='y']").val(row.y)
+                    $("input[name='w']").val(row.w)
+                    $("input[name='h']").val(row.h)
+
+                } else { $.show_alert('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+            }
+        });
+        $("#btnDelete").click(function () {
+            if ($(this).linkbutton('options').disabled == false) {
+                var row = $('#grid').datagrid('getSelected');
+                if (row != null) {
+                    $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                        if (r) {
+                            $.post("/Word/Delete_WordTempLCT?ID=" + row.ID, function (data) {
+                                if (data.type == 1) {
+                                    reload();
+                                }
+                                $.messageBox5s('@Suggestion.Tip', data.message);
+                            }, "json");
+
+                        }
+                    });
+                } else { $.show_alert('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+            }
+        });
+    });
+
+    function reload() {
+        var queryData = {
+            wkey: $("input[name='wkey']").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Word/GetData_WordTempLCT',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - offheight,
+            fitColumns: false,
+            idField: 'ID',
+            sortName: 'ID',
+            sortOrder: 'asc',
+            pagination: true,
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'ID', title: 'ID', width: 100, halign: 'center', hidden: 'true' },
+                { field: 'wkey', title: '书签名称', width: 150, halign: 'center' },
+                { field: 'dkey', title: '数据库字段', width: 100, halign: 'center' },
+                { field: 'formate', title: '格式化字符串', width: 200, halign: 'center' },
+                { field: 'fontName', title: '字体名称', width: 60, halign: 'center' },
+                { field: 'fontSize', title: '字体大小', width: 60, halign: 'center' },
+                { field: 'x', title: 'x坐标', width: 60, halign: 'center' },
+                { field: 'y', title: 'y坐标', width: 60, halign: 'center' },
+                { field: 'w', title: '宽度', width: 60, halign: 'center' },
+                { field: 'h', title: '高度', width: 60, halign: 'center' },
+            ]]
+        });
+    }
+
+</script>

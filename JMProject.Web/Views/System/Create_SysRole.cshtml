@@ -1,0 +1,85 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.SysRole
+@{
+    ViewBag.Title = "角色维护";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("input[name='Id']").val()
+                    , Name: $("input[name='Name']").val()
+                    , Remake: $("input[name='Remake']").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/System/Create_SysRole",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save,false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return,false)
+</div>
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    编号
+                </th>
+                <td>
+                    <input type="text" name="Id" class="easyui-validatebox" maxlength="30" required="true" value="@Model.Id" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    名称
+                </th>
+                <td>
+                    <input type="text" name="Name" class="easyui-validatebox" maxlength="50" required="true" value="@Model.Name" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    描述
+                </th>
+                <td>
+                    <input type="text" name="Remake" class="easyui-validatebox" maxlength="200" value="@Model.Remake" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

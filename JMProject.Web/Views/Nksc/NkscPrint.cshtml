@@ -1,0 +1,1182 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>打印信息</title>
+    <script src="@Url.Content("~/Content/esayui1.5.3.0/jquery.min.js")" type="text/javascript"></script>
+    <link href="@Url.Content("~/Content/esayuiDemo.css")" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        *
+        {
+            font-size: 12px;
+        }
+        p
+        {
+            line-height: 18px;
+            height: auto;
+            margin: 2px;
+            color: #2E8B57;
+            font-size:13px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            window.print();
+        });
+    </script>
+</head>
+<body>
+<center>
+    <table class="tab_form" cellpadding="0" cellspacing="0" style="width:700px;min-width:700px;max-width:700px;">
+        <tr>
+            <td class="dec" style="">
+                内控手册颁发日期:
+            </td>
+            <td class="con" style="">
+                <p>@Model.NkscModel.dwjc</p>
+            </td>
+            <td class="dec" style="">
+                单位全称
+            </td>
+            <td class="con" style="">
+                <p>@Model.NkscModel.dwqc</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                党组织机构名称
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.dzzjgmc</p>
+            </td>
+            <td class="dec">
+                本手册适用范围
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.syfw0415</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                单位简介
+            </td>
+            <td class="con" colspan="3">
+                @foreach (string itemstr in Model.NkscModel.dwjj.Split('\n'))
+                {
+                    <p>@itemstr</p>   
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                手册编制牵头部门
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.scqtbm</p>
+            </td>
+            <td class="dec">
+                手册编制协作部门
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.scxzbm</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                正职职务名称
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zzzwmc</p>
+            </td>
+            <td class="dec">
+                正职领导姓名
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.ldzzmc</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                <span id="spanzzzwDY">@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) || Model.NkscModel.dzzjgmc == "" ? "" : string.Format("是否{0}成员", Model.NkscModel.dzzjgmc))</span>
+            </td>
+            <td class="con" colspan="3">
+                <div id="divzzzwDY" style="@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) || Model.NkscModel.dzzjgmc == "" ? "display:none;" : "")">
+                    <p>
+                        @(Model.NkscModel.zzzwDY == "1" ? "是" : "否")</p>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                正职领导分管科室
+            </td>
+            <td class="con" colspan="3" >
+                <p>@Model.NkscModel.ldzzfg</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                副职职务名称1
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.fzzwmc1</p>
+            </td>
+            <td class="dec">
+                副职领导姓名1
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.ldfzmc1</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                <span id="spanfzzwDY">@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) || Model.NkscModel.dzzjgmc == "" ? "" : string.Format("是否{0}成员", Model.NkscModel.dzzjgmc))</span>
+            </td>
+            <td class="con" colspan="3">
+                <div id="divfzzwDY" style="@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) || Model.NkscModel.dzzjgmc == "" ? "display:none;" : "")">
+                    <p>
+                        @(Model.NkscModel.fzzwDY == "1" ? "是" : "否")</p>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                副职领导1分管科室
+            </td>
+            <td class="con" colspan="3" >
+                <p>@Model.NkscModel.ldfzfg1</p>
+            </td>
+        </tr>
+        @foreach (var item in Model.Nksc_fzModel)
+        {
+            <tr>
+                <td class="dec">
+                    @string.Format("副职职务名称{0}", item.sort)
+                </td>
+                <td class="con">
+                    <p>@item.fzzwmc</p>
+                </td>
+                <td class="dec">
+                    @string.Format("副职领导姓名{0}", item.sort)
+                </td>
+                <td class="con">
+                    <p>@item.ldfzmc</p>
+                </td>
+            </tr> 
+            <tr>
+                <td class="dec">
+                    <span id="@string.Format("spanfzzwDY{0}", item.sort)">@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) || Model.NkscModel.dzzjgmc == "" ? "" : string.Format("是否{0}成员", Model.NkscModel.dzzjgmc))</span>
+                </td>
+                <td class="con"  colspan="3">
+                    <div id="@string.Format("divfzzwDY{0}", item.sort)" style="@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) || Model.NkscModel.dzzjgmc == "" ? "display:none;" : "")">
+                        <p>@(item.fzzwDY == "1" ? "是" : "否")</p>
+                    </div>
+                </td>
+            </tr> 
+            <tr>
+                <td class="dec">
+                    @string.Format("副职领导{0}分管科室", item.sort)
+                </td>
+                <td class="con" colspan="3" >
+                    <p>@item.ldfzfg</p>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td class="dec">
+                内部控制领导小组：成员信息
+            </td>
+            <td class="con" colspan="3" >
+                <p>@Model.NkscModel.nkldxzcy</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                内部控制领导小组：组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.nkldxzzz</p>
+            </td>
+            <td class="dec">
+                内部控制领导小组：副组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.nkldxzfzz</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                内部控制工作小组：牵头科室
+            </td>
+            <td class="con" colspan="3" >
+                <p>@Model.NkscModel.nbkzgzxzzzqt01</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                内部控制工作小组：成员信息
+            </td>
+            <td class="con" colspan="3" >
+                <p>@Model.NkscModel.nbkzgzxzzzcy01</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                内部控制工作小组：组长
+            </td>
+            <td class="con" colspan="3" >
+                <p>@Model.NkscModel.nbkzgzxzzz01</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                内部控制工作小组：副组长
+            </td>
+            <td class="con" colspan="3" >
+                <p>@Model.NkscModel.nbkzgzxzfzz01</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                风险评估工作小组：牵头科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.fxpgxzqtks</p>
+            </td>
+            <td class="dec">
+                风险评估工作小组：成员信息
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.fxpgxzcy</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                风险评估工作小组：组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.fxpgxzzz</p>
+            </td>
+            <td class="dec">
+                风险评估工作小组：副组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.fxpgxzfzz</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                预算管理领导小组：牵头科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.ysldxzqdks</p>
+            </td>
+            <td class="dec">
+                预算管理领导小组：成员信息
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.ysldxzcy</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                预算管理领导小组：组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.ysldxzzz</p>
+            </td>
+            <td class="dec">
+                预算管理领导小组：副组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.ysldxzfzz</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                政府采购领导小组：牵头科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zfcgxzqdks</p>
+            </td>
+            <td class="dec">
+                政府采购领导小组：成员信息
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zfcgxzcy</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                政府采购领导小组：组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zfcgxzzz</p>
+            </td>
+            <td class="dec">
+                政府采购领导小组：副组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zfcgxzfzz</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                国有资产管理小组：牵头科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gyzcxzqdks</p>
+            </td>
+            <td class="dec">
+                国有资产管理小组：成员信息
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gyzcxzcy</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                国有资产管理小组：组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gyzcxzzz</p>
+            </td>
+            <td class="dec">
+                国有资产管理小组：副组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gyzcxzfzz</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                监督检查工作小组：牵头科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.jdjcxzqdks</p>
+            </td>
+            <td class="dec">
+                监督检查工作小组：成员信息
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.jdjcxzcy</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                监督检查工作小组：组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.jdjcxzzz</p>
+            </td>
+            <td class="dec">
+                监督检查工作小组：副组长
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.jdjcxzfzz</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                内部审计负责科室名称
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.nbsjks</p>
+            </td>
+            <td class="dec">
+                重大决策实施后评价负责科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zdjcsshpjks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                不相容岗位分离制度解释科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.bxrgwzdks</p>
+            </td>
+            <td class="dec">
+                编制年度岗位轮岗计划的科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.bzndlgjhks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                不能轮岗的岗位包括哪些?
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.bnlgdgwmc</p>
+            </td>
+            <td class="dec">
+                重大事项内部报告的归口管理科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zdbgdgkks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                政务信息公开制度牵头科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zwxxgkks</p>
+            </td>
+            <td class="dec">
+                信息公开责任追究归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.xxgkzrjjks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                负责单位信息管理系统的科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.fzxxglxtks</p>
+            </td>
+            <td class="dec">
+                新闻宣传工作牵头管理科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.xxxcgzqtks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                考勤管理的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.ksglks</p>
+            </td>
+            <td class="dec">
+                廉政诫勉约谈的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.lzjmytgkks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                本单位收入包括哪些内容
+            </td>
+            <td class="con">
+                <p>@(Model.NkscModel.bdwsrbk == "财政拨款收入、非税收入、其他收入" ? "行政单位" : "事业单位")</p>
+            </td>
+            <td class="con" colspan="2">
+                <p>@Model.NkscModel.bdwsrbk</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                收入业务的归口管理部门
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.srywgkks</p>
+            </td>
+            <td class="dec">
+                经费支出的归口管理部门
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.jfzcgkks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                政府采购资料的保管归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zfcgzlgkks</p>
+            </td>
+            <td class="dec">
+                人事管理制度的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.rsglzdgkks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                人事管理的回避规定监督归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.rsglhbks</p>
+            </td>
+            <td class="dec">
+                年终考核,开展民主评议的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.nzkhgkks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                合同管理的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.htgkks1</p>
+            </td>
+            <td class="dec">
+                重大事项报告存档科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.zdbgcdks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                公文管理归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gwglgkks</p>
+            </td>
+            <td class="dec">
+                固定资产处置的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gdzccz</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                固定资产调拨的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gdzcdb</p>
+            </td>
+            <td class="dec">
+                固定资产购置的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gdzcgz</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                固定资产清查的归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gdzcqc</p>
+            </td>
+            <td class="dec">
+                办公用品管理归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.bgypglgkks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                印章管理归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.yzglgkks</p>
+            </td>
+            <td class="dec">
+                是否有公务卡制度
+            </td>
+            <td class="con">
+                <p>@(Model.NkscModel.gwkzd == "1" ? "有" : "无")</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                公务卡制度管理归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gwkglks</p>
+            </td>
+            <td class="dec">
+                公务卡监督执行归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.gwkjdks</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                是否有机房
+            </td>
+            <td class="con">
+                <p>@(Model.NkscModel.EngineRoom == "1" ? "有" : "无")</p>
+            </td>
+            <td class="dec">
+                是否需要财政专项资金管理办法
+            </td>
+            <td class="con">
+                <p>@(Model.NkscModel.zxzjgl == "1" ? "有" : "无")</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                财政专项资金归口科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.czzxzjgkks</p>
+            </td>
+            <td class="dec">
+                建设项目归口主管科室
+            </td>
+            <td class="con">
+                <p>@Model.NkscModel.jsxmgkks01</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                建设项目绩效评价管理科室
+            </td>
+            <td class="con" colspan="3">
+                <p>@Model.NkscModel.jsxmjxpjks01</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                本单位包含业务内容
+            </td>
+            <td class="con" colspan="3" >
+                <ul class="ul_check" style="width:550px">
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('1') == -1)
+                        {
+                        }
+                        else
+                        { 
+                            <p>
+                                预算业务(含预算编制、执行、决算)</p>
+                        }
+                    </li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('2') == -1)
+                        {
+                        }
+                        else
+                        {
+                            <p>
+                                收入业务</p>
+                        }
+                    </li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('3') == -1)
+                        {
+                        }
+                        else
+                        { 
+                            <p>
+                                支出业务</p>
+                        }</li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('4') == -1)
+                        {
+                        }
+                        else
+                        { 
+                            <p>
+                                票据业务</p>
+                        }</li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('5') == -1)
+                        {
+                        }
+                        else
+                        { 
+                            <p>
+                                政府采购业务</p>
+                        }</li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('6') == -1)
+                        {
+                        }
+                        else
+                        { 
+                            <p>
+                                资产业务</p>
+                        }</li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('7') == -1)
+                        {
+                        }
+                        else
+                        { 
+                            <p>
+                                建设项目业务</p>
+                        }</li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('8') == -1)
+                        {
+                        }
+                        else
+                        { 
+                            <p>
+                                合同管理业务</p>
+                        }</li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('9') == -1)
+                        {
+                        }
+                        else
+                        { 
+                            <p>
+                                印章管理业务</p>
+                        }</li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('a') == -1)
+                        {
+                        }
+                        else
+                        {
+                            <p>
+                                收费业务(含收费、非税收入)</p>
+                        }
+                    </li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('b') == -1)
+                        {
+                        }
+                        else
+                        {
+                            <p>
+                                债务业务</p>
+                        }
+                    </li>
+                    <li>
+                        @if (Model.NkscModel.bhyw == null || Model.NkscModel.bhyw.IndexOf('c') == -1)
+                        {
+                        }
+                        else
+                        {
+                            <p>
+                                对外投资业务</p>
+                        }
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                业务梳理制度的包括<br />
+                业务流程名称
+            </td>
+            <td class="con" colspan="3" >
+                <p>@Model.NkscModel.ywslzdmc</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="con" colspan="4" >
+                <p>
+                    上下班时间</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                @(string.IsNullOrEmpty(Model.NkscModel.kqsjswSd) ? "上午" : "夏令时：上午")
+            </td>
+            <td class="con">
+                <p>@(Model.NkscModel.kqsjswS + " 至 " + @Model.NkscModel.kqsjswE)</p>
+            </td>
+            <td class="dec">
+                @(string.IsNullOrEmpty(Model.NkscModel.kqsjswSd) ? "下午" : "夏令时：下午")
+            </td>
+            <td class="con" colspan="2">
+                <p>@(Model.NkscModel.kqsjxwS + " 至 " + @Model.NkscModel.kqsjxwE)</p>
+            </td>
+        </tr>
+        <tr style="@(string.IsNullOrEmpty(Model.NkscModel.kqsjswSd) ? "display:none;" : "")">
+            <td class="dec">
+                @(string.IsNullOrEmpty(Model.NkscModel.kqsjswSd) ? "上午" : "冬令时：上午")
+            </td>
+            <td class="con">
+                <p>@(Model.NkscModel.kqsjswSd + " 至 " + @Model.NkscModel.kqsjswEd)</p>
+            </td>
+            <td class="dec">
+                @(string.IsNullOrEmpty(Model.NkscModel.kqsjswSd) ? "下午" : "冬令时：下午")
+            </td>
+            <td class="con" colspan="2">
+                <p>@(Model.NkscModel.kqsjxwSd + " 至 " + @Model.NkscModel.kqsjxwEd)</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                采购合同授权审批设置
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radio_cghtsq == "1" ? "采购合同需要金额授权" : Model.NkscModel.Radio_cghtsq == "0" ? "采购合同不需要具体金额的授权" : "无采购业务")</p>
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_cghtsq == "0" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_cghtsqModel.Count > 0)
+                { 
+                    <p>
+                        采购合同授权审批需经 @Model.Nksc_cghtsqModel[0].jkspr 审核审批。</p>
+                }
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_cghtsq == "1" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_cghtsqModel.Count > 0)
+                { 
+                    <table cellpadding="0" cellspacing="0">
+                        @foreach (JMProject.Model.Nksc_cghtsq item in Model.Nksc_cghtsqModel)
+                        {
+                            <tr>
+                                <td>
+                                    <p>
+                                        采购合同授权审批金额在 @item.jkmoney 元 @item.jktype 的，由 @item.jkspr 审核审批。</p>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                单位自行采购授权审批设置
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radio_zxcgsq == "1" ? "单位自行采购需要金额授权" : Model.NkscModel.Radio_zxcgsq == "0" ? "单位自行采购不需要具体金额的授权" : "无采购业务")</p>
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_zxcgsq == "0" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_ZxcghtsqModel.Count > 0)
+                { 
+                    <p>
+                        单位自行采购授权审批需经 @Model.Nksc_ZxcghtsqModel[0].jkspr 审核审批。</p>
+                }
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_zxcgsq == "1" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_ZxcghtsqModel.Count > 0)
+                { 
+                    <table cellpadding="0" cellspacing="0">
+                        @foreach (JMProject.Model.Nksc_cghtsq item in Model.Nksc_ZxcghtsqModel)
+                        {
+                            <tr>
+                                <td>
+                                    <p>
+                                        单位自行采购授权审批金额在 @item.jkmoney 元 @item.jktype 的，由 @item.jkspr 审核审批。</p>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                预算内资金支付审批权限
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radio_zjzf == "1" ? "需要金额授权审批流程" : "不需要具体金额的授权审批流程")</p>
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_zjzf == "0" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_ZcywModel.Count > 0)
+                { 
+                    <p>
+                        预算内资金支付业务需经 @Model.Nksc_ZcywModel[0].zcspr 审核审批。</p>
+                }
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_zjzf == "1" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_ZcywModel.Count > 0)
+                { 
+                    <table cellpadding="0" cellspacing="0">
+                        @foreach (JMProject.Model.Nksc_Zcyw item in Model.Nksc_ZcywModel)
+                        {
+                            <tr>
+                                <td>
+                                    <p>
+                                        预算内资金支付单笔支出金额在 @item.zcmoney 元 @item.zctype 的，由 @item.zcspr 审核审批。</p>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                财政专项资金支付审批 
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radio_czzxzj == "1" ? "需要金额授权审批流程" : Model.NkscModel.Radio_czzxzj == "0" ? "不需要具体金额的授权审批流程" : "无财政专项资金业务")</p>
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_czzxzj == "0" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_CzZcywModel.Count > 0)
+                { 
+                    <p>
+                        财政专项资金支付业务需经 @Model.Nksc_CzZcywModel[0].zcspr 审核审批。</p>
+                }
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_czzxzj == "1" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_CzZcywModel.Count > 0)
+                { 
+                    <table cellpadding="0" cellspacing="0">
+                        @foreach (JMProject.Model.Nksc_Zcyw item in Model.Nksc_CzZcywModel)
+                        {
+                            <tr>
+                                <td>
+                                    <p>
+                                        财政专项资金支付单笔支出金额在 @item.zcmoney 元 @item.zctype 的，由 @item.zcspr 审核审批。</p>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                非财政专项资金支付审批
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radio_fczzxzj == "1" ? "需要金额授权审批流程" : Model.NkscModel.Radio_fczzxzj == "0" ? "不需要具体金额的授权审批流程" : "无非财政专项资金业务")</p>
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_fczzxzj == "0" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_FczZcywModel.Count > 0)
+                { 
+                    <p>
+                        非财政专项资金支付业务需经 @Model.Nksc_FczZcywModel[0].zcspr 审核审批。</p>
+                }
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_fczzxzj == "1" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_FczZcywModel.Count > 0)
+                { 
+                    <table cellpadding="0" cellspacing="0">
+                        @foreach (JMProject.Model.Nksc_Zcyw item in Model.Nksc_FczZcywModel)
+                        {
+                            <tr>
+                                <td>
+                                    <p>
+                                        非财政专项资金支付单笔支出金额在 @item.zcmoney 元 @item.zctype 的，由 @item.zcspr 审核审批。</p>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                借款审批权限
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radio_jksh == "1" ? "借款需要金额授权" : Model.NkscModel.Radio_jksh == "0" ? "借款不需要具体金额的授权" : "无借款业务")</p>
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_jksh == "0" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_JkywModel.Count > 0)
+                { 
+                    <p>
+                        借款业务需经 @Model.Nksc_JkywModel[0].jkspr 审核审批。</p>
+                }
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_jksh == "1" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_JkywModel.Count > 0)
+                { 
+                    <table cellpadding="0" cellspacing="0">
+                        @foreach (JMProject.Model.Nksc_Jkyw item in Model.Nksc_JkywModel)
+                        {
+                            <tr>
+                                <td>
+                                    <p>
+                                        金额在 @item.jkmoney 元 @item.jktype 的，由 @item.jkspr 审核审批。</p>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                报销审批权限
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radio_bxsh == "1" ? "报销需要金额授权" : "报销不需要具体金额的授权")</p>
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_bxsh == "0" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_BxywModel.Count > 0)
+                { 
+                    <p>
+                        报销业务需经 @Model.Nksc_BxywModel[0].bxspr 审核审批。</p>
+                }
+            </td>
+        </tr>
+        <tr style="@(Model.NkscModel.Radio_bxsh == "1" ? "" : "display:none;")">
+            <td class="con" colspan="4" >
+                @if (Model.Nksc_BxywModel.Count > 0)
+                { 
+                    <table cellpadding="0" cellspacing="0">
+                        @foreach (JMProject.Model.Nksc_Bxyw item in Model.Nksc_BxywModel)
+                        {
+                            <tr>
+                                <td>
+                                    <p>
+                                        报销金额在 @item.bxmoney 元 @item.bxtype 的，由 @item.bxspr 审核审批。</p>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                本单位现金支付授权范围
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.jine041509 == "0.00" ? "无零星支出业务" : "金额为" + Model.NkscModel.jine041509 + "元以下的零星支出。")</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="con" colspan="4" >
+                <p>
+                    固定资产单位价值在 @Model.NkscModel.jine0407 元以上的一般设备；</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="con" colspan="4" >
+                <p>
+                    固定资产单位价值在 @Model.NkscModel.jine0408 元以上的专用设备；</p>
+            </td>
+        </tr>
+        @foreach (var item in Model.Nksc_ksModel)
+        {                            
+            <tr class="kstr">
+                <td class="dec">
+                    科室名称
+                </td>
+                <td class="con" colspan="3" >
+                    <p>@item.kszn.ksmc</p>
+                </td>
+            </tr>
+            <tr class="kstr">
+                <td class="dec">
+                    科室职能
+                </td>
+                <td class="con" colspan="3" >
+                    @foreach (string itemstr in item.kszn.kszn.Split('\n'))
+                    {
+                        <p>@itemstr</p>   
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" >
+                    <table class="tab_form" cellpadding="0" cellspacing="0" style="width:695px;min-width:695px;max-width:695px;">
+                        @foreach (var ksgw in item.ksgwzr)
+                        {
+                            <tr>
+                                <td class="dec">
+                                    科室岗位
+                                </td>
+                                <td class="con">
+                                    <p>@ksgw.ksgw</p>
+                                </td>
+                                <td class="dec">
+                                    岗位责任
+                                </td>
+                                <td class="con">
+                                    @foreach (string itemstr in ksgw.ksgwzr.Split('\n'))
+                                    {
+                                        <p>@itemstr</p>   
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td class="dec">
+                差旅费制度
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radioclf == "2" ? "有（本单位无该制度文件，就按省直机关标准执行）" : (Model.NkscModel.Radioclf == "1" ? "有（必须上传本单位制度附件）" : "无该制度"))</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                会议费制度
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radiohyf == "2" ? "有（本单位无该制度文件，就按省直机关标准执行）" : (Model.NkscModel.Radiohyf == "1" ? "有（必须上传本单位制度附件）" : "无该制度"))</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                培训费制度
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radiopxf == "2" ? "有（本单位无该制度文件，就按省直机关标准执行）" : (Model.NkscModel.Radiopxf == "1" ? "有（必须上传本单位制度附件）" : "无该制度"))</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                公务招待制度
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radiogwzdf == "2" ? "有（本单位无该制度文件，就按省直机关标准执行）" : (Model.NkscModel.Radiogwzdf == "1" ? "有（必须上传本单位制度附件）" : "无该制度"))</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                是否报账制(没有会计<br/>出纳，只有报账员)
+            </td>
+            <td class="con" colspan="3" >
+                <p>@(Model.NkscModel.Radiobzz == "1" ? "是（必须上传本单位制度附件）" : "否")</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="dec">
+                上传附件
+            </td>
+            <td class="con" colspan="3" >
+                <ul style="list-style: none; padding: 0px;">
+                    @if (Model.NkscModel.yhscfj != null)
+                    {
+                        for (int i = 0; i < Model.NkscModel.yhscfj.Split('、').Length; i++)
+                        {
+                            string filename = Model.NkscModel.yhscfj.Split('、')[i];
+                            if (!string.IsNullOrEmpty(filename))
+                            {
+                        <li>
+                            <p>@filename</p>
+                        </li>
+                            }
+                        }
+                    }
+                </ul>
+            </td>
+        </tr>
+    </table>
+    <!--endprint-->
+</center>
+</body>
+</html>

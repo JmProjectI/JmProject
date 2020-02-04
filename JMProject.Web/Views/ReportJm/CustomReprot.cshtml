@@ -1,0 +1,192 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "报表管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script src="@Url.Content("~/Content/My97DatePicker/WdatePicker.js")" type="text/javascript"></script>
+<div class="divtool" style="font-size: 12px; height: 60px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height: 28px;">
+            <td style="min-width: 60px">
+                <span>合同产品</span>
+            </td>
+            <td style="min-width: 260px">
+                <input id="dllOrderItem" name="OrderItem" class="easyui-combotree" style="width: 250px;" />
+            </td>
+            <td style="min-width: 60px">
+                <span>所属地区</span>
+            </td>
+            <td style="min-width: 210px">
+                <input id="DiQuS" class="easyui-combobox" style="width: 190px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                <span>业务员</span>
+            </td>
+            <td style="min-width: 200px">
+                <input id="userS" class="easyui-combobox" style="width: 160px;" editable="false" />
+            </td>            
+            <td style="min-width: 60px">
+                <span>产品组合</span>
+            </td>
+            <td style="min-width: 200px">
+                <input id="Radiozh1" name="Radiozh" type="radio" checked="checked" value="or" /><label for="Radiozh1">或</label>
+                <input id="Radiozh2" name="Radiozh" type="radio" value="and" /><label for="Radiozh2">且</label>
+            </td>
+        </tr>
+        <tr style="height: 28px;">
+            <td>
+                <span>合同日期</span>
+            </td>
+            <td>
+                <input id="txtOrderDateS" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                    style="font-size: 12px; width: 112px;" />
+                <span>-</span>
+                <input id="txtOrderDateE" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                    style="font-size: 12px; width: 112px;" />
+            </td>
+            <td>
+                <span>客户名称</span>
+            </td>
+            <td>
+                <input id="NameS" class="easyui-textbox" style="width: 190px;" />
+            </td>
+            <td>
+                <span>合计金额</span>
+            </td>
+            <td>
+                <input id="txtItemMoneyS" type="text" name="ItemMoney" class="easyui-validatebox"
+                    style="font-size: 12px; width: 78px;" />
+                <span>-</span>
+                <input id="txtItemMoneyE" type="text" name="ItemMoney" class="easyui-validatebox"
+                    style="font-size: 12px; width: 78px;" />
+            </td>
+            <td>
+            </td>
+            <td>
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<table id="grid"></table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false"></div>
+<script type="text/javascript">
+    var offwidth = 10;
+    var offheight = 65;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('load');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+
+    function BindComb() {
+
+        //合同产品
+        $('#dllOrderItem').combotree({
+            url: '/Financial/GetTree_FinProductType?all=false',
+            valueField: 'id',
+            textField: 'text',
+            multiple: true,
+            onSelect: function (node) {
+            },
+            onShowPanel: function () {
+                // 动态调整高度  
+                $(this).combotree('panel').height(600);
+            }
+        });
+
+        //地区
+        $("#DiQuS").combobox({
+            url: '/Basic/Get_CombCity?pid=',
+            multiple: true,
+            panelHeight: 600,
+            valueField: 'ID',
+            textField: 'Name',
+            groupField: 'CityPLName'
+        }).combobox('clear');
+
+        //业务员
+        $('#userS').combobox({
+            url: '/System/GetComb_Users?All=true',
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                if ($("#hiduserS").val().length > 0) {
+                    $("#userS").combobox('setValue', $("#hiduserS").val());
+                    $("#userS").combobox("disable");
+                }
+                reload();
+            }
+        });
+    }
+
+    $(function () {
+        BindComb();
+        reload()
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            });
+        });
+
+    });
+
+    function reload() {
+        var queryData = {
+            NameS: $("#NameS").val(),
+            OrderDateS: $("#txtOrderDateS").val(),
+            OrderDateE: $("#txtOrderDateE").val(),
+            DiQuS: $("#DiQuS").combobox("getValues") + "",
+            userS: $("#userS").combobox("getValues") + "",
+            ItemNames: $("#dllOrderItem").combobox('getText') + "",
+            ItemMoneyS: $("#txtItemMoneyS").val(),
+            ItemMoneyE: $("#txtItemMoneyE").val(),
+            Radiobzh: $("input[name='Radiozh']:checked").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/ReportJm/GetData_CustomReprot',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - offheight,
+            fitColumns: false,
+            idField: 'Row',
+            sortName: 'SaleCustomId',
+            sortOrder: 'asc',
+            pagination: true,
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'Name', title: '单位全称', width: 200, halign: 'center', sortable: true },
+                { field: 'ItemMoney', title: '总消费金额', width: 120, halign: 'center', sortable: true },
+                { field: 'Invoicemoney', title: '总开票金额', width: 120, halign: 'center' },
+                { field: 'Paymentmoney', title: '总回款金额', width: 120, halign: 'center' },
+                { field: 'ItemNames', title: '购买项目', width: 400, halign: 'center' },
+            ]]
+        });
+    }
+</script>

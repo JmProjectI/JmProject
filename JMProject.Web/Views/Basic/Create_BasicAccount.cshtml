@@ -1,0 +1,105 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.BasicAccount
+@{
+    ViewBag.Title = "账户管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("input[name='Id']").val()
+                    , Name: $("input[name='Name']").val()
+                    , Key: $("input[name='Key']").val()
+                    , Bank: $("input[name='Bank']").val()
+                    , BankNum: $("input[name='BankNum']").val()
+                    , SNum: $("input[name='SNum']").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Basic/Create_BasicAccount",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    名称
+                </th>
+                <td>
+                    <input type="text" name="Name" class="easyui-validatebox" maxlength="60" required="true" value="@Model.Name" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    简写
+                </th>
+                <td>
+                    <input type="text" name="Key" class="easyui-validatebox" maxlength="20" required="true" value="@Model.Key" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    开户行
+                </th>
+                <td>
+                    <input type="text" name="Bank" class="easyui-validatebox" maxlength="60" required="true" value="@Model.Bank" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    账号
+                </th>
+                <td>
+                    <input type="text" name="BankNum" class="easyui-validatebox" maxlength="50" required="true" value="@Model.BankNum" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    税号
+                </th>
+                <td>
+                    <input type="text" name="SNum" class="easyui-validatebox" maxlength="50" required="true" value="@Model.SNum" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

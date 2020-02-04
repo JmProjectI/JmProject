@@ -1,0 +1,86 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.BasicProvince
+@{
+    ViewBag.Title = "";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<style type="text/css">
+    .form_table th
+    {
+        text-align: left;
+        text-indent: 0.5em;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Pid: $("#Pid").val()
+                    , Name: $("input[name='Name']").val()
+                    , beizhu: $("textarea[name='beizhu']").val()
+                };
+
+                $.ajax({
+                    url: "/Basic/Create_BasicProvince",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<input id="Pid" name="Pid" type="hidden" value="@Model.Pid" />
+<form id="CreateForm" method="post">
+<table class="form_table">
+    <tbody>
+        <tr>
+            <th>
+                名称
+            </th>
+            <td colspan="5">
+                <input type="text" name="Name" class="easyui-validatebox" maxlength="30" required="true" style="width:350px;" value="@Model.Name" />
+            </td>
+            <td style="width:95px;"></td>
+        </tr>
+        <tr>
+            <th>
+                备注
+            </th>
+            <td colspan="5">
+                <textarea id="beizhu" name="beizhu" rows="3" class="easyui-validatebox" style="height: 60px;
+                    font-size: 14px; width: 350px;" maxlength="500" >@Model.beizhu</textarea>
+            </td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+</form>

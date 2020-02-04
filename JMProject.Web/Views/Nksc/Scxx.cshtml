@@ -1,0 +1,2217 @@
+﻿@model JMProject.Model.View.View_Full
+@{
+    ViewBag.Title = "手册信息";
+}
+<link href="@Url.Content("~/webuploader-0.1.5/webuploader.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Content/smart_wizard_vertical.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.smartWizard.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/webuploader-0.1.5/webuploader.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/My97DatePicker/WdatePicker.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/Scxx.js?v=190520")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/Scxx_zjsp.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/Scxx_ksgw.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/Scxx_fj.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/Scxx_qlqd.js?v=190508")" type="text/javascript"></script>
+<input id="Hiddenid" name="id" type="hidden" value="@Model.NkscModel.id" /><!--手册编号-->
+<input id="HiddenFlag" name="Flag" type="hidden" value="@Model.NkscModel.flag" /><!--手册状态-->
+<input id="HiddenCustomerID" name="CustomerID" type="hidden" value="@Model.NkscModel.CustomerID" /><!--客户编号-->
+<input id="HiddenManager" name="Manager" type="hidden" value="@ViewBag.Manager" /><!--管理员访问-->
+<!-- Start 修改金额审批 对话框 -->
+<div id="dlgZJ" modal="true" class="easyui-dialog" style="width: 370px; height: 200px;
+    padding: 10px;" closed="true" buttons="#dlg-buttons-ZJ">
+    金额在
+    <input id="txtjineT" name="jineT" class="easyui-numberbox" style="width: 100px;"
+        min="0" max="100000000" precision="2" />
+    元
+    <select class="easyui-combobox" name="jineC" id="dlljineC" editable="false" style="width: 100px;"
+        data-options="value:''">
+        <option value="以下">以下</option>
+        <option value="以上">以上</option>
+    </select>
+</div>
+<div id="dlg-buttons-ZJ">
+    <a href="javascript:void(0)" class="easyui-linkbutton" style="width: 60px" onclick="saveZJ()"
+        iconcls="icon-save">确定</a> <a href="javascript:void(0)" class="easyui-linkbutton"
+            style="width: 60px" onclick="javascript:$('#dlgZJ').dialog('close')" iconcls="icon-cancel">
+            取消</a>
+</div>
+<!-- End 修改金额审批 对话框 -->
+<!-- Start 选择 科室 对话框 -->
+<div id="dlgKS" modal="true" class="easyui-dialog" style="width: 500px; height: 400px;"
+    closed="true" buttons="#dlg-buttons-KS">
+    <input id="HiddenKS" name="HiddenKS" type="hidden" value="" />
+    <ul id="ulKS" style="list-style-type: none; padding: 5px;">
+    </ul>
+    <ul id="ulZW" style="list-style-type: none; padding: 5px;">
+    </ul>
+</div>
+<div id="dlg-buttons-KS">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="chooseKS()" iconcls="icon-save">
+        选择</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="closeKS()"
+            iconcls="icon-cancel">取消</a>
+</div>
+<!-- End 选择 科室 对话框 -->
+<div id="wizard" class="swMain" style="width: 100%; height: 100%;">
+    <ul>
+        <li><a href="#step-1"><span class="stepDesc">基本信息</span></a></li>
+        <li><a href="#step-2"><span class="stepDesc">领导及职务</span></a></li>
+        <li><a href="#step-3"><span class="stepDesc">工作小组</span></a></li>
+        <li><a href="#step-4"><span class="stepDesc">负责科室</span></a></li>
+        <li><a href="#step-5"><span class="stepDesc">资金审批</span></a></li>
+        <li><a href="#step-6"><span class="stepDesc">科室职能</span></a></li>
+        <li><a href="#step-7"><span class="stepDesc">相关制度与附件</span></a></li>
+        <li><a href="#step-8"><span class="stepDesc">领导权力清单</span></a></li>
+        <li><a href="#step-9"><span class="stepDesc">提交&打印&查看</span></a></li>
+    </ul>
+    <!--基本信息-->
+    <div id="step-1">
+        <h2 class="StepTitle">
+            基本信息 <span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    内控手册颁发日期
+                </td>
+                <td class="con" style="width: 200px;">
+                    <input id="txtdwjc" name="dwjc" type="text" value="@Model.NkscModel.dwjc" onclick="WdatePicker({ minDate: '2015-05-01', maxDate: '%y-%M-%d',dateFmt:'yyyy年 MM月 dd日' })" />
+                </td>
+                <td class="dec" style="width: 120px;">
+                    单位全称
+                </td>
+                <td class="con">
+                    <input id="txtdwqc" name="dwqc" type="text" value="@Model.NkscModel.dwqc" class="easyui-validatebox easyui-tooltip" style="width: 300px"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    发票抬头
+                </td>
+                <td class="con" colspan="3">
+                    <input id="txtInvoice" name="dwqc" type="text" value="@ViewBag.Invoice" class="easyui-validatebox easyui-tooltip" style="width: 300px"/>
+                    <span style="font-size: 12px; color: Red; font-weight: bold;">注：用于发票，请确认无误</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="2">
+                    <input id="check_tyxy" type="checkbox" /><label for="check_tyxy" style="color: #2E8B57">本单位发票信息不需要统一社会信用代码</label>
+                </td>
+                <td class="dec">
+                    统一社会信用代码
+                </td>
+                <td class="con">
+                    <input id="TexttyxyID" name="tyxyID" value="@Model.CustomModel.Code" maxlength="20" placeholder="用于开发票" type="text"
+                        style="width: 300px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    发票收件人
+                </td>
+                <td class="con">
+                    <input id="TextName" name="Name" type="text" placeholder="请填写发票收取人姓名" value="@Model.CustomModel.QtLxr" maxlength="40" />
+                </td>
+                <td class="dec">
+                    手机号
+                </td>
+                <td class="con">
+                    <input id="TextTel" name="Tel" type="text" placeholder="请填写手机号" value="@Model.CustomModel.QtTel" maxlength="50" style="width: 300px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    QQ
+                </td>
+                <td class="con">
+                    <input id="TextQQ" name="QQ" type="text" placeholder="请填写QQ号" value="@Model.CustomModel.QQ" maxlength="50" />
+                </td>
+                <td class="dec">
+                    邮寄地址
+                </td>
+                <td class="con">
+                    <input id="TextAddress" name="Address" placeholder="用于邮寄发票，请填写详细邮寄地址" type="text" class="easyui-tooltip"
+                        maxlength="500" value="@Model.CustomModel.Address" style="width: 550px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    本手册适用范围
+                </td>
+                <td class="con" colspan="3">
+                    <input id="cboxscfw1" name="checkboxscfw" type="checkbox" checked="checked" disabled="disabled"
+                        value="本单位各科室" /><label for="cboxscfw1">本单位各科室</label>
+                    <input id="cboxscfw2" name="checkboxscfw" type="checkbox" @(Model.NkscModel.syfw0415.IndexOf("事业单位") >= 0 ? "checked='checked'" : "") value="事业单位" /><label
+                        for="cboxscfw2">事业单位</label>
+                    <input id="cboxscfw3" name="checkboxscfw" type="checkbox" @(Model.NkscModel.syfw0415.IndexOf("派出机构") >= 0 ? "checked='checked'" : "") value="派出机构" /><label
+                        for="cboxscfw3">派出机构</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="4">
+                    <input id="Checkbox_dxkq" type="checkbox" @(string.IsNullOrEmpty(Model.NkscModel.kqsjswSd) ? "" : "checked='checked'") /><label
+                        for="Checkbox_dxkq" style="color: #2E8B57">分冬夏 上下班时间</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    <span id="spankqsjsw">上午</span>
+                </td>
+                <td class="con">
+                    <input id="txtkqsjswS" name="kqsjswS" type="text" value="@Model.NkscModel.kqsjswS" onclick="WdatePicker({dateFmt:'HH:mm'})" style="width:80px;" />
+                    至
+                    <input id="txtkqsjswE" name="kqsjswE" type="text" value="@Model.NkscModel.kqsjswE" onclick="WdatePicker({dateFmt:'HH:mm'})" style="width:80px;" />
+                </td>
+                <td class="dec">
+                    <span id="spankqsjxw">下午</span>
+                </td>
+                <td class="con">
+                    <input id="txtkqsjxwS" name="kqsjxwS" type="text" value="@Model.NkscModel.kqsjxwS" onclick="WdatePicker({dateFmt:'HH:mm'})" style="width:80px;" />
+                    至
+                    <input id="txtkqsjxwE" name="kqsjxwE" type="text" value="@Model.NkscModel.kqsjxwE" onclick="WdatePicker({dateFmt:'HH:mm'})" style="width:80px;" />
+                </td>
+            </tr>
+            <tr id="dxkqsj" style="display: none;">
+                <td class="dec">
+                    冬令时：上午
+                </td>
+                <td class="con">
+                    <input id="txtkqsjswSd" name="kqsjswSd" type="text" value="@Model.NkscModel.kqsjswSd" onclick="WdatePicker({dateFmt:'HH:mm'})" style="font-size:12px;width:80px;" />
+                    至
+                    <input id="txtkqsjswEd" name="kqsjswEd" type="text" value="@Model.NkscModel.kqsjswEd" onclick="WdatePicker({dateFmt:'HH:mm'})" style="font-size:12px;width:80px;" />
+                </td>
+                <td class="dec">
+                    冬令时：下午
+                </td>
+                <td class="con">
+                    <input id="txtkqsjxwSd" name="kqsjxwSd" type="text" value="@Model.NkscModel.kqsjxwSd" onclick="WdatePicker({dateFmt:'HH:mm'})" style="font-size:12px;width:80px;" />
+                    至
+                    <input id="txtkqsjxwEd" name="kqsjxwEd" type="text" value="@Model.NkscModel.kqsjxwEd" onclick="WdatePicker({dateFmt:'HH:mm'})" style="font-size:12px;width:80px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    本单位的所有科室
+                </td>
+                <td class="con" colspan="3">
+                    <input id="txtbhks" name="bhks" type="text" value="@Model.NkscModel.bhks" placeholder="每项之间使用、号分隔" class="easyui-textbox"
+                        style="width: 1050px;" />
+                </td>
+            </tr>
+            <tr style="height: 262px">
+                <td class="dec">
+                    单位简介
+                </td>
+                <td class="con" colspan="3">
+                    <textarea id="txtdwjj" name="dwjj" rows="7" maxlength="4000" class="easyui-validatebox"
+                        placeholder="一定要包含历史沿革、取得成绩、机构情况、人员编制，主要职责，也可将单位公共受托目标和责任、单位编制情况（如行政、事业、工勤、离退休编制和实有编制情况）等内容写上"
+                        style="height: 250px; width: 1050px; font-size: 12px;">@Model.NkscModel.dwjj</textarea>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!--领导及职务-->
+    <div id="step-2">
+        <h2 class="StepTitle">
+            领导及职务<span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="dec">
+                    党组织机构名称
+                </td>
+                <td class="con" colspan="5">
+                    <input id="Radio_dzzjgmc2" type="radio" name="dzzjgmc" value="党委" @(Model.NkscModel.dzzjgmc == "党委" ? "checked='checked'" : "") /><label
+                        for="Radio_dzzjgmc2">党委</label>
+                    <input id="Radio_dzzjgmc3" type="radio" name="dzzjgmc" value="党支部" @(Model.NkscModel.dzzjgmc == "党支部" ? "checked='checked'" : "") /><label
+                        for="Radio_dzzjgmc3">党支部</label>
+                    <input id="Radio_dzzjgmc1" type="radio" name="dzzjgmc" value="党组" @(Model.NkscModel.dzzjgmc == "党组" ? "checked='checked'" : "") /><label
+                        for="Radio_dzzjgmc1">党组</label>
+                    <input id="Radio_dzzjgmc5" type="radio" name="dzzjgmc" value="党工委" @(Model.NkscModel.dzzjgmc == "党工委" ? "checked='checked'" : "") /><label
+                        for="Radio_dzzjgmc5">党工委</label>
+                    <input id="Radio_dzzjgmc6" type="radio" name="dzzjgmc" value="党总支" @(Model.NkscModel.dzzjgmc == "党总支" ? "checked='checked'" : "") /><label
+                        for="Radio_dzzjgmc6">党总支</label>
+                    <input id="Radio_dzzjgmc4" type="radio" name="dzzjgmc" value="无" @(Model.NkscModel.dzzjgmc == "无" ? "checked='checked'" : "") /><label
+                        for="Radio_dzzjgmc4">无</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    正职职务名称
+                </td>
+                <td class="con">
+                    <input id="txtzzzwmc" name="zzzwmc" type="text" value="@Model.NkscModel.zzzwmc" placeholder="如局长、主任" class="easyui-textbox" />
+                </td>
+                <td class="dec">
+                    正职领导姓名
+                </td>
+                <td class="con">
+                    <input id="txtldzzmc" name="ldzzmc" type="text" value="@Model.NkscModel.ldzzmc" class="easyui-textbox" />
+                </td>
+                <td class="dec">
+                    <span id="spanzzzwDY">@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) ? "" : string.Format("是否{0}成员", Model.NkscModel.dzzjgmc))</span>
+                </td>
+                <td class="con" style="min-width: 208px;">
+                    <div id="divzzzwDY" style="@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) ? "display:none;" : "")">
+                        <input id="Radio_zzzwDY1" type="radio" name="zzzwDY" value="1" @(Model.NkscModel.zzzwDY == "1" ? "checked='checked'" : "") /><label
+                            for="Radio_zzzwDY1">是</label>
+                        <input id="Radio_zzzwDY2" type="radio" name="zzzwDY" value="0" @(Model.NkscModel.zzzwDY != "1" ? "checked='checked'" : "") /><label
+                            for="Radio_zzzwDY2">否</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    正职领导分管科室
+                </td>
+                <td class="con" colspan="5">
+                    <input jm="com" id="txtldzzfg" name="ldzzfg" type="text" value="@Model.NkscModel.ldzzfg" placeholder="如没有分管科室请不用填写文字。如有就直接填写科室名称 [科室名称之间用顿号(、)分隔]" class="easyui-textbox" style="width:1050px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    副职职务名称1
+                </td>
+                <td class="con">
+                    <input id="txtfzzwmc1" name="fzzwmc1" type="text" value="@Model.NkscModel.fzzwmc1" placeholder="如副局长、副主任" class="easyui-textbox" />
+                </td>
+                <td class="dec">
+                    副职领导姓名1
+                </td>
+                <td class="con">
+                    <input id="txtldfzmc1" name="ldfzmc1" type="text" value="@Model.NkscModel.ldfzmc1" class="easyui-textbox" />
+                </td>
+                <td class="dec">
+                    <span id="spanfzzwDY">@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) ? "" : string.Format("是否{0}成员", Model.NkscModel.dzzjgmc))</span>
+                </td>
+                <td class="con">
+                    <div id="divfzzwDY" style="@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) ? "display:none;" : "")">
+                        <input id="Radio_fzzwDY1" type="radio" name="fzzwDY" value="1" @(Model.NkscModel.fzzwDY == "1" ? "checked='checked'" : "") /><label
+                            for="Radio_fzzwDY1">是</label>
+                        <input id="Radio_fzzwDY2" type="radio" name="fzzwDY" value="0" @(Model.NkscModel.fzzwDY != "1" ? "checked='checked'" : "") /><label
+                            for="Radio_fzzwDY2">否</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    副职领导1分管科室
+                </td>
+                <td class="con" colspan="5">
+                    <input jm="com" id="txtldfzfg1" name="ldfzfg1" type="text" value="@Model.NkscModel.ldfzfg1" placeholder="填写如[财务科、综合科...](用、号分隔)" class="easyui-textbox" style="width:1050px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-add" onclick="addfz()">
+                        添加副职</a> <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel"
+                            onclick="removefz()" style="margin-left: 10px;">删除副职</a> <span style="color: #900;">
+                                （更多的副职领导请点击左侧“添加副职”按钮）</span>
+                </td>
+            </tr>
+        </table>
+        <table id="table_fz" class="tab_form" cellpadding="0" cellspacing="0">
+            @foreach (var item in Model.Nksc_fzModel)
+            {
+                <tr>
+                    <td class="dec">
+                        <input id="@string.Format("check_fz{0}", item.sort)" type="checkbox" name="check_fz" /><label for="@string.Format("check_fz{0}", item.sort)">@string.Format("副职职务名称{0}", item.sort)</label>
+                    </td>
+                    <td class="con">
+                        <input id="@string.Format("txtfzzwmc{0}", item.sort)" name="@string.Format("fzzwmc{0}", item.sort)" type="text" value="@item.fzzwmc" class="easyui-textbox" />
+                    </td>
+                    <td class="dec">
+                        @string.Format("副职领导姓名{0}", item.sort)
+                    </td>
+                    <td class="con">
+                        <input id="@string.Format("txtldfzmc{0}", item.sort)" name="@string.Format("ldfzmc{0}", item.sort)" type="text" value="@item.ldfzmc" class="easyui-textbox" />
+                    </td>
+                    <td class="dec">
+                        <span id="@string.Format("spanfzzwDY{0}", item.sort)">@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) ? "" : string.Format("是否{0}成员", Model.NkscModel.dzzjgmc))</span>
+                    </td>
+                    <td class="con" style="min-width: 208px;">
+                        <div id="@string.Format("divfzzwDY{0}", item.sort)" style="@(string.IsNullOrEmpty(Model.NkscModel.dzzjgmc) ? "display:none;" : "")">
+                            <input id="@string.Format("Radio_fzzwDY1{0}", item.sort)" type="radio" name="@string.Format("fzzwDY{0}", item.sort)" value="1" @(item.fzzwDY == "1" ? "checked='checked'" : "") /><label for="@string.Format("Radio_fzzwDY1{0}", item.sort)">是</label>
+                            <input id="@string.Format("Radio_fzzwDY2{0}", item.sort)" type="radio" name="@string.Format("fzzwDY{0}", item.sort)" value="0" @(item.fzzwDY != "1" ? "checked='checked'" : "") /><label for="@string.Format("Radio_fzzwDY2{0}", item.sort)">否</label>
+                        </div>
+                    </td>
+                </tr> 
+                <tr>
+                    <td class="dec">
+                        @string.Format("副职领导{0}分管科室", item.sort)
+                    </td>
+                    <td class="con" colspan="5">
+                        <input id="@string.Format("txtldfzfg{0}", item.sort)" name="@string.Format("ldfzfg{0}", item.sort)" type="text" value="@item.ldfzfg" class="easyui-textbox" style="width: 1000px" />
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+    <!--工作小组-->
+    <div id="step-3">
+        <h2 class="StepTitle">
+            工作小组<span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="dec">
+                    手册编制牵头部门
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtscqtbm" name="scqtbm" type="text" value="@Model.NkscModel.scqtbm" placeholder="如财务科或办公室等，不能与风险评估小组和监督检查小组同一科室。" class="easyui-textbox" />
+                </td>
+                <td class="dec">
+                    手册编制协作部门
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtscxzbm" name="scxzbm" type="text" value="@Model.NkscModel.scxzbm" placeholder="一般是各科室内控联络员为成员，如办公室张三、人教科李四（用、号分隔）【推荐填写科室名称+科室内控联络员姓名】" class="easyui-textbox" style="width:600px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="4" style="color: #2E8B57">
+                    内部控制领导小组
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    内部控制领导小组：成员信息
+                </td>
+                <td class="con" colspan="3">
+                    <input jm="com" id="txtnkldxzcy" name="nkldxzcy" type="text" value="@Model.NkscModel.nkldxzcy" placeholder="一般为各部门（科室）负责人为成员，如办公室负责人等（用、号分隔）【推荐填写科室名称+负责人姓名】" class="easyui-textbox" style="width:980px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    内部控制领导小组：组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtnkldxzzz" name="nkldxzzz" type="text" value="@Model.NkscModel.nkldxzzz" placeholder="一般为单位“一把手”【推荐填写职务+姓名】" class="easyui-textbox" />
+                </td>
+                <td class="dec">
+                    内部控制领导小组：副组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtnkldxzfzz" name="nkldxzfzz" type="text" value="@Model.NkscModel.nkldxzfzz" placeholder="一般为分管内控的副职领导，如副局长【推荐填写职务+姓名】" class="easyui-textbox" style="width:600px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="4" style="color: #2E8B57">
+                    内部控制工作小组
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    内部控制工作小组：牵头科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtnbkzgzxzzzqt01" name="nbkzgzxzzzqt01" type="text" value="@Model.NkscModel.nbkzgzxzzzqt01" placeholder="一般与手册编制牵头部门同一科室。" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    内部控制工作小组：成员信息
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtnbkzgzxzzzcy01" name="nbkzgzxzzzcy01" type="text" value="@Model.NkscModel.nbkzgzxzzzcy01" placeholder="一般与手册编制协作部门一样" class="easyui-textbox" style="font-size:12px;width:600px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    内部控制工作小组：组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtnbkzgzxzzz01" name="nbkzgzxzzz01" type="text" value="@Model.NkscModel.nbkzgzxzzz01" placeholder="一般为单位内控工作小组牵头科室分管领导，不能与内控领导小组组长同为一人【推荐填写职务+姓名】" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    内部控制工作小组：副组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtnbkzgzxzfzz01" name="nbkzgzxzfzz01" type="text" value="@Model.NkscModel.nbkzgzxzfzz01" placeholder="一般为内控工作小组牵头科室负责人，如财务科科长张三【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="4" style="color: #2E8B57">
+                    风险评估工作小组
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    风险评估工作小组：牵头科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtfxpgxzqtks" name="fxpgxzqtks" type="text" value="@Model.NkscModel.fxpgxzqtks" placeholder="不能与内控工作小组牵头科室同一科室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    风险评估工作小组：成员信息
+                </td>
+                <td class="con" style="min-width: 623px">
+                    <input jm="com" id="txtfxpgxzcy" name="fxpgxzcy" type="text" value="@Model.NkscModel.fxpgxzcy" placeholder="如财务科、办公室、人教科等...（用、号分隔）【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    风险评估工作小组：组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtfxpgxzzz" name="fxpgxzzz" type="text" value="@Model.NkscModel.fxpgxzzz" placeholder="一般为风险评估工作小组牵头科室分管领导，不能与内控工作小组组长同为一人【推荐填写职务+姓名】" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    风险评估工作小组：副组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtfxpgxzfzz" name="fxpgxzfzz" type="text" value="@Model.NkscModel.fxpgxzfzz" placeholder="一般为风险评估工作小组牵头科室负责人，如办公室主任张三【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="4" style="color: #2E8B57">
+                    预算管理领导小组
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    预算管理领导小组：牵头科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtysldxzqdks" name="ysldxzqdks" type="text" value="@Model.NkscModel.ysldxzqdks" placeholder="一般为单位财务部门，如财务科。" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    预算管理领导小组：成员信息
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtysldxzcy" name="ysldxzcy" type="text" value="@Model.NkscModel.ysldxzcy" placeholder="一般为各部门（科室）负责人为成员，如办公室负责人等（用、号分隔）【推荐填写科室名称+负责人姓名】" class="easyui-textbox" style="font-size:12px;width:600px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    预算管理领导小组：组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtysldxzzz" name="ysldxzzz" type="text" value="@Model.NkscModel.ysldxzzz" placeholder="一般为单位“一把手”【推荐填写职务+姓名】" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    预算管理领导小组：副组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtysldxzfzz" name="ysldxzfzz" type="text" value="@Model.NkscModel.ysldxzfzz" placeholder="一般为分管财务领导或财务部门负责人，如财务科科长张三【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="4" style="color: #2E8B57">
+                    政府采购领导小组
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    政府采购领导小组：牵头科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtzfcgxzqdks" name="zfcgxzqdks" type="text" placeholder="一般是负责采购的部门，如财务科【建议按本单位实际管理填写】" value="@Model.NkscModel.zfcgxzqdks"  class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    政府采购领导小组：成员信息
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtzfcgxzcy" name="zfcgxzcy" type="text" value="@Model.NkscModel.zfcgxzcy" placeholder="一般由财务、办公室、纪检等部门组成【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    政府采购领导小组：组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtzfcgxzzz" name="zfcgxzzz" type="text" value="@Model.NkscModel.zfcgxzzz" placeholder="一般是政府采购领导小组牵头科室的分管领导，如分管副局长" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    政府采购领导小组：副组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtzfcgxzfzz" name="zfcgxzfzz" type="text" value="@Model.NkscModel.zfcgxzfzz" placeholder="一般是政府采购领导小组牵头科室负责人，如财务科科长【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="4" style="color: #2E8B57">
+                    国有资产管理小组
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    国有资产管理小组：牵头科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgyzcxzqdks" name="gyzcxzqdks" type="text" placeholder="一般是实物主管科室，如办公室等" value="@Model.NkscModel.gyzcxzqdks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    国有资产管理小组：成员信息
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgyzcxzcy" name="gyzcxzcy" type="text" value="@Model.NkscModel.gyzcxzcy" placeholder="一般由财务、办公室、纪检等部门组成【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    国有资产管理小组：组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" jm="com" id="txtgyzcxzzz" name="gyzcxzzz" type="text" value="@Model.NkscModel.gyzcxzzz" placeholder="一般为国有资产管理小组牵头科室分管领导，如分管副局长" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    国有资产管理小组：副组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" jm="com" id="txtgyzcxzfzz" name="gyzcxzfzz" type="text" value="@Model.NkscModel.gyzcxzfzz" placeholder="一般为国有资产管理小组牵头科室负责人，如办公室主任【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="4" style="color: #2E8B57">
+                    监督检查工作小组
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    监督检查工作小组：牵头科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtjdjcxzqdks" name="jdjcxzqdks" type="text" placeholder="一般是单位负责纪检监察的科室，如机关纪委" value="@Model.NkscModel.jdjcxzqdks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    监督检查工作小组：成员信息
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtjdjcxzcy" name="jdjcxzcy" type="text" value="@Model.NkscModel.jdjcxzcy" placeholder="一般由牵头科室的内部人员和单位内审人员组成【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    监督检查工作小组：组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtjdjcxzzz" name="jdjcxzzz" type="text" value="@Model.NkscModel.jdjcxzzz" placeholder="一般为监督检查工作小组牵头科室分管领导" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    监督检查工作小组：副组长
+                </td>
+                <td class="con">
+                    <input jm="com_zw" id="txtjdjcxzfzz" name="jdjcxzfzz" type="text" value="@Model.NkscModel.jdjcxzfzz" placeholder="一般为监督检查工作小组牵头科室负责人，如机关纪委主任【推荐填写科室名称+职务+姓名】" class="easyui-textbox" style="font-size:12px;width:600px;" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!--负责科室-->
+    <div id="step-4">
+        <h2 class="StepTitle">
+            负责科室<span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="con" colspan="6" style="color: #900;">
+                    本单位包含业务内容（如没有“建设项目”就无需打勾！）（没有勾选的业务，内控手册中将不会体现有关制度内容）
+                </td>
+            </tr>
+            @*<tr>
+                <td class="dec">
+                    本单位包含业务内容
+                </td>
+                <td class="con" colspan="5">
+                    <ul class="ul_check">
+                        <li>
+                            <input id="Checkbox1" name="checkbox" type="checkbox" value="1" @(Model.NkscModel.bhyw.IndexOf('1') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox1">1、预算业务(含预算编制、执行、决算)</label>
+                        </li>
+                        <li>
+                            <input id="Checkbox2" name="checkbox" type="checkbox" value="2" @(Model.NkscModel.bhyw.IndexOf('2') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox2">2、财政拨款收入业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkbox3" name="checkbox" type="checkbox" value="3" @(Model.NkscModel.bhyw.IndexOf('3') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox3">3、支出业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkbox4" name="checkbox" type="checkbox" value="4" @(Model.NkscModel.bhyw.IndexOf('4') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox4">4、财政票据业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkbox5" name="checkbox" type="checkbox" value="5" @(Model.NkscModel.bhyw.IndexOf('5') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox5">5、政府采购业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkbox6" name="checkbox" type="checkbox" value="6" @(Model.NkscModel.bhyw.IndexOf('6') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox6">6、资产业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkbox7" name="checkbox" type="checkbox" value="7" @(Model.NkscModel.bhyw.IndexOf('7') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox7">7、建设项目业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkbox8" name="checkbox" type="checkbox" value="8" @(Model.NkscModel.bhyw.IndexOf('8') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox8">8、合同管理业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkbox9" name="checkbox" type="checkbox" value="9" @(Model.NkscModel.bhyw.IndexOf('9') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkbox9">9、印章管理业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkboxa" name="checkbox" type="checkbox" value="a" @(Model.NkscModel.bhyw.IndexOf('a') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkboxa">10、非税收入业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkboxb" name="checkbox" type="checkbox" value="b" @(Model.NkscModel.bhyw.IndexOf('b') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkboxb">11、债务业务</label>
+                        </li>
+                        <li>
+                            <input id="Checkboxc" name="checkbox" type="checkbox" value="c" @(Model.NkscModel.bhyw.IndexOf('c') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkboxc">12、对外投资业务</label>
+                        </li>
+                    </ul>
+                </td>
+            </tr>*@
+            <tr>
+                <td class="dec">
+                    一、
+                </td>
+                <td class="con">
+                    <input id="Checkbox1" name="checkboxYW" type="checkbox" value="1" @(Model.NkscModel.bhyw.IndexOf('1') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkbox1">预算业务(含预算编制、执行、决算)</label>
+                </td>
+                <td class="dec">
+                    二、
+                </td>
+                <td class="con" colspan="3">
+                    <input id="Checkbox2" name="checkboxYW" type="checkbox" value="2" @(Model.NkscModel.bhyw.IndexOf('2') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkbox2">收入业务</label>
+                    <input id="Checkbox3" name="checkboxYW" type="checkbox" value="3" @(Model.NkscModel.bhyw.IndexOf('3') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkbox3">支出业务</label>
+                    <input id="Checkboxa" name="checkboxYW" type="checkbox" value="a" @(Model.NkscModel.bhyw.IndexOf('a') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxa">非税收入业务</label>
+                    <input id="Checkboxd" name="checkboxYW" type="checkbox" value="d" @(Model.NkscModel.bhyw.IndexOf('d') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxd">收入登记入账</label>
+                    <br />
+                    <input id="Checkboxe" name="checkboxYW" type="checkbox" value="e" @(Model.NkscModel.bhyw.IndexOf('e') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxe">财政票据业务</label>
+                    <input id="Checkboxf" name="checkboxYW" type="checkbox" value="f" @(Model.NkscModel.bhyw.IndexOf('f') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxf">财政直接支付</label>
+                    <input id="Checkboxg" name="checkboxYW" type="checkbox" value="g" @(Model.NkscModel.bhyw.IndexOf('g') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxg">财政授权支付</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    三、
+                </td>
+                <td class="con">
+                    <input id="Checkboxh" name="checkboxYW" type="checkbox" value="h" @(Model.NkscModel.bhyw.IndexOf('h') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxh">公务卡</label>
+                </td>
+                <td class="dec">
+                    四、
+                </td>
+                <td class="con" colspan="3">
+                    <input id="Checkbox5" name="checkboxYW" type="checkbox" value="5" @(Model.NkscModel.bhyw.IndexOf('5') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkbox5">政府采购业务</label>
+                    <input id="Checkboxi" name="checkboxYW" type="checkbox" value="i" @(Model.NkscModel.bhyw.IndexOf('i') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxi">政府购买服务流程</label>
+                    @*<input id="Checkboxj" name="checkboxYW" type="checkbox" value="j" @(Model.NkscModel.bhyw.IndexOf('j') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkboxj">进口产品政府采购流程</label>*@
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    五、
+                </td>
+                <td class="con" colspan="5">
+                    <input id="Checkbox6" name="checkboxYW" type="checkbox" value="6" @(Model.NkscModel.bhyw.IndexOf('6') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkbox6">资产业务</label>
+                    <input id="Checkboxk" name="checkboxYW" type="checkbox" value="k" @(Model.NkscModel.bhyw.IndexOf('k') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxk">国有资产出租出借业务</label>
+                    @*<input id="Checkboxl" name="checkboxYW" type="checkbox" value="l" @(Model.NkscModel.bhyw.IndexOf('l') >= 0 ? "checked='checked'" : "") /><label
+                                for="Checkboxl">国有资产对外投资、提供担保业务</label>*@
+                    <input id="Checkboxm" name="checkboxYW" type="checkbox" value="m" @(Model.NkscModel.bhyw.IndexOf('m') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxm">国有资产收入上缴流程</label>
+                    <input id="Checkboxn" name="checkboxYW" type="checkbox" value="n" @(Model.NkscModel.bhyw.IndexOf('n') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxn">国有资产产权登记、变更、注销流程</label>
+                    <input id="Checkboxo" name="checkboxYW" type="checkbox" value="o" @(Model.NkscModel.bhyw.IndexOf('o') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxo">国有资产产权纠纷调处流程</label>
+                    <input id="Checkboxp" name="checkboxYW" type="checkbox" value="p" @(Model.NkscModel.bhyw.IndexOf('p') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxp">资产评估流程</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    六、
+                </td>
+                <td class="con" colspan="5">
+                    <input id="Checkbox7" name="checkboxYW" type="checkbox" value="7" @(Model.NkscModel.bhyw.IndexOf('7') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkbox7">建设项目业务</label>
+                    <input id="Checkboxq" name="checkboxYW" type="checkbox" value="q" @(Model.NkscModel.bhyw.IndexOf('q') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxq">建设项目公开招标流程、邀请招标流程</label>
+                    <input id="Checkboxr" name="checkboxYW" type="checkbox" value="r" @(Model.NkscModel.bhyw.IndexOf('r') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxr">建设项目设计变更、洽商签证流程</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    七、
+                </td>
+                <td class="con">
+                    <input id="Checkbox8" name="checkboxYW" type="checkbox" value="8" @(Model.NkscModel.bhyw.IndexOf('8') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkbox8">合同管理业务</label>
+                </td>
+                <td class="dec">
+                    八、
+                </td>
+                <td class="con" colspan="3">
+                    <input id="Checkbox9" name="checkboxYW" type="checkbox" value="9" @(Model.NkscModel.bhyw.IndexOf('9') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkbox9">印章管理业务</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    九、
+                </td>
+                <td class="con">
+                    <input id="Checkboxb" name="checkboxYW" type="checkbox" value="b" @(Model.NkscModel.bhyw.IndexOf('b') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxb">债务业务</label>
+                </td>
+                <td class="dec">
+                    十、
+                </td>
+                <td class="con" colspan="3">
+                    <input id="Checkboxc" name="checkboxYW" type="checkbox" value="c" @(Model.NkscModel.bhyw.IndexOf('c') >= 0 ? "checked='checked'" : "") /><label
+                        for="Checkboxc">对外投资业务</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    业务梳理制度的<br />
+                    包括业务流程名称
+                </td>
+                <td class="con" colspan="5">
+                    <input id="txtywslzdmc" name="ywslzdmc" type="text" value="@Model.NkscModel.ywslzdmc" placeholder="如：1.预算编制与执行业务流程；2.政府采购业务流程；3.行政执行办案业务流程；等......(用分号；分隔)" class="easyui-textbox" style="width:1010px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    内部审计负责科室名称
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtnbsjks" name="nbsjks" type="text" placeholder="一般是负责财务、监察的科室" value="@Model.NkscModel.nbsjks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    重大决策实施后评价负责科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtzdjcsshpjks" name="zdjcsshpjks" placeholder="一般是负责行政、党务、内控的科室" type="text" value="@Model.NkscModel.zdjcsshpjks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    不相容岗位分离制度解释科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtbxrgwzdks" name="bxrgwzdks" placeholder="一般是负责财务的科室" type="text" value="@Model.NkscModel.bxrgwzdks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    编制年度岗位轮岗计划的科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtbzndlgjhks" name="bzndlgjhks" placeholder="一般是负责人事的科室" type="text" value="@Model.NkscModel.bzndlgjhks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    不能轮岗的岗位包括哪些?
+                </td>
+                <td class="con">
+                    <input id="txtbnlgdgwmc" name="bnlgdgwmc" type="text" placeholder="如财务负责人、会计、出纳等" value="@Model.NkscModel.bnlgdgwmc" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    重大事项内部报告的归口管理科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtzdbgdgkks" name="zdbgdgkks" type="text" placeholder="一般是负责行政、党务、内控的科室" value="@Model.NkscModel.zdbgdgkks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    政务信息公开制度牵头科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtzwxxgkks" name="zwxxgkks" type="text" placeholder="一般是办公室、行政部门、党务办公室等..." value="@Model.NkscModel.zwxxgkks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    信息公开责任追究归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtxxgkzrjjks" name="xxgkzrjjks" type="text" placeholder="一般是负责行政、党务、内控的科室" value="@Model.NkscModel.xxgkzrjjks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    负责单位信息管理系统的科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtfzxxglxtks" name="fzxxglxtks" placeholder="一般是单位计算机室或信息中心、或办公室" type="text" value="@Model.NkscModel.fzxxglxtks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    新闻宣传工作牵头管理科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtxxxcgzqtks" name="xxxcgzqtks" placeholder="一般是负责行政、党务的科室" type="text" value="@Model.NkscModel.xxxcgzqtks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    考勤管理的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtksglks" name="ksglks" type="text" placeholder="一般是负责人事的科室" value="@Model.NkscModel.ksglks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    廉政诫勉约谈的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtlzjmytgkks" name="lzjmytgkks" type="text" placeholder="一般是负责行政、党务、人事的科室" value="@Model.NkscModel.lzjmytgkks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    本单位收入包括哪些内容
+                </td>
+                <td class="con" colspan="5">
+                    <input id="radiodwxz1" name="radiodwxz" type="radio" value="xzdw" @(Model.NkscModel.bdwsrbk == "财政拨款收入、非税收入、其他收入" ? "checked='checked'" : "") /><label
+                        for="radiodwxz1">行政单位</label>
+                    <input id="radiodwxz2" name="radiodwxz" type="radio" value="sydw" @(Model.NkscModel.bdwsrbk == "财政补助收入、上级补助收入、事业收入、其他收入" ? "checked='checked'" : "") /><label
+                        for="radiodwxz2">事业单位</label>
+                    <input id="txtbdwsrbk" name="bdwsrbk" type="text" value="@Model.NkscModel.bdwsrbk" disabled="disabled" placeholder="如：非税收入、财政拨款收入、财政补助收入、事业收入、其他收入等......(用、号分隔)" class="easyui-textbox" style="font-size:12px;width:800px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    收入业务的归口管理部门
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtsrywgkks" name="srywgkks" type="text" value="@Model.NkscModel.srywgkks" placeholder="一般是负责财会的科室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    经费支出的归口管理部门
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtjfzcgkks" name="jfzcgkks" type="text" value="@Model.NkscModel.jfzcgkks" placeholder="一般是负责财会的科室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    政府采购资料的保管归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtzfcgzlgkks" name="zfcgzlgkks" type="text" value="@Model.NkscModel.zfcgzlgkks" placeholder="一般归办公室、或行政、综合科" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    人事管理制度的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtrsglzdgkks" name="rsglzdgkks" type="text" value="@Model.NkscModel.rsglzdgkks" placeholder="一般归人教科、或办公室负责" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    人事管理的回避规定监督归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtrsglhbks" name="rsglhbks" type="text" value="@Model.NkscModel.rsglhbks" placeholder="一般归人教科、或办公室负责" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    年终考核,开展民主评议的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtnzkhgkks" name="nzkhgkks" type="text" value="@Model.NkscModel.nzkhgkks" placeholder="一般归人教科、或管绩效科室负责" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    重大事项报告存档科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtzdbgcdks" name="zdbgcdks" type="text" placeholder="一般是负责行政、党务、内控的科室" value="@Model.NkscModel.zdbgcdks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    合同管理的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txthtgkks1" name="htgkks1" type="text" value="@Model.NkscModel.htgkks1" placeholder="一般是办公室或财务科室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    公文管理归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgwglgkks" name="gwglgkks" type="text" value="@Model.NkscModel.gwglgkks" placeholder="一般是办公室、行政部门、综合部门" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    固定资产处置的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgdzccz" name="gdzccz" type="text" value="@Model.NkscModel.gdzccz" placeholder="一般归办公室或财务科" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    固定资产调拨的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgdzcdb" name="gdzcdb" type="text" value="@Model.NkscModel.gdzcdb" placeholder="一般归办公室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    固定资产购置的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgdzcgz" name="gdzcgz" type="text" value="@Model.NkscModel.gdzcgz" placeholder="一般归办公室或财务科" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    固定资产清查的归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgdzcqc" name="gdzcqc" type="text" value="@Model.NkscModel.gdzcqc" placeholder="一般归办公室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    办公用品管理归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtbgypglgkks" name="bgypglgkks" type="text" value="@Model.NkscModel.bgypglgkks" placeholder="一般归办公室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    印章管理归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtyzglgkks" name="yzglgkks" type="text" value="@Model.NkscModel.yzglgkks" placeholder="一般归办公室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    是否需要机房管理制度
+                </td>
+                <td class="con">
+                    <input id="Radio_EngineRoom1" type="radio" name="EngineRoom" value="1" @(Model.NkscModel.EngineRoom == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_EngineRoom1">有</label>
+                    <input id="Radio_EngineRoom2" type="radio" name="EngineRoom" value="0" @(Model.NkscModel.EngineRoom == "0" ? "checked='checked'" : "") /><label
+                        for="Radio_EngineRoom2">无</label>
+                </td>
+                <td class="dec">
+                    是否需要财政专项资金管理办法
+                </td>
+                <td class="con">
+                    <input id="Radio_zxzjgl1" type="radio" name="zxzjgl" value="1" @(Model.NkscModel.zxzjgl == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_zxzjgl1">是</label>
+                    <input id="Radio_zxzjgl2" type="radio" name="zxzjgl" value="0" @(Model.NkscModel.zxzjgl == "0" ? "checked='checked'" : "") /><label
+                        for="Radio_zxzjgl2">否</label>
+                </td>
+                <td class="dec">
+                    财政专项资金归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtczzxzjgkks" name="czzxzjgkks" type="text" @(Model.NkscModel.zxzjgl == "0" ? "disabled='disabled'" : "") value="@Model.NkscModel.czzxzjgkks" placeholder="一般是负责财会的科室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    公务卡制度管理归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgwkglks" name="gwkglks" type="text" @(Model.NkscModel.gwkzd == "0" ? "disabled='disabled'" : "") placeholder="一般是财务科" value="@Model.NkscModel.gwkglks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    公务卡监督执行归口科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtgwkjdks" name="gwkjdks" type="text" @(Model.NkscModel.gwkzd == "0" ? "disabled='disabled'" : "") placeholder="一般是办公室" value="@Model.NkscModel.gwkjdks" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    @*是否需要公务卡管理制度*@
+                </td>
+                <td class="con">
+                    @*<input id="Radio_gwkzd1" type="radio" name="gwkzd" value="1" @(Model.NkscModel.gwkzd == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_gwkzd1">有</label>
+                    <input id="Radio_gwkzd2" type="radio" name="gwkzd" value="0" @(Model.NkscModel.gwkzd == "0" ? "checked='checked'" : "") /><label
+                        for="Radio_gwkzd2">无</label>*@
+                </td>
+            </tr>
+            <tr>
+                <td class="dec">
+                    建设项目归口主管科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtjsxmgkks01" name="jsxmgkks01" type="text" value="@Model.NkscModel.jsxmgkks01" placeholder="一般是本单位负责建设项目的主管科室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                    建设项目绩效评价管理科室
+                </td>
+                <td class="con">
+                    <input jm="com" id="txtjsxmjxpjks01" name="jsxmjxpjks01" type="text" value="@Model.NkscModel.jsxmjxpjks01" placeholder="一般是财务或主管绩效评价的科室" class="easyui-textbox" style="font-size:12px;" />
+                </td>
+                <td class="dec">
+                </td>
+                <td class="con">
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!--资金审批-->
+    <div id="step-5">
+        <h2 class="StepTitle">
+            资金审批<span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <table id="divzjsp" class="tab_form" cellpadding="0" cellspacing="0" style="width: 1235px;">
+            <!--采购合同审批-->
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px;">
+                    采购合同授权审批设置
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="">
+                    <input id="Radio_cghtsq1" name="Radio_cghtsq" type="radio" value="1" @(Model.NkscModel.Radio_cghtsq == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_cghtsq1">采购合同需要金额授权</label>
+                    <input id="Radio_cghtsq2" name="Radio_cghtsq" type="radio" value="0" @(Model.NkscModel.Radio_cghtsq == "0" ? "checked='checked'" : "") /><label
+                        for="Radio_cghtsq2">采购合同不需要具体金额的授权</label>
+                    <input id="Radio_cghtsq3" name="Radio_cghtsq" type="radio" value="2" @(Model.NkscModel.Radio_cghtsq == "2" ? "checked='checked'" : "") /><label
+                        for="Radio_cghtsq3">无采购业务</label>
+                </td>
+            </tr>
+            <tr id="tr_cghtsq1" style="@(Model.NkscModel.Radio_cghtsq == "0" ? "" : "display:none;")">
+                <td class="con" style="min-width: 240px; width: 240px">
+                    <input name="btn_cghtsq_AddS" onclick="addcghtsqs('div_cghtsq')" value="增加审核审批人"
+                        type="button" />
+                    <input name="btn_cghtsq_DelS" onclick="delcghtsqs('div_cghtsq')" value="删除审核审批人"
+                        type="button" />
+                </td>
+                <td class="con" colspan="5" style="">
+                    <div id="div_cghtsq" style="float: left; margin-left: 3px; margin-right: 3px;">
+                        @if (Model.NkscModel.Radio_cghtsq == "0")
+                        {
+                            if (Model.Nksc_cghtsqModel.Count == 0)
+                            {
+                            <input id="div_cghtsq_0" name="divsplc" type="combobox" style="width: 160px;" class="easyui-combobox"
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                            }
+                            else
+                            {
+                                for (int j = 0; j < Model.Nksc_cghtsqModel.Count; j++)
+                                {
+                                    for (int i = 0; i < Model.Nksc_cghtsqModel[j].jkspr.Split('、').Length; i++)
+                                    {
+                                        string spr = Model.Nksc_cghtsqModel[j].jkspr.Split('、')[i];
+                                        if (i > 0)
+                                        {
+                            <span>、</span>
+                                        }
+                            <input id="@string.Format("div_cghtsq_{0}", i)" name="divsplc" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                                valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                                "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        { 
+                            <input id="div_cghtsq_0" name="divsplc" type="combobox" style="width: 160px;" class="easyui-combobox"
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                        }
+                    </div>
+                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                </td>
+            </tr>
+            <tr id="tr_cghtsq2" style="@(Model.NkscModel.Radio_cghtsq == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    金额在
+                    <input id="txtjine_cghtsq" name="jine_cghtsq" class="easyui-numberbox" style="width: 100px;"
+                        min="0" max="100000000" precision="2" />
+                    元
+                    <select class="easyui-combobox" name="jine_cghtsqT" id="dlljine_cghtsqT" editable="false"
+                        style="width: 100px;" data-options="value:''">
+                        <option value="以下">以下</option>
+                        <option value="以上">以上</option>
+                    </select>
+                    <input name="btn_cghtsq_AddB" onclick="addcghtsq()" value="生成步骤" type="button" style="margin-left: 10px;" />
+                    <span style="font-size: 12px; color: #900; margin-left: 10px;">(注释：每个步骤可以多个审核审批人)</span>
+                </td>
+            </tr>
+            <tr id="tr_cghtsq3" style="@(Model.NkscModel.Radio_cghtsq == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    <table id="table_cghtsq" cellpadding="0" cellspacing="0" style="width: 100%;">
+                        @if (Model.NkscModel.Radio_cghtsq == "1")
+                        {
+                            foreach (JMProject.Model.Nksc_cghtsq item in Model.Nksc_cghtsqModel)
+                            {
+                            <tr id="@string.Format("table_tr_cghtsq{0}", item.sort - 1)">
+                                <td style="border: solid #ccc; border-width: 0px 1px 1px 0px; width: 100px;">
+                                    <input name="btn_cghtsq_DelB" onclick="delcghtsq('@string.Format("table_tr_cghtsq{0}", item.sort - 1)')" value="删除步骤" type="button" style="margin-left: 10px;" />
+                                </td>
+                                <td class="con" style="min-width: 240px; width: 240px">
+                                    <input name="btn_cghtsq_AddS" onclick="addcghtsqs('@string.Format("div_cghtsq{0}", item.sort - 1)')" value="增加审核审批人" type="button" />
+                                    <input name="btn_cghtsq_DelS" onclick="delcghtsqs('@string.Format("div_cghtsq{0}", item.sort - 1)')" value="删除审核审批人" type="button" />
+                                </td>
+                                <td class="con" colspan="5">
+                                    <span class="moneyText" jtext="金额在" style="float: left; margin-top: 3px;">
+                                        @string.Format("金额在{0}元{1}的，由", item.jkmoney, item.jktype)
+                                    </span>
+                                    <div jkmoney="@item.jkmoney" jktype="@item.jktype" id="@string.Format("div_cghtsq{0}", item.sort - 1)" style="float:left; margin-left:3px; margin-right:3px;">
+                                        @for (int i = 0; i < item.jkspr.Split('、').Length; i++)
+                                        {
+                                            string spr = item.jkspr.Split('、')[i];
+                                            if (i > 0)
+                                            {
+                                            <span>、</span>
+                                            }
+                                            <input id="@string.Format("div_cghtsq{0}_{1}", item.sort - 1, i)" name="divsplc" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                                   maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                                   valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                                   "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                        }
+                                    </div>
+                                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                                </td>
+                            </tr>
+                            }
+                        }
+                    </table>
+                </td>
+            </tr>
+            <!--自行采购合同审批-->
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px; border-top-color: #1ac4ff;
+                    border-top-width: 2px;">
+                    单位自行采购审批设置
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="">
+                    <input id="Radio_zxcgsq1" name="Radio_zxcgsq" type="radio" value="1" @(Model.NkscModel.Radio_zxcgsq == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_zxcgsq1">单位自行采购需要金额授权</label>
+                    <input id="Radio_zxcgsq2" name="Radio_zxcgsq" type="radio" value="0" @(Model.NkscModel.Radio_zxcgsq == "0" ? "checked='checked'" : "") /><label
+                        for="Radio_zxcgsq2">单位自行采购不需要具体金额的授权</label>
+                    <input id="Radio_zxcgsq3" name="Radio_zxcgsq" type="radio" value="2" @(Model.NkscModel.Radio_zxcgsq == "2" ? "checked='checked'" : "") /><label
+                        for="Radio_zxcgsq3">无单位自行采购业务</label>
+                </td>
+            </tr>
+            <tr id="tr_zxcgsq1" style="@(Model.NkscModel.Radio_zxcgsq == "0" ? "" : "display:none;")">
+                <td class="con" style="min-width: 240px; width: 240px">
+                    <input name="btn_zxcgsq_AddS" onclick="addzxcghtsqs('div_zxcghtsq')" value="增加审核审批人"
+                        type="button" />
+                    <input name="btn_zxcgsq_DelS" onclick="delzxcghtsqs('div_zxcghtsq')" value="删除审核审批人"
+                        type="button" />
+                </td>
+                <td class="con" colspan="5" style="">
+                    <div id="div_zxcghtsq" style="float: left; margin-left: 3px; margin-right: 3px;">
+                        @if (Model.NkscModel.Radio_zxcgsq == "0")
+                        {
+                            if (Model.Nksc_ZxcghtsqModel.Count == 0)
+                            {
+                            <input id="div_zxcghtsq_0" name="divzxsplc" type="combobox" style="width: 160px;"
+                                class="easyui-combobox" maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                            }
+                            else
+                            {
+                                for (int j = 0; j < Model.Nksc_ZxcghtsqModel.Count; j++)
+                                {
+                                    for (int i = 0; i < Model.Nksc_ZxcghtsqModel[j].jkspr.Split('、').Length; i++)
+                                    {
+                                        string spr = Model.Nksc_ZxcghtsqModel[j].jkspr.Split('、')[i];
+                                        if (i > 0)
+                                        {
+                            <span>、</span>
+                                        }
+                            <input id="@string.Format("div_zxcghtsq_{0}", i)" name="divzxsplc" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                                valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                                "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        { 
+                            <input id="div_zxcghtsq_0" name="divzxsplc" type="combobox" style="width: 160px;"
+                                class="easyui-combobox" maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                            valueField:'ItemName', textField:'ItemName'" />
+                        }
+                    </div>
+                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                </td>
+            </tr>
+            <tr id="tr_zxcgsq2" style="@(Model.NkscModel.Radio_zxcgsq == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    金额在
+                    <input id="txtjine_zxcgsq" name="jine_zxcgsq" class="easyui-numberbox" style="width: 100px;"
+                        min="0" max="100000000" precision="2" />
+                    元
+                    <select class="easyui-combobox" name="jine_zxcgsqT" id="dlljine_zxcgsqT" editable="false"
+                        style="width: 100px;" data-options="value:''">
+                        <option value="以下">以下</option>
+                        <option value="以上">以上</option>
+                    </select>
+                    <input name="btn_zxcgsq_AddB" onclick="addzxcghtsq()" value="生成步骤" type="button"
+                        style="margin-left: 10px;" />
+                    <span style="font-size: 12px; color: #900; margin-left: 10px;">(注释：每个步骤可以多个审核审批人)</span>
+                </td>
+            </tr>
+            <tr id="tr_zxcgsq3" style="@(Model.NkscModel.Radio_zxcgsq == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    <table id="table_zxcgsq" cellpadding="0" cellspacing="0" style="width: 100%;">
+                        @if (Model.NkscModel.Radio_zxcgsq == "1")
+                        {
+                            foreach (JMProject.Model.Nksc_cghtsq item in Model.Nksc_ZxcghtsqModel)
+                            {
+                            <tr id="@string.Format("table_tr_zxcghtsq{0}", item.sort - 1)">
+                                <td style="border: solid #ccc; border-width: 0px 1px 1px 0px; width: 100px;">
+                                    <input name="btn_zxcgsq_DelB" onclick="delzxcghtsq('@string.Format("table_tr_zxcghtsq{0}", item.sort - 1)')" value="删除步骤" type="button" style="margin-left: 10px;" />
+                                </td>
+                                <td class="con" style="min-width: 240px; width: 240px;">
+                                    <input name="btn_zxcgsq_AddS" onclick="addzxcghtsqs('@string.Format("div_zxcghtsq{0}", item.sort - 1)')" value="增加审核审批人" type="button" />
+                                    <input name="btn_zxcgsq_DelS" onclick="delzxcghtsqs('@string.Format("div_zxcghtsq{0}", item.sort - 1)')" value="删除审核审批人" type="button" />
+                                </td>
+                                <td class="con" colspan="5" style="border-color: none;">
+                                    <span class="moneyText" jtext="金额在" style="float: left; margin-top: 3px;">
+                                        @string.Format("金额在{0}元{1}的，由", item.jkmoney, item.jktype)
+                                    </span>
+                                    <div jkmoney="@item.jkmoney" jktype="@item.jktype" id="@string.Format("div_zxcghtsq{0}", item.sort - 1)" style="float:left; margin-left:3px; margin-right:3px;">
+                                        @for (int i = 0; i < item.jkspr.Split('、').Length; i++)
+                                        {
+                                            string spr = item.jkspr.Split('、')[i];
+                                            if (i > 0)
+                                            {
+                                            <span>、</span>
+                                            }
+                                            <input id="@string.Format("div_zxcghtsq{0}_{1}", item.sort - 1, i)" name="divzxsplc" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                                valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                                "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                        }
+                                    </div>
+                                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                                </td>
+                            </tr>
+                            }
+                        }
+                    </table>
+                </td>
+            </tr>
+            <!--资金支付审批-->
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px; border-top-color: #1ac4ff;
+                    border-top-width: 2px;">
+                    资金支付审批权限：预算内资金支付审批
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="">
+                    <input id="Radio_zjzf1" name="Radio_zjzf" type="radio" value="1" @(Model.NkscModel.Radio_zjzf == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_zjzf1">需要金额授权审批流程</label>
+                    <input id="Radio_zjzf2" name="Radio_zjzf" type="radio" value="0" @(Model.NkscModel.Radio_zjzf == "0" ? "checked='checked'" : "")/><label
+                        for="Radio_zjzf2">不需要具体金额的授权审批流程</label>
+                </td>
+            </tr>
+            <tr id="tr_zjzf1" style="@(Model.NkscModel.Radio_zjzf == "0" ? "" : "display:none;")">
+                <td class="con" style="min-width: 240px; width: 240px">
+                    <input name="btn_zjzf_AddS" onclick="addzjzfs('div_ysnzjzf')" value="增加审核审批人" type="button" />
+                    <input name="btn_zjzf_DelS" onclick="delzjzfs('div_ysnzjzf')" value="删除审核审批人" type="button" />
+                </td>
+                <td class="con" colspan="5" style="">
+                    <span style="float: left; margin-top: 3px;">预算内资金支付业务需经</span>
+                    <div id="div_ysnzjzf" style="float: left; margin-left: 3px; margin-right: 3px;">
+                        @if (Model.NkscModel.Radio_zjzf == "0")
+                        {
+                            if (Model.Nksc_ZcywModel.Count == 0)
+                            {
+                            <input id="div_ysnzjzf_0" name="divysnzjzf" type="combobox" style="width: 160px;"
+                                class="easyui-combobox" maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                            }
+                            else
+                            {
+                                for (int j = 0; j < Model.Nksc_ZcywModel.Count; j++)
+                                {
+                                    for (int i = 0; i < Model.Nksc_ZcywModel[j].zcspr.Split('、').Length; i++)
+                                    {
+                                        string spr = Model.Nksc_ZcywModel[j].zcspr.Split('、')[i];
+                                        if (i > 0)
+                                        {
+                            <span>、</span>
+                                        }
+                            <input id="@string.Format("div_ysnzjzf_{0}", i)" name="divysnzjzf" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <input id="div_ysnzjzf_0" name="divysnzjzf" type="combobox" style="width: 160px;"
+                                class="easyui-combobox" maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                        }
+                    </div>
+                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                </td>
+            </tr>
+            <tr id="tr_zjzf2" style="@(Model.NkscModel.Radio_zjzf == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    资金支付单笔支出金额在
+                    <input id="txtjine_zjzf" name="jine_zjzf" class="easyui-numberbox" style="width: 100px;"
+                        min="0" max="100000000" precision="2" />
+                    元
+                    <select class="easyui-combobox" name="jine_zjzfT" id="dlljine_zjzfT" editable="false"
+                        style="width: 100px;" data-options="value:''">
+                        <option value="以下">以下</option>
+                        <option value="以上">以上</option>
+                    </select>
+                    <input name="btn_zjzf_AddB" onclick="addzjzf()" value="生成步骤" type="button" style="margin-left: 10px;" />
+                    <span style="font-size: 12px; color: #900; margin-left: 10px;">(注释：每个步骤可以多个审核审批人)</span>
+                </td>
+            </tr>
+            <tr id="tr_zjzf3" style="@(Model.NkscModel.Radio_zjzf == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    <table id="table_zjzf" cellpadding="0" cellspacing="0" style="width: 100%;">
+                        @if (Model.NkscModel.Radio_zjzf == "1")
+                        {
+                            foreach (JMProject.Model.Nksc_Zcyw item in Model.Nksc_ZcywModel)
+                            {
+                            <tr id="@string.Format("table_tr_zjzf{0}", item.sort - 1)">
+                                <td style="border: solid #ccc; border-width: 0px 1px 1px 0px; width: 100px;">
+                                    <input name="btn_zjzf_DelB" onclick="delzjzf('@string.Format("table_tr_zjzf{0}", item.sort - 1)')" value="删除步骤" type="button" style="margin-left: 10px;" />
+                                </td>
+                                <td class="con" style="min-width: 240px; width: 240px">
+                                    <input name="btn_zjzf_AddS" onclick="addzjzfs('@string.Format("div_ysnzjzf{0}", item.sort - 1)')" value="增加审核审批人" type="button" />
+                                    <input name="btn_zjzf_DelS" onclick="delzjzfs('@string.Format("div_ysnzjzf{0}", item.sort - 1)')" value="删除审核审批人" type="button" />
+                                </td>
+                                <td class="con" colspan="5">
+                                    <span class="moneyText" jtext="单笔支出金额在" style="float: left; margin-top: 3px;">
+                                        @string.Format("单笔支出金额在{0}元{1}的，由", item.zcmoney, item.zctype)
+                                    </span>
+                                    <div zcmoney="@item.zcmoney" zctype="@item.zctype" id="@string.Format("div_ysnzjzf{0}", item.sort - 1)" style="float:left; margin-left:3px; margin-right:3px;">
+                                        @for (int i = 0; i < item.zcspr.Split('、').Length; i++)
+                                        {
+                                            string spr = item.zcspr.Split('、')[i];
+                                            if (i > 0)
+                                            {
+                                            <span>、</span>
+                                            }
+                                            <input id="@string.Format("div_ysnzjzf{0}_{1}", item.sort - 1, i)" name="divysnzjzf" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                        maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                        valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                        "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                        }
+                                    </div>
+                                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                                </td>
+                            </tr>
+                            }
+                        }
+                    </table>
+                </td>
+            </tr>
+            <!--财政专项资金支付审批-->
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px; border-top-color: #1ac4ff;
+                    border-top-width: 2px;">
+                    财政专项资金支付审批
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="">
+                    <input id="Radio_czzxzj1" name="Radio_czzxzj" type="radio" value="1" @(Model.NkscModel.Radio_czzxzj == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_czzxzj1">需要金额授权审批流程</label>
+                    <input id="Radio_czzxzj2" name="Radio_czzxzj" type="radio" value="0" @(Model.NkscModel.Radio_czzxzj == "0" ? "checked='checked'" : "")/><label
+                        for="Radio_czzxzj2">不需要具体金额的授权审批流程</label>
+                    <input id="Radio_czzxzj3" name="Radio_czzxzj" type="radio" value="2" @(Model.NkscModel.Radio_czzxzj == "2" ? "checked='checked'" : "")/><label
+                        for="Radio_czzxzj3">无财政专项资金业务</label>
+                </td>
+            </tr>
+            <tr id="tr_czzxzj1" style="@(Model.NkscModel.Radio_czzxzj == "0" ? "" : "display:none;")">
+                <td class="con" style="min-width: 240px; width: 240px">
+                    <input name="btn_czzxzj_AddS" onclick="addczzjzfs('div_czzxzj')" value="增加审核审批人"
+                        type="button" />
+                    <input name="btn_czzxzj_DelS" onclick="delczzjzfs('div_czzxzj')" value="删除审核审批人"
+                        type="button" />
+                </td>
+                <td class="con" colspan="5" style="">
+                    <span style="float: left; margin-top: 3px;">财政专项资金支付业务需经</span>
+                    <div id="div_czzxzj" style="float: left; margin-left: 3px; margin-right: 3px;">
+                        @if (Model.NkscModel.Radio_czzxzj == "0")
+                        {
+                            if (Model.Nksc_CzZcywModel.Count == 0)
+                            {
+                            <input id="div_czzxzj_0" name="divczzxzj" type="combobox" style="width: 160px;" class="easyui-combobox"
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                            }
+                            else
+                            {
+                                for (int j = 0; j < Model.Nksc_CzZcywModel.Count; j++)
+                                {
+                                    for (int i = 0; i < Model.Nksc_CzZcywModel[j].zcspr.Split('、').Length; i++)
+                                    {
+                                        string spr = Model.Nksc_CzZcywModel[j].zcspr.Split('、')[i];
+                                        if (i > 0)
+                                        {
+                            <span>、</span>
+                                        }
+                            <input id="@string.Format("div_czzxzj_{0}", i)" name="divczzxzj" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        { 
+                            <input id="div_czzxzj_0" name="divczzxzj" type="combobox" style="width: 160px;" class="easyui-combobox"
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                        }
+                    </div>
+                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                </td>
+            </tr>
+            <tr id="tr_czzxzj2" style="@(Model.NkscModel.Radio_czzxzj == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    资金支付单笔支出金额在
+                    <input id="txtjine_czzxzj" name="jine_czzxzj" class="easyui-numberbox" style="width: 100px;"
+                        min="0" max="100000000" precision="2" />
+                    元
+                    <select class="easyui-combobox" name="jine_czzxzjT" id="dlljine_czzxzjT" editable="false"
+                        style="width: 100px;" data-options="value:''">
+                        <option value="以下">以下</option>
+                        <option value="以上">以上</option>
+                    </select>
+                    <input name="btn_czzxzj_AddB" onclick="addczzjzf()" value="生成步骤" type="button" style="margin-left: 10px;" />
+                    <span style="font-size: 12px; color: #900; margin-left: 10px;">(注释：每个步骤可以多个审核审批人)</span>
+                </td>
+            </tr>
+            <tr id="tr_czzxzj3" style="@(Model.NkscModel.Radio_czzxzj == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    <table id="table_czzxzj" cellpadding="0" cellspacing="0" style="width: 100%;">
+                        @if (Model.NkscModel.Radio_czzxzj == "1")
+                        {
+                            foreach (JMProject.Model.Nksc_Zcyw item in Model.Nksc_CzZcywModel)
+                            {
+                                if (item.zcywtype == "1")
+                                {
+                            <tr id="@string.Format("table_tr_czzxzj{0}", item.sort - 1)">
+                                <td style="border: solid #ccc; border-width: 0px 1px 1px 0px; width: 100px;">
+                                    <input name="btn_czzxzj_DelB" onclick="delczzjzf('@string.Format("table_tr_czzxzj{0}", item.sort - 1)')" value="删除步骤" type="button" style="margin-left: 10px;" />
+                                </td>
+                                <td class="con" style="min-width: 240px; width: 240px">
+                                    <input name="btn_czzxzj_AddS" onclick="addczzjzfs('@string.Format("div_czzxzj{0}", item.sort - 1)')" value="增加审核审批人" type="button" />
+                                    <input name="btn_czzxzj_DelS" onclick="delczzjzfs('@string.Format("div_czzxzj{0}", item.sort - 1)')" value="删除审核审批人" type="button" />
+                                </td>
+                                <td class="con" colspan="5">
+                                    <span class="moneyText" jtext="单笔支出金额在" style="float: left; margin-top: 3px;">
+                                        @string.Format("单笔支出金额在{0}元{1}的，由", item.zcmoney, item.zctype)
+                                    </span>
+                                    <div zcmoney="@item.zcmoney" zctype="@item.zctype" id="@string.Format("div_czzxzj{0}", item.sort - 1)" style="float:left; margin-left:3px; margin-right:3px;">
+                                        @for (int i = 0; i < item.zcspr.Split('、').Length; i++)
+                                        {
+                                            string spr = item.zcspr.Split('、')[i];
+                                            if (i > 0)
+                                            {
+                                            <span>、</span>
+                                            }
+                                            <input id="@string.Format("div_czzxzj{0}_{1}", item.sort - 1, i)" name="divczzxzj" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                            maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                            valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                            "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                        }
+                                    </div>
+                                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                                </td>
+                            </tr>
+                                }
+                            }
+                        }
+                    </table>
+                </td>
+            </tr>
+            <!--非财政专项资金支付审批-->
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px; border-top-color: #1ac4ff;
+                    border-top-width: 2px;">
+                    非财政专项资金支付审批
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="">
+                    <input id="Radio_fczzxzj1" name="Radio_fczzxzj" type="radio" value="1" @(Model.NkscModel.Radio_fczzxzj == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_fczzxzj1">需要金额授权审批流程</label>
+                    <input id="Radio_fczzxzj2" name="Radio_fczzxzj" type="radio" value="0" @(Model.NkscModel.Radio_fczzxzj == "0" ? "checked='checked'" : "")/><label
+                        for="Radio_fczzxzj2">不需要具体金额的授权审批流程</label>
+                    <input id="Radio_fczzxzj3" name="Radio_fczzxzj" type="radio" value="2" @(Model.NkscModel.Radio_fczzxzj == "2" ? "checked='checked'" : "")/><label
+                        for="Radio_fczzxzj3">无非财政专项资金业务</label>
+                </td>
+            </tr>
+            <tr id="tr_fczzxzj1" style="@(Model.NkscModel.Radio_fczzxzj == "0" ? "" : "display:none;")">
+                <td class="con" style="min-width: 240px; width: 240px">
+                    <input name="btn_fczzxzj_AddS" onclick="addfczzjzfs('div_fczzxzj')" value="增加审核审批人"
+                        type="button" />
+                    <input name="btn_fczzxzj_DelS" onclick="delfczzjzfs('div_fczzxzj')" value="删除审核审批人"
+                        type="button" />
+                </td>
+                <td class="con" colspan="5" style="">
+                    <span style="float: left; margin-top: 3px;">非财政专项资金支付业务需经</span>
+                    <div id="div_fczzxzj" style="float: left; margin-left: 3px; margin-right: 3px;">
+                        @if (Model.NkscModel.Radio_fczzxzj == "0")
+                        {
+                            if (Model.Nksc_FczZcywModel.Count == 0)
+                            {
+                            <input id="div_fczzxzj_0" name="divfczzxzj" type="combobox" style="width: 160px;"
+                                class="easyui-combobox" maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                            }
+                            else
+                            {
+                                for (int j = 0; j < Model.Nksc_FczZcywModel.Count; j++)
+                                {
+                                    for (int i = 0; i < Model.Nksc_FczZcywModel[j].zcspr.Split('、').Length; i++)
+                                    {
+                                        string spr = Model.Nksc_FczZcywModel[j].zcspr.Split('、')[i];
+                                        if (i > 0)
+                                        {
+                            <span>、</span>
+                                        }
+                            <input id="@string.Format("div_fczzxzj_{0}", i)" name="divfczzxzj" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        { 
+                            <input id="div_fczzxzj_0" name="divfczzxzj" type="combobox" style="width: 160px;"
+                                class="easyui-combobox" maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                valueField:'ItemName', textField:'ItemName'" />
+                        }
+                    </div>
+                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                </td>
+            </tr>
+            <tr id="tr_fczzxzj2" style="@(Model.NkscModel.Radio_fczzxzj == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    资金支付单笔支出金额在
+                    <input id="txtjine_fczzxzj" name="jine_fczzxzj" class="easyui-numberbox" style="width: 100px;"
+                        min="0" max="100000000" precision="2" />
+                    元
+                    <select class="easyui-combobox" name="jine_fczzxzjT" id="dlljine_fczzxzjT" editable="false"
+                        style="width: 100px;" data-options="value:''">
+                        <option value="以下">以下</option>
+                        <option value="以上">以上</option>
+                    </select>
+                    <input name="btn_fczzxzj_AddB" onclick="addfczzjzf()" value="生成步骤" type="button"
+                        style="margin-left: 10px;" />
+                    <span style="font-size: 12px; color: #900; margin-left: 10px;">(注释：每个步骤可以多个审核审批人)</span>
+                </td>
+            </tr>
+            <tr id="tr_fczzxzj3" style="@(Model.NkscModel.Radio_fczzxzj == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    <table id="table_fczzxzj" cellpadding="0" cellspacing="0" style="width: 100%;">
+                        @if (Model.NkscModel.Radio_fczzxzj == "1")
+                        {
+                            foreach (JMProject.Model.Nksc_Zcyw item in Model.Nksc_FczZcywModel)
+                            {
+                                if (item.zcywtype == "2")
+                                {
+                            <tr id="@string.Format("table_tr_fczzxzj{0}", item.sort - 1)">
+                                <td style="border: solid #ccc; border-width: 0px 1px 1px 0px; width: 100px;">
+                                    <input name="btn_fczzxzj_DelB" onclick="delfczzjzf('@string.Format("table_tr_fczzxzj{0}", item.sort - 1)')" value="删除步骤" type="button" style="margin-left: 10px;" />
+                                </td>
+                                <td class="con" style="min-width: 240px; width: 240px">
+                                    <input name="btn_fczzxzj_AddS" onclick="addfczzjzfs('@string.Format("div_fczzxzj{0}", item.sort - 1)')" value="增加审核审批人" type="button" />
+                                    <input name="btn_fczzxzj_DelS" onclick="delfczzjzfs('@string.Format("div_fczzxzj{0}", item.sort - 1)')" value="删除审核审批人" type="button" />
+                                </td>
+                                <td class="con" colspan="5">
+                                    <span class="moneyText" jtext="单笔支出金额在" style="float: left; margin-top: 3px;">
+                                        @string.Format("单笔支出金额在{0}元{1}的，由", item.zcmoney, item.zctype)
+                                    </span>
+                                    <div zcmoney="@item.zcmoney" zctype="@item.zctype" id="@string.Format("div_fczzxzj{0}", item.sort - 1)" style="float:left; margin-left:3px; margin-right:3px;">
+                                        @for (int i = 0; i < item.zcspr.Split('、').Length; i++)
+                                        {
+                                            string spr = item.zcspr.Split('、')[i];
+                                            if (i > 0)
+                                            {
+                                            <span>、</span>
+                                            }
+                                            <input id="@string.Format("div_fczzxzj{0}_{1}", item.sort - 1, i)" name="divfczzxzj" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                                valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                                "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                        }
+                                    </div>
+                                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                                </td>
+                            </tr>
+                                }
+                            }
+                        }
+                    </table>
+                </td>
+            </tr>
+            <!--借款审批-->
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px; border-top-color: #1ac4ff;
+                    border-top-width: 2px;">
+                    借款审批权限：支出管理制度
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="">
+                    <input id="Radio_jksh1" name="Radio_jksh" type="radio" value="1" @(Model.NkscModel.Radio_jksh == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_jksh1">借款需要金额授权</label>
+                    <input id="Radio_jksh2" name="Radio_jksh" type="radio" value="0" @(Model.NkscModel.Radio_jksh == "0" ? "checked='checked'" : "") /><label
+                        for="Radio_jksh2">借款不需要具体金额的授权</label>
+                    <input id="Radio_jksh3" name="Radio_jksh" type="radio" value="2" @(Model.NkscModel.Radio_jksh == "2" ? "checked='checked'" : "") /><label
+                        for="Radio_jksh3">无借款业务</label>
+                </td>
+            </tr>
+            <tr id="tr_jksh1" style="@(Model.NkscModel.Radio_jksh == "0" ? "" : "display:none;")">
+                <td class="con" style="min-width: 240px; width: 240px">
+                    <input name="btn_jksh_AddS" onclick="addjkshs('div_jksh')" value="增加审核审批人" type="button" />
+                    <input name="btn_jksh_DelS" onclick="deljkshs('div_jksh')" value="删除审核审批人" type="button" />
+                </td>
+                <td class="con" colspan="5" style="">
+                    <span style="float: left; margin-top: 3px;">借款业务需经</span>
+                    <div id="div_jksh" style="float: left; margin-left: 3px; margin-right: 3px;">
+                        @if (Model.NkscModel.Radio_jksh == "0")
+                        {
+                            if (Model.Nksc_JkywModel.Count == 0)
+                            {
+                            <input id="div_jksh_0" name="divjksh" type="combobox" style="width: 160px;" class="easyui-combobox"
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                    valueField:'ItemName', textField:'ItemName'" />
+                            }
+                            else
+                            {
+                                for (int i = 0; i < Model.Nksc_JkywModel[0].jkspr.Split('、').Length; i++)
+                                {
+                                    string spr = Model.Nksc_JkywModel[0].jkspr.Split('、')[i];
+                                    if (i > 0)
+                                    {
+                            <span>、</span>
+                                    }
+                            <input id="@string.Format("div_jksh_{0}", i)" name="divjksh" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                    maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                    valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                    "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                }
+                            }
+                        }
+                        else
+                        { 
+                            <input id="div_jksh_0" name="divjksh" type="combobox" style="width: 160px;" class="easyui-combobox"
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                    valueField:'ItemName', textField:'ItemName'" />
+                        }
+                    </div>
+                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                </td>
+            </tr>
+            <tr id="tr_jksh2" style="@(Model.NkscModel.Radio_jksh == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    借款金额在
+                    <input id="txtjine_jksh" name="jine_jksh" class="easyui-numberbox" style="width: 100px;"
+                        min="0" max="100000000" precision="2" />
+                    元
+                    <select class="easyui-combobox" name="jine_jkshT" id="dlljine_jkshT" editable="false"
+                        style="width: 100px;" data-options="value:''">
+                        <option value="以下">以下</option>
+                        <option value="以上">以上</option>
+                    </select>
+                    <input name="btn_jksh_AddB" onclick="addjksh()" value="生成步骤" type="button" style="margin-left: 10px;" />
+                    <span style="font-size: 12px; color: #900; margin-left: 10px;">(注释：每个步骤可以多个审核审批人)</span>
+                </td>
+            </tr>
+            <tr id="tr_jksh3" style="@(Model.NkscModel.Radio_jksh == "1" ? "" : "display:none;")">
+                <td class="con" colspan="6">
+                    <table id="table_jksh" cellpadding="0" cellspacing="0" style="width: 100%;">
+                        @if (Model.NkscModel.Radio_jksh == "1")
+                        {
+                            foreach (JMProject.Model.Nksc_Jkyw item in Model.Nksc_JkywModel)
+                            {
+                            <tr id="@string.Format("table_tr_jksh{0}", item.sort - 1)">
+                                <td style="border: solid #ccc; border-width: 0px 1px 1px 0px; width: 100px;">
+                                    <input name="btn_jksh_DelB" onclick="deljksh('@string.Format("table_tr_jksh{0}", item.sort - 1)')" value="删除步骤" type="button" style="margin-left: 10px;" />
+                                </td>
+                                <td class="con" style="min-width: 240px; width: 240px">
+                                    <input name="btn_jksh_AddS" onclick="addjkshs('@string.Format("div_jksh{0}", item.sort - 1)')" value="增加审核审批人" type="button" />
+                                    <input name="btn_jksh_DelS" onclick="deljkshs('@string.Format("div_jksh{0}", item.sort - 1)')" value="删除审核审批人" type="button" />
+                                </td>
+                                <td class="con" colspan="5">
+                                    <span class="moneyText" jtext="借款金额在" style="float: left; margin-top: 3px;">
+                                        @string.Format("借款金额在{0}元{1}的，由", item.jkmoney, item.jktype)
+                                    </span>
+                                    <div jkmoney="@item.jkmoney" jktype="@item.jktype" id="@string.Format("div_jksh{0}", item.sort - 1)" style="float:left; margin-left:3px; margin-right:3px;">
+                                        @for (int i = 0; i < item.jkspr.Split('、').Length; i++)
+                                        {
+                                            string spr = item.jkspr.Split('、')[i];
+                                            if (i > 0)
+                                            {
+                                            <span>、</span>
+                                            }
+                                            <input id="@string.Format("div_jksh{0}_{1}", item.sort - 1, i)" name="divjksh" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                    maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                    valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                    "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                        }
+                                    </div>
+                                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                                </td>
+                            </tr>
+                            }
+                        }
+                    </table>
+                </td>
+            </tr>
+            <!--报销审批-->
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px; border-top-color: #1ac4ff;
+                    border-top-width: 2px;">
+                    报销审批权限：资金支出审批管理办法
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="">
+                    <input id="Radio_bxsh1" name="Radio_bxsh" type="radio" value="1" @(Model.NkscModel.Radio_bxsh == "1" ? "checked='checked'" : "") /><label
+                        for="Radio_bxsh1">报销需要金额授权</label>
+                    <input id="Radio_bxsh2" name="Radio_bxsh" type="radio" value="0" @(Model.NkscModel.Radio_bxsh == "0" ? "checked='checked'" : "") /><label
+                        for="Radio_bxsh2">报销不需要具体金额的授权</label>
+                </td>
+            </tr>
+            <tr id="tr_bxsh1" style="@(Model.NkscModel.Radio_bxsh == "1" ? "display:none;" : "")">
+                <td class="con" style="min-width: 240px; width: 240px">
+                    <input name="btn_bxsh_AddS" onclick="addbxshs('div_bxsh')" value="增加审核审批人" type="button" />
+                    <input name="btn_bxsh_DelS" onclick="delbxshs('div_bxsh')" value="删除审核审批人" type="button" />
+                </td>
+                <td class="con" colspan="5" style="">
+                    <span style="float: left; margin-top: 3px;">报销业务需经</span>
+                    <div id="div_bxsh" style="float: left; margin-left: 3px; margin-right: 3px;">
+                        @if (Model.NkscModel.Radio_bxsh == "0")
+                        {
+                            if (Model.Nksc_BxywModel.Count == 0)
+                            {
+                            <input id="div_bxsh_0" name="divbxsh" type="combobox" style="width: 160px;" class="easyui-combobox"
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                    valueField:'ItemName', textField:'ItemName'" />
+                            }
+                            else
+                            {
+                                for (int i = 0; i < Model.Nksc_BxywModel[0].bxspr.Split('、').Length; i++)
+                                {
+                                    string spr = Model.Nksc_BxywModel[0].bxspr.Split('、')[i];
+                                    if (i > 0)
+                                    {
+                            <span>、</span>
+                                    }
+                            <input id="@string.Format("div_bxsh_{0}", i)" name="divbxsh" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                    maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                    valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                    "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                }
+                            }
+                        }
+                        else
+                        { 
+                            <input id="div_bxsh_0" name="divbxsh" type="combobox" style="width: 160px;" class="easyui-combobox"
+                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                    valueField:'ItemName', textField:'ItemName'" />
+                        }
+                    </div>
+                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                </td>
+            </tr>
+            <tr id="tr_bxsh2" style="@(Model.NkscModel.Radio_bxsh == "0" ? "display:none;" : "")">
+                <td class="con" colspan="6">
+                    报销金额在
+                    <input id="txtjine_bxsh" name="jine_bxsh" class="easyui-numberbox" style="width: 100px;"
+                        min="0" max="100000000" precision="2" />
+                    元
+                    <select class="easyui-combobox" name="jine_bxshT" id="dlljine_bxshT" editable="false"
+                        style="width: 100px;" data-options="value:''">
+                        <option value="以下">以下</option>
+                        <option value="以上">以上</option>
+                    </select>
+                    <input name="btn_bxsh_AddB" onclick="addbxsh()" value="生成步骤" type="button" style="margin-left: 10px;" />
+                    <span style="font-size: 12px; color: #900; margin-left: 10px;">(注释：每个步骤可以多个审核审批人)</span>
+                </td>
+            </tr>
+            <tr id="tr_bxsh3" style="@(Model.NkscModel.Radio_bxsh == "0" ? "display:none;" : "")">
+                <td class="con" colspan="6">
+                    <table id="table_bxsh" cellpadding="0" cellspacing="0" style="width: 100%;">
+                        @if (Model.NkscModel.Radio_bxsh == "1")
+                        {
+                            foreach (JMProject.Model.Nksc_Bxyw item in Model.Nksc_BxywModel)
+                            {
+                            <tr id="@string.Format("table_tr_bxsh{0}", item.sort - 1)">
+                                <td style="border: solid #ccc; border-width: 0px 1px 1px 0px; width: 100px;">
+                                    <input name="btn_bxsh_DelB" onclick="delbxsh('@string.Format("table_tr_bxsh{0}", item.sort - 1)')" value="删除步骤" type="button" style="margin-left: 10px;" />
+                                </td>
+                                <td class="con" style="min-width: 240px; width: 240px">
+                                    <input name="btn_bxsh_AddS" onclick="addbxshs('@string.Format("div_bxsh{0}", item.sort - 1)')" value="增加审核审批人" type="button" />
+                                    <input name="btn_bxsh_DelS" onclick="delbxshs('@string.Format("div_bxsh{0}", item.sort - 1)')" value="删除审核审批人" type="button" />
+                                </td>
+                                <td class="con" colspan="5">
+                                    <span class="moneyText" jtext="报销金额在" style="float: left; margin-top: 3px;">
+                                        @string.Format("报销金额在{0}元{1}的，由", item.bxmoney, item.bxtype)
+                                    </span>
+                                    <div bxmoney="@item.bxmoney" bxtype="@item.bxtype" id="@string.Format("div_bxsh{0}", item.sort - 1)" style="float:left; margin-left:3px; margin-right:3px;">
+                                        @for (int i = 0; i < item.bxspr.Split('、').Length; i++)
+                                        {
+                                            string spr = item.bxspr.Split('、')[i];
+                                            if (i > 0)
+                                            {
+                                            <span>、</span>
+                                            }
+                                            <input id="@string.Format("div_bxsh{0}_{1}", item.sort - 1, i)" name="divbxsh" type="combobox" style="width: 160px;" class="easyui-combobox" 
+                                                maxlength="30" editable="false" data-options="panelHeight:'auto',url:'/Basic/GetComb_SpLcDictionaryItem?DicID=027',
+                                                valueField:'ItemName', textField:'ItemName'" value="@(spr == "分管业务领导" || spr == "主管业务领导" ?
+                                                "主管业务领导" : (spr == "分管财务领导" || spr == "主管财务领导" ? "主管财务领导" : spr))" />
+                                        }
+                                    </div>
+                                    <span style="float: left; margin-top: 3px;">审核审批。</span>
+                                </td>
+                            </tr>
+                            }
+                        }
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px; border-top-color: #1ac4ff;
+                    border-top-width: 2px;">
+                    本单位现金支付授权范围
+                    <input id="CheckboxXJZF" name="XjzfLxzc" type="checkbox" value="xzdw" @(Model.NkscModel.jine041509 == "0.00" ? "checked='checked'" : "")/><label
+                        for="CheckboxXJZF" style="color: #000; font-size: 12px;">无零星支出业务</label>
+                </td>
+            </tr>
+            <tr id="tr_XjzfLxzc" style="@(Model.NkscModel.jine041509 == "0.00" ? "display:none;" : "")">
+                <td class="con" colspan="6">
+                    金额为
+                    <input id="txtjine041509" name="jine041509" class="easyui-validatebox easyui-numberbox"
+                        style="font-size: 12px; width: 100px; text-align: right;" min="0" max="100000000" data-options="value:'@Model.NkscModel.jine041509'"
+                        precision="2" />
+                    元以下的零星支出。(如：一般为1000元)
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6" style="color: #2E8B57; font-size: 13px; border-top-color: #1ac4ff;
+                    border-top-width: 2px;">
+                    固定资产标准：实物资产制度、固定资产制度
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6">
+                    （1）单位价值在
+                    <input id="txtjine0407" name="jine0407" class="easyui-validatebox easyui-numberbox"
+                        style="font-size: 12px; width: 100px; text-align: right;" min="0" max="100000000" data-options="value:'@Model.NkscModel.jine0407'"
+                        precision="2" />
+                    元以上的一般设备；（如：一般是1000元）
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="6">
+                    （2）单位价值在
+                    <input id="txtjine0408" name="jine0408" class="easyui-validatebox easyui-numberbox"
+                        style="font-size: 12px; width: 100px; text-align: right;" min="0" max="100000000" data-options="value:'@Model.NkscModel.jine0408'"
+                        precision="2" />
+                    元以上的专用设备；（如：一般是1500元）
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!--科室职能-->
+    <div id="step-6">
+        <h2 class="StepTitle">
+            科室职能<span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="con" colspan="6">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-add" onclick="addks()">
+                        添加科室</a> <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel"
+                            onclick="removeks()" style="margin-left: 10px;">删除科室</a> <span style="color: #900;">
+                                （更多的科室请点击左侧“添加科室”按钮）</span>
+                </td>
+            </tr>
+        </table>
+        <table id="table_ksgwzz" class="tab_form" cellpadding="0" cellspacing="0">
+            @foreach (var item in Model.Nksc_ksModel)
+            {                            
+                <tr class="kstr">
+                    <td class="dec">
+                        科室名称
+                    </td>
+                    <td class="con">
+                        <input id="@string.Format("txtksmc{0}", item.kszn.sort)" name="@string.Format("ksmc{0}", item.kszn.sort)" type="text" value="@item.kszn.ksmc" class="easyui-validatebox" />
+                        <input id="btnAdd" type="button" value="添加岗位与责任" onclick="addgw('@string.Format("table_ksgwzr{0}", item.kszn.sort)')" /><input
+                    id="btnRemove" type="button" value="删除岗位与责任" onclick="removegw('@string.Format("table_ksgwzr{0}", item.kszn.sort)')" />
+                    </td>
+                </tr>
+                <tr class="kstr">
+                    <td class="dec">
+                        科室职能
+                    </td>
+                    <td class="con">
+                        <textarea id="@string.Format("txtkszn{0}", item.kszn.sort)" name="@string.Format("kszn{0}", item.kszn.sort)" rows="3" class="easyui-validatebox" style="height: 120px;
+                    width: 1018px; font-size: 12px;">@item.kszn.kszn</textarea>
+                    </td>
+                </tr>
+                <tr class="kstr" id="@string.Format("tr{0}", item.kszn.sort)">
+                    <td colspan="2">
+                        <table id="@string.Format("table_ksgwzr{0}", item.kszn.sort)" class="tab_form" cellpadding="0" cellspacing="0" style="width: 100%">
+                            @foreach (var ksgw in item.ksgwzr)
+                            {
+                                <tr>
+                                    <td class="dec">
+                                        科室岗位（更多的岗位请点击
+                                        <br />
+                                        “添加岗位与责任”按钮！）
+                                    </td>
+                                    <td class="con">
+                                        <input id="@string.Format("txtksgw_{0}_{1}", item.kszn.sort, ksgw.sort)" name="@string.Format("ksgw_{0}_{1}", item.kszn.sort, ksgw.sort)" type="text" value="@ksgw.ksgw" class="easyui-validatebox" />
+                                    </td>
+                                    <td class="dec">
+                                        岗位责任
+                                    </td>
+                                    <td class="con">
+                                        <textarea id="@string.Format("txtgwzr_{0}_{1}", item.kszn.sort, ksgw.sort)" name="@string.Format("gwzr_{0}_{1}", item.kszn.sort, ksgw.sort)" rows="3" class="easyui-validatebox" style="height: 120px;
+                                    width: 620px; font-size: 12px;">@ksgw.ksgwzr</textarea>
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+    <!--相关制度与附件-->
+    <div id="step-7">
+        <h2 class="StepTitle">
+            相关制度与附件<span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="con" colspan="3" style="color: #2E8B57; font-size: 13px;">
+                    相关制度
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width: 120px; width: 120px">
+                    差旅费制度
+                </td>
+                <td class="con" style="min-width: 540px; width: 570px;">
+                    <input id="Radioclf3" name="Radioclf" type="radio" @(Model.NkscModel.Radioclf == "2" ? "checked='checked'" : "") value="2" /><label
+                        for="Radioclf3">有（本单位无该制度文件，就按省直机关标准执行）</label>
+                    <input id="Radioclf1" name="Radioclf" type="radio" @(Model.NkscModel.Radioclf == "1" ? "checked='checked'" : "") value="1" /><label
+                        for="Radioclf1">有（必须上传本单位制度附件）</label>
+                    <input id="Radioclf2" name="Radioclf" type="radio" @(Model.NkscModel.Radioclf == "0" ? "checked='checked'" : "") value="0" /><label
+                        for="Radioclf2">无该制度</label>
+                </td>
+                <td class="con" style="color: #900">
+                    若无差旅费制度，本手册将不会体现《差旅费管理制度或办法》
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width: 120px; width: 120px">
+                    会议费制度
+                </td>
+                <td class="con">
+                    <input id="Radiohyf3" name="Radiohyf" type="radio" @(Model.NkscModel.Radiohyf == "2" ? "checked='checked'" : "") value="2" /><label
+                        for="Radiohyf3">有（本单位无该制度文件，就按省直机关标准执行）</label>
+                    <input id="Radiohyf1" name="Radiohyf" type="radio" @(Model.NkscModel.Radiohyf == "1" ? "checked='checked'" : "") value="1" /><label
+                        for="Radiohyf1">有（必须上传本单位制度附件）</label>
+                    <input id="Radiohyf2" name="Radiohyf" type="radio" @(Model.NkscModel.Radiohyf == "0" ? "checked='checked'" : "") value="0" /><label
+                        for="Radiohyf2">无该制度</label>
+                </td>
+                <td class="con" style="color: #900">
+                    若无会议费制度，本手册将不会体现《会议费管理制度或办法》
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width: 120px; width: 120px">
+                    培训费制度
+                </td>
+                <td class="con">
+                    <input id="Radiopxf3" name="Radiopxf" type="radio" @(Model.NkscModel.Radiopxf == "2" ? "checked='checked'" : "") value="2" /><label
+                        for="Radiopxf3">有（本单位无该制度文件，就按省直机关标准执行）</label>
+                    <input id="Radiopxf1" name="Radiopxf" type="radio" @(Model.NkscModel.Radiopxf == "1" ? "checked='checked'" : "") value="1" /><label
+                        for="Radiopxf1">有（必须上传本单位制度附件）</label>
+                    <input id="Radiopxf2" name="Radiopxf" type="radio" @(Model.NkscModel.Radiopxf == "0" ? "checked='checked'" : "") value="0" /><label
+                        for="Radiopxf2">无该制度</label>
+                </td>
+                <td class="con" style="color: #900">
+                    若无培训费制度，本手册将不会体现《培训费管理制度或办法》
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width: 120px; width: 120px">
+                    公务招待制度
+                </td>
+                <td class="con">
+                    <input id="Radiogwzdf3" name="Radiogwzdf" type="radio" @(Model.NkscModel.Radiogwzdf == "2" ? "checked='checked'" : "") value="2" /><label
+                        for="Radiogwzdf3">有（本单位无该制度文件，就按省直机关标准执行）</label>
+                    <input id="Radiogwzdf1" name="Radiogwzdf" type="radio" @(Model.NkscModel.Radiogwzdf == "1" ? "checked='checked'" : "") value="1" /><label
+                        for="Radiogwzdf1">有（必须上传本单位制度附件）</label>
+                    <input id="Radiogwzdf2" name="Radiogwzdf" type="radio" @(Model.NkscModel.Radiogwzdf == "0" ? "checked='checked'" : "") value="0" /><label
+                        for="Radiogwzdf2">无该制度</label>
+                </td>
+                <td class="con" style="color: #900">
+                    若无公务招待制度，本手册将不会体现《公务招待管理制度或办法》
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width: 120px; width: 120px">
+                    是否报账制
+                </td>
+                <td class="con">
+                    <input id="Radiobzz2" name="Radiobzz" type="radio" @(Model.NkscModel.Radiobzz == "0" ? "checked='checked'" : "") value="0" /><label
+                        for="Radiobzz2">否</label>
+                    <input id="Radiobzz1" name="Radiobzz" type="radio" @(Model.NkscModel.Radiobzz == "1" ? "checked='checked'" : "") value="1" /><label
+                        for="Radiobzz1">是（必须上传本单位制度附件）</label>
+                </td>
+                <td class="con" style="color: #900">
+                    报账制即上级会计集中核算，若是报账核算，则手册不会体现《会计机构管理制度》
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="3" style="color: #2E8B57; font-size: 13px;">
+                    附件管理
+                </td>
+            </tr>
+            <tr>
+                <td class="con" colspan="3">
+                    <input id="HiddenFJ" name="id" type="hidden" value="@Model.NkscModel.yhscfj" />
+                    <div id="uploader" class="wu-example">
+                        <!--用来存放文件信息-->
+                        <ul id="thelist" class="imglist">
+                            @if (Model.NkscModel.flag == "1" && ViewBag.Manager == "0")
+                            {
+                                <li id="picker"><a href="javascript:;" title="选择文件">
+                                    <img class="fjimg" alt="选择文件" src="../../Image/up.jpg" style="height: 120px;" />
+                                </a></li>
+                            }
+                            @if (Model.NkscModel.yhscfj != null)
+                            {
+                                for (int i = 0; i < Model.NkscModel.yhscfj.Split('、').Length; i++)
+                                {
+                                    string filename = Model.NkscModel.yhscfj.Split('、')[i];
+                                    if (!string.IsNullOrEmpty(filename))
+                                    {
+                                        string exp = filename.Split('.')[1];
+                                        if (exp == "doc" || exp == "docx")
+                                        {
+                                            exp = "docx";
+                                        }
+                                        else
+                                        {
+                                            exp = "xlsx";
+                                        }
+                                <li id="@string.Format("fileid_{0}", i + 1)">
+                                    @if (Model.NkscModel.flag == "1" && ViewBag.Manager == "0")
+                                    {
+                                        <img alt="删除" onclick="deleteFJ('@string.Format("fileid_{0}", i + 1)','@filename')" style="cursor:pointer; position:absolute;right:15px;top:10px;" src="../../image/close.png" />
+                                    }
+                                    <a href="javascript:;" title="@filename">
+                                        <img class="fjimg" alt="@filename" src="@string.Format("../../image/{0}.png", exp)" /><span>@filename</span>
+                                    </a></li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!--领导权力清单-->
+    <div id="step-8">
+        <h2 class="StepTitle">
+            领导权力清单<span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="con" colspan="6">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-add" onclick="CreateQLQD()">生成清单</a>
+                    @if (Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0")
+                    {
+
+                    }
+                    else
+                    {
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="removeQLQD()" style="margin-left: 10px;">删除清单</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="removeAll()" style="margin-left: 10px;">删除全部</a>
+                    }
+                <span style="color: #900; font-size: 14px;">
+                领导权力清单根据第2页领导及职务生成，点击生成清单，可以对内容进行修改，修改后请保存！
+                </span>
+                </td>
+            </tr>
+        </table>
+        <table id="table_qlqd" class="tab_form" cellpadding="0" cellspacing="0">
+            @if (Model.Nksc_qlqdModel != null)
+            {
+                for (int i = 0; i < Model.Nksc_qlqdModel.Count; i++)
+                {
+                    if (i == 0 || Model.Nksc_qlqdModel[i].leder != Model.Nksc_qlqdModel[i - 1].leder)
+                    {
+                <tr group="@Model.Nksc_qlqdModel[i].leder">
+                    <td class="con" colspan="2">
+                        <input type="checkbox" name="ckbqlqd" id="@("ckb_ql" + i)" /><label for="@("ckb_ql" + i)">@Model.Nksc_qlqdModel[i].leder</label>
+                        职权清单
+                    </td>
+                </tr>
+                    }                
+                <tr group="@Model.Nksc_qlqdModel[i].leder">
+                    <td class="dec">
+                        @Model.Nksc_qlqdModel[i].qlsxname
+                    </td>
+                    <td class="con">
+                        <textarea autoHeight="true" class="textarea" id="@("zz_" + Model.Nksc_qlqdModel[i].qlsx + "_" + Model.Nksc_qlqdModel[i].qlsxname + "_" + Model.Nksc_qlqdModel[i].leder+ "_" + Model.Nksc_qlqdModel[i].qlsort)" style="font-size: 12px; width: 1050px;" cols="" rows="1">@Model.Nksc_qlqdModel[i].qltext</textarea>
+                    </td>
+                </tr>
+                }
+            }
+        </table>
+    </div>
+    <!--提交&打印&查看-->
+    <div id="step-9">
+        <h2 class="StepTitle">
+            提交&打印&查看<span style="color: #900; font-size: 14px;">
+                @(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "（信息已提交不能修改，如想修改请联系我们）" : "")
+            </span>
+        </h2>
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconcls="icon-print" onclick="Print()"
+            style="width: 230px; height: 40px;">打印信息</a> <a href="javascript:void(0);" class="easyui-linkbutton"
+                iconcls="icon-search" onclick="LookSwf()" style="width: 230px; height: 40px;
+                margin-left: 20px;">查看手册</a>
+        <p style="color: #2E8B57; font-size: 20px;">
+            确认填写信息无误后，请单击右下角<span style="color: #900; font-size: 25px;"> 《提交》 </span>按钮。</p>
+        <p style="color: #900; font-size: 16px;">
+            (注：提交后将不能修改信息！待我方审核通过后开始制作手册！)</p>
+    </div>
+</div>
+<div id="zzdiv" style="width:100px; height:100px;position:fixed;left:180px; top :10px;background-color:#000;opacity:0.1;z-index:999; 
+@(Model.NkscModel.flag != "1" && Model.NkscModel.flag != "0" && ViewBag.Manager == "0" ? "display:block" : "display:none")">
+</div>

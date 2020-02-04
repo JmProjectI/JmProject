@@ -1,0 +1,642 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.SaleCustom
+@{
+    ViewBag.Title = "客户管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<ServiceTime> ServiceTime = (List<ServiceTime>)ViewBag.Services;
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<style type="text/css">
+    .form_table th
+    {
+        text-align: left;
+        text-indent: 0.5em;
+    }
+</style>
+<script type="text/javascript">
+
+    function bindCityPL(CId) {
+
+        //上级主管区域
+        $('#UpIDBm').combobox({
+            url: '/Basic/Get_CombCityPL?pid=' + CId,
+            valueField: 'ID',
+            textField: 'Name',
+            panelHeight: 300,
+            onLoadSuccess: function (node, data) {
+                $("#UpIDBm").combobox('setValue', '@Model.UpID');
+            },
+            onSelect: function (node) {
+                bindCity(node.ID);
+            }
+        });
+    }
+
+    function bindCity(CId) {
+
+        //所在市县区
+        $('#RegionID').combobox({
+            url: '/Basic/Get_CombCity?pid=' + CId,
+            valueField: 'ID',
+            textField: 'Name',
+            onLoadSuccess: function (node, data) {
+                $("#RegionID").combobox('setValue', '@Model.Region');
+            }
+        });
+    }
+    /*下拉框填充*/
+    function bindGroup() {
+        //财政局 
+        $('#FinanceID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=005',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#FinanceID").combobox('setValue', '@Model.Finance');
+            }
+        });
+        //部门
+        $('#BMID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=006',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#BMID").combobox('setValue', '@Model.BM');
+            }
+        });
+        //职务
+        $('#ZwID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=002',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#ZwID").combobox('setValue', '@Model.Zw');
+            }
+        });
+        //省份
+        $('#ProvinceID').combobox({
+            url: '/Basic/Get_CombProvince',
+            valueField: 'Pid',
+            textField: 'Name',
+            onLoadSuccess: function (node, data) {
+                if ('@Model.Province' == "") {
+                    var vdata = $('#ProvinceID').combobox('getData');
+                    $("#ProvinceID").combobox('select', vdata[0].Pid);
+                }
+                else {
+                    $("#ProvinceID").combobox('setValue', '@Model.Province');
+                }
+            },
+            onSelect: function (node) {
+                bindCityPL(node.Pid);
+            }
+        });
+        //行业
+        $('#IndustryID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=001',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#IndustryID").combobox('setValue', '@Model.Industry');
+            }
+        });
+        //业务员
+        $('#YwyID').combobox({
+            url: '/System/GetComb_Users',
+            multiple: true,
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                if ('@Model.Ywy' == "") {
+                    $.ajax({
+                        url: "/Account/GetUsers",
+                        type: "Post",
+                        data: null,
+                        dataType: "json",
+                        success: function (data) {
+                            $("#YwyID").combobox('setValues', data.Id);
+                        }
+                    });
+                }
+                else {
+                    $("#YwyID").combobox('setValues', '@Model.Ywy');
+                }
+            }
+        });
+        //创建人
+        $('#UidID').combobox({
+            url: '/System/GetComb_Users',
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                if ('@Model.Uid' == "") {
+                    $.ajax({
+                        url: "/Account/GetUsers",
+                        type: "Post",
+                        data: null,
+                        dataType: "json",
+                        success: function (data) {
+                            $("#UidID").combobox('setValue', data.Id);
+                        }
+                    });
+                }
+                else {
+                    $("#UidID").combobox('setValue', '@Model.Uid');
+                }
+            }
+        });
+        //与客户关系
+        $('#GxID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=007',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#GxID").combobox('setValue', '@Model.Gx');
+            }
+        });
+        //客户重要性
+        $('#ZyxID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=008',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#ZyxID").combobox('setValue', '@Model.Zyx');
+            }
+        });
+        //客户来源
+        $('#SourceID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=009',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#SourceID").combobox('setValue', '@Model.Source');
+            }
+        });
+        //信用等级
+        $('#XydjID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=010',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#XydjID").combobox('setValue', '@Model.Xydj');
+            }
+        });
+        //客户类别
+        $('#CustomerTypeID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=011',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#CustomerTypeID").combobox('setValue', '@Model.CustomerType');
+            }
+        });
+        //客户等级
+        $('#CustomerGradeID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=003',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#CustomerGradeID").combobox('setValue', '@Model.CustomerGrade');
+            }
+        });
+    }
+
+    $(function () {
+        if ($("input[name='CDate']").val() == "") {
+            var myDate = new Date();
+            $("#CDateID").datebox('setValue', myDate.toLocaleDateString());
+        }
+        bindGroup();
+
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                if ($("input[name='UserPwd']").val() != "" && $("input[name='UserPwd1']").val() == "") {
+                    window.parent.ShowCenter("两次密码 不一致");
+                    return;
+                }
+                else {
+                    var postData = {
+                        ID: $("#ID").val()
+                        , CDate: $("input[name='CDate']").val()
+                        , Ywy: $("#YwyID").combobox('getValues') + ""
+                        , Name: $("input[name='Name']").val()
+                        , BM: $("#BMID").combobox('getValue')
+                        , Lxr: $("input[name='Lxr']").val()
+                        , Zw: $("#ZwID").combobox('getValue')
+                        , Phone: $("input[name='Phone']").val()
+                        , Industry: $("#IndustryID").combobox('getValue')
+                        , UpID: $("#UpIDBm").combobox('getValue')
+                        , Province: $("#ProvinceID").combobox('getValue')
+                        , Xydj: $("#XydjID").combobox('getValue')
+                        , Gx: $("#GxID").combobox('getValue')
+                        , Zyx: $("#ZyxID").combobox('getValue')
+                        , Tel: $("input[name='Tel']").val()
+                        , QQ: $("input[name='QQ']").val()
+                        , Email: $("input[name='Email']").val()
+                        , Address: $("input[name='Address']").val()
+                        , LxrSR: $("input[name='LxrSR']").val()
+                        , QtLxr: $("input[name='QtLxr']").val()
+                        , QtTel: $("input[name='QtTel']").val()
+                        , Bank: $("input[name='Bank']").val()
+                        , CardNum: $("input[name='CardNum']").val()
+                        , SuiH: $("input[name='SuiH']").val()
+                        , Desc: $("textarea[name='Desc']").val()
+                        , Remark: $("textarea[name='Remark']").val()
+                        , Flag: $("input[name='Flag']").val()
+                        , Uid: $("#UidID").val()
+                        , Source: $("#SourceID").combobox('getValue')
+                        , Region: $("#RegionID").combobox('getValue')
+                        , CustomerType: $("#CustomerTypeID").combobox('getValue')
+                        , CustomerGrade: $("#CustomerGradeID").combobox('getValue')
+                        , Code: $("input[name='Code']").val()
+                        , Invoice: $("input[name='Invoice']").val()
+                        , UserName: $("input[name='UserName']").val()
+                        , UserPwd: $("input[name='UserPwd']").val()
+                        , Finance: $("#FinanceID").combobox('getValue')
+                        , YwyName: $("#YwyID").combobox('getText')
+                    };
+
+                    $.ajax({
+                        url: "/Sale/Create_Customer",
+                        type: "Post",
+                        data: postData,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.type == 1) {
+                                window.parent.frameReturnByMes(data.message);
+                                window.parent.frameReturnByReload(false);
+                                window.parent.frameReturnValuesClose(data.value);
+                                window.parent.frameReturnClose();
+                            }
+                            else {
+                                window.parent.frameReturnByMes(data.message);
+                            }
+                        }
+                    });
+                }
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnClose();
+        });
+    });
+
+    function gosubmit() {
+
+        $.ajax({
+            url: "/Sale/Get_CustomerInfo",
+            type: "Post",
+            data: { Name: $("input[name='Name']").val() },
+            dataType: "json",
+            success: function (data) {
+                $("#ProvinceID").combobox('setValue', data.Level1); //省
+                $("#UpIDBm").combobox('setValue', data.Level2); //市
+                $("#RegionID").combobox('setValue', data.Level3); //县
+                $("#FinanceID").combobox('setValue', data.czj); //财政局
+
+                $("input[name='UserName']").val(data.UP); //用户密码简拼
+                $("input[name='UserPwd']").val(data.UP); //用户密码简拼
+                $("input[name='UserPwd1']").val(data.UP); //用户密码简拼
+
+            }
+        });
+    }
+</script>
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<input id="ID" name="ID" type="hidden" value="@Model.ID" />
+<form id="CreateForm" method="post">
+<div style="overflow-y: scroll; height: 600px;">
+    <table class="form_table" style="overflow-y: scroll;">
+        <tbody>
+            <tr>
+                <th>
+                    创建日期
+                </th>
+                <td>
+                    <input id="CDateID" type="text" name="CDate" class="easyui-datebox" required="true" editable="false" value="@Model.CDate" />
+                </td>
+                <th>
+                    客户全称
+                </th>
+                <td colspan="3">
+                    <input type="text" name="Name" class="easyui-validatebox" required="true" maxlength="50" style="width:534px;" value="@Model.Name" onkeydown='if(event.keyCode==13){gosubmit();}' />
+                </td>
+                <td style="width: 95px;">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    省份
+                </th>
+                <td>
+                    <input id="ProvinceID" name="Province" style="width: 208px;" class="easyui-combobox"
+                        required="true" editable="false" />
+                </td>
+                <th>
+                    上级主管区域
+                </th>
+                <td>
+                    <input id="UpIDBm" name="UpID" class="easyui-combobox" style="width: 208px;" maxlength="30"
+                        required="true" editable="false" />
+                </td>
+                <th>
+                    所在市县区
+                </th>
+                <td>
+                    <input id="RegionID" name="Region" style="width: 208px;" class="easyui-combobox"
+                        maxlength="30" required="true" editable="false" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    财政局
+                </th>
+                <td>
+                    <input id="FinanceID" name="Finance" class="easyui-combobox" style="width: 208px;"
+                        maxlength="30" required="true" editable="false" />
+                </td>
+                <th>
+                    主要联系人
+                </th>
+                <td>
+                    <input type="text" name="Lxr" class="easyui-validatebox" maxlength="10" required="true" value="@Model.Lxr" />
+                </td>
+                <th>
+                    手机
+                </th>
+                <td>
+                    <input type="text" name="Phone" class="easyui-validatebox" maxlength="20" required="true" value="@Model.Phone" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    行业
+                </th>
+                <td>
+                    <input id="IndustryID" name="Industry" style="width: 208px;" class="easyui-combobox"
+                        maxlength="30" required="true" editable="false" />
+                </td>
+                <th>
+                    客户等级
+                </th>
+                <td>
+                    <input id="CustomerGradeID" name="CustomerGrade" type="combobox" style="width: 208px;"
+                        class="easyui-combobox" maxlength="30" required="true" editable="false" />
+                </td>
+                <th>
+                    主要联系人生日
+                </th>
+                <td>
+                    <input type="text" name="LxrSR" class="easyui-datebox" editable="false" value="@Model.LxrSR" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    用户名
+                </th>
+                <td>
+                    <input type="text" name="UserName" class="easyui-validatebox" maxlength="30" value="@Model.UserName" />
+                </td>
+                <th>
+                    密码
+                </th>
+                <td>
+                    <input id="UserPwdID" type="password" name="UserPwd" class="easyui-validatebox" maxlength="30" value="@Model.UserPwd" />
+                </td>
+                <th>
+                    确认密码
+                </th>
+                <td>
+                    <input type="password" name="UserPwd1" class="easyui-validatebox" maxlength="30" validtype="equalTo['#UserPwdID']"
+                             value="@Model.UserPwd" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    发票抬头
+                </th>
+                <td colspan="5">
+                    <input type="text" name="Invoice" class="easyui-validatebox" style="width:856px;" maxlength="100" value="@Model.Invoice" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    统一信用代码
+                </th>
+                <td colspan="5">
+                    <input type="text" id="Code" name="Code" class="easyui-validatebox" style="width:856px;" maxlength="20" value="@Model.Code" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    单位地址
+                </th>
+                <td colspan="5">
+                    <input type="text" name="Address" class="easyui-validatebox" style="width:856px;" maxlength="100" value="@Model.Address" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    地址、电话
+                </th>
+                <td>
+                    <input type="text" name="SuiH" class="easyui-validatebox" maxlength="30" value="@Model.SuiH" />
+                </td>
+                <th>
+                    开户行
+                </th>
+                <td>
+                    <input type="text" name="Bank" class="easyui-validatebox" maxlength="50" value="@Model.Bank" />
+                </td>
+                <th>
+                    帐号
+                </th>
+                <td>
+                    <input type="text" name="CardNum" class="easyui-validatebox" maxlength="30" value="@Model.CardNum" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    QQ号码
+                </th>
+                <td>
+                    <input type="text" name="QQ" class="easyui-validatebox" maxlength="50" value="@Model.QQ" />
+                </td>
+                <th>
+                    邮箱
+                </th>
+                <td>
+                    <input type="text" name="Email" class="easyui-validatebox" maxlength="50" value="@Model.Email" />
+                </td>
+                <th>
+                    部门
+                </th>
+                <td>
+                    <input id="BMID" name="BM" class="easyui-combobox" style="width: 208px;" editable="false" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    职务
+                </th>
+                <td>
+                    <input id="ZwID" name="Zw" class="easyui-combobox" style="width: 208px;" maxlength="30"
+                        editable="false" />
+                </td>
+                <th>
+                    与客户关系
+                </th>
+                <td>
+                    <input id="GxID" name="Gx" type="combobox" style="width: 208px;" class="easyui-combobox"
+                        editable="false" />
+                </td>
+                <th>
+                    客户重要性
+                </th>
+                <td>
+                    <input id="ZyxID" name="Zyx" type="combobox" style="width: 208px;" class="easyui-combobox"
+                        editable="false" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    客户来源
+                </th>
+                <td>
+                    <input id="SourceID" name="Source" type="combobox" style="width: 208px;" class="easyui-combobox"
+                        editable="false" maxlength="30" />
+                </td>
+                <th>
+                    信用等级
+                </th>
+                <td>
+                    <input id="XydjID" name="Xydj" type="combobox" style="width: 208px;" class="easyui-combobox"
+                        editable="false" />
+                </td>
+                <th>
+                    客户类别
+                </th>
+                <td>
+                    <input id="CustomerTypeID" name="CustomerType" type="combobox" style="width: 208px;"
+                        class="easyui-combobox" maxlength="30" editable="false" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    内控联系人
+                </th>
+                <td>
+                    <input type="text" name="QtLxr" class="easyui-validatebox" maxlength="20" value="@Model.QtLxr" />
+                </td>
+                <th>
+                    内控电话
+                </th>
+                <td>
+                    <input type="text" name="QtTel" class="easyui-validatebox" maxlength="50" value="@Model.QtTel" />
+                </td>
+                <th>
+                    电话
+                </th>
+                <td>
+                    <input type="text" name="Tel" class="easyui-validatebox"  maxlength="50" value="@Model.Tel" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr style="height: 72px">
+                <th>
+                    信息化构建情况
+                </th>
+                <td colspan="5">
+                    <textarea id="type_Desc" name="Desc" rows="3" class="easyui-validatebox" style="height: 60px;
+                        font-size: 14px; width: 856px;" maxlength="500">@Model.Desc</textarea>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    备注
+                </th>
+                <td colspan="5">
+                    <textarea id="Remark" name="Remark" rows="3" class="easyui-validatebox" style="height: 60px;
+                        font-size: 14px; width: 856px;" maxlength="500">@Model.Remark</textarea>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    创建人
+                </th>
+                <td>
+                    <input id="UidID" name="Uid" type="combobox" style="width: 208px;" class="easyui-combobox" readonly="true" editable="false" value="@Model.Uid" />
+                </td>
+                <th>
+                    业务员
+                </th>
+                <td colspan="4">
+                    <inpu id="YwyID" name="Ywy" type="combobox" style="width: 208px;" class="easyui-combobox"
+                        editable="false" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr style="height: 30px;">
+                <th style="vertical-align: top;">
+                    <div style="height: 30px; line-height: 30px;">
+                        服务期限
+                    </div>
+                </th>
+                <td colspan="5" style="padding-top: 5px;">
+                    <ul id="FwQx" style="padding: 0; margin: 0; width: 860px;">
+                        @if (ServiceTime != null)
+                        {
+                            foreach (var item in ServiceTime)
+                            {
+                            <li style="list-style-type: none; height: 25px; line-height: 25px;">名称：@item.TypeName&nbsp;&nbsp;&nbsp;服务开始日期：@item.SerDateS&nbsp;&nbsp;&nbsp;服务结束日期：
+                                @item.SerDateE&nbsp;&nbsp;&nbsp;服务期限(月)：@item.ServiceMonth
+                            </li>
+                            }
+                        }
+                    </ul>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</form>

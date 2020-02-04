@@ -1,0 +1,140 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.View.View_SaleOrder
+@{
+    ViewBag.Title = "提成管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    AccountModel Account = (AccountModel)ViewBag.Account; 
+}
+<script type="text/javascript">
+    $(function () {
+        reload();
+
+        /*已提*/
+        $("#btnSaveYT").click(function () {
+            var rows = $('#grid').datagrid('getSelections');
+            if (rows.length > 0) {
+                $.messager.confirm('系统提示', '确认要【已提】吗?', function (yes) {
+                    if (yes) {
+                        var selectID = "";
+                        $.each(rows, function (index, item) {
+                            selectID += this.ItemId + ",";
+                        });
+
+                        $.post('/Financial/Set_SaleOrderTC', { ids: selectID, TcFlag: true }, function (data) {
+                            if (data.type == 1) {
+                                window.parent.frameReturnByMes(data.message);
+                                reload();
+                            }
+                            else {
+                                window.parent.frameReturnByMes(data.message);
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+            else {
+                window.parent.frameReturnByMes('请勾选要操作的行!');
+            }
+        });
+
+        /*未提*/
+        $("#btnSaveWT").click(function () {
+            var rows = $('#grid').datagrid('getSelections');
+            if (rows.length > 0) {
+                $.messager.confirm('系统提示', '确认要【未提】吗?', function (yes) {
+                    if (yes) {
+                        var selectID = "";
+                        $.each(rows, function (index, item) {
+                            selectID += this.ItemId + ",";
+                        });
+
+                        $.post('/Financial/Set_SaleOrderTC', { ids: selectID, TcFlag: false }, function (data) {
+                            if (data.type == 1) {
+                                window.parent.frameReturnByMes(data.message);
+                                reload();
+                            }
+                            else {
+                                window.parent.frameReturnByMes(data.message);
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+            else {
+                window.parent.frameReturnByMes('请勾选要操作的行!');
+            }
+        });
+
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByReload(false);
+            window.parent.frameReturnByClose();
+        });
+    });
+
+    function reload() {
+        var queryData = {
+            Id: $("#Id").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Sale/GetData_SaleOrderItem',
+            width: 1134,
+            methord: 'post',
+            height: 465,
+            fitColumns: false,
+            idField: 'ItemId',
+            sortName: 'ItemId',
+            sortOrder: 'asc',
+            pagination: false,
+            striped: true, //奇偶行是否区分
+            singleSelect: false, //单选模式
+            queryParams: queryData,
+            columns: [[
+              { field: 'ck', checkbox: true },
+              { field: 'TcName', title: '提成状态', width: 70
+              , formatter: function (value, row, index) {
+                  if (row.TcName == "") {
+                      return "未提成";
+                  }
+                  else {
+                      return value;
+                  }
+              }
+              },
+              { field: 'TcDate', title: '提成日期', width: 80 },
+              { field: 'TypeName', title: '商品分类', width: 90 },
+              { field: 'ProdectDesc', title: '商品参数(描述)', width: 200, editor: { type: 'text'} },
+              { field: 'ItemCount', title: '成交数量', width: 60 },
+              { field: 'ItemPrice', title: '成交单价', width: 80 },
+              { field: 'ItemMoney', title: '成交金额', width: 80 },
+              { field: 'TaxMoney', title: '税金', width: 70 },
+              { field: 'PresentMoney', title: '礼品金额', width: 75 },
+              { field: 'OtherMoney', title: '其他费用', width: 75 },
+              { field: 'Service', title: '含服务', width: 50 },
+              { field: 'SerDateS', title: '服务开始日期', width: 80 },
+              { field: 'SerDateE', title: '服务结束日期', width: 80 }
+            ]],
+            onLoadSuccess: function (data) {
+
+            }
+        });
+    };
+
+</script>
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSaveYT", "icon-ok", "已提", false)
+    @Html.ToolButton("btnSaveWT", "icon-remove", "未提", true)
+    @Html.ToolButton("btnReturn", "icon-return", "退出并刷新", false)
+</div>
+<div style="padding-left: 1px">
+    <table id="grid">
+    </table>
+</div>

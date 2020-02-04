@@ -1,0 +1,201 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "激活决算";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<ServiceTime> ServiceTime = (List<ServiceTime>)ViewBag.Services;
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<style type="text/css">
+    .form_table th
+    {
+        text-align: left;
+        text-indent: 0.5em;
+        height: 28px;
+    }
+</style>
+<script type="text/javascript">
+
+    $(function () {
+
+        //系统当前日期
+        $("#CDateID").datebox('setValue', new Date().toLocaleDateString());
+
+        //业务员
+        $('#YwyID').combobox({
+            url: '/System/GetComb_Users',
+            multiple: true,
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+
+            }
+        });
+
+        //账户
+        $('#AccountId').combobox({
+            url: '/Basic/GetComb_BasicAccount',
+            valueField: 'Id',
+            textField: 'Key',
+            onLoadSuccess: function (node, data) {
+
+            },
+            onShowPanel: function () {
+                // 动态调整高度  
+                $(this).combobox('panel').height(140);
+            }
+        });
+
+        $("#btnCreate").click(function () {
+            var postData = {
+                Jsyear: $("#jsyear").val()//决算年度
+                , Key: $("input[name='Key']").val()//邀请码
+                , Vlevel: $("input[name='VisitType']:checked").val()//客户级别
+            };
+
+            $.ajax({
+                url: "/Sale/Create_JsKey",
+                type: "Post",
+                data: postData,
+                dataType: "json",
+                success: function (data) {
+                    if (data.type == 1) {
+                        $("#UserKey").val(data.message);
+                    }
+                    else {
+                        window.parent.frameReturnByMes(data.message);
+                    }
+                }
+            });
+        });
+
+        /*保存*/
+        $("#btnSave").click(function () {
+
+            if ($("#CreateForm").form('validate')) {
+
+                var postData = {
+                    CDate: $("input[name='CDate']").val()//合同日期
+                        , CId: $("#CId").val()//客户编号
+                        , AccountId: $('#AccountId').combobox("getValue")//账户编号
+                        , HTMoney: $("#txtMoney").numberbox("getValue")//合同金额
+                        , Jsyear: $("#jsyear").val()//决算年度
+                        , Key: $("input[name='Key']").val()//邀请码
+                        , Vlevel: $("input[name='VisitType']:checked").val()//客户级别
+                        , UserKey: $("input[name='UserKey']").val()//邀请码
+                        , Ywy: $("#YwyID").combobox('getValues') + ""//业务员
+                };
+
+                $.ajax({
+                    url: "/Sale/Save_JsKeyOrder",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnValuesClose(data.value);
+                            window.parent.frameReturnClose();
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnClose();
+        });
+    });
+</script>
+<div class="divtool bgb">
+    @Html.ToolButton("btnCreate", "icon-save", "生成激活码", false)
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+    <input id="CId" name="CId" type="hidden" value="@ViewBag.CId" />
+</div>
+<form id="CreateForm" method="post">
+<div style="overflow-y: scroll; height: 340px;">
+    <table class="form_table" style="overflow-y: scroll;">
+        <tbody>
+            <tr>
+                <th>
+                    客户全称
+                </th>
+                <td colspan="3">
+                    <input type="text" name="Name" class="easyui-validatebox" required="true" maxlength="50" style="width: 545px;" value="@ViewBag.Cname"  />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    日期
+                </th>
+                <td>
+                    <input id="CDateID" type="text" name="CDate" class="easyui-datebox" required="true" editable="false" value="" />
+                </td>
+                <th>
+                    账户
+                </th>
+                <td>
+                    <input type="text" id="AccountId" name="AccountId" class="easyui-combobox" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    业务员
+                </th>
+                <td>
+                    <input id="YwyID" name="Ywy" type="combobox" style="width: 208px;" class="easyui-combobox" required="true" editable="false" />
+                </td>
+                <th>
+                    合同金额
+                </th>
+                <td>
+                    <input type="text" id="txtMoney" class="easyui-numberbox" value="" required="true" data-options="min:0,precision:2" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    决算年度
+                </th>
+                <td>
+                    <input type="text" id="jsyear" name="jsyear" class="easyui-validatebox" maxlength="50" value="2019" />
+                </td>
+                <th>
+                    客户注册级别
+                </th>
+                <td>
+                    <input id="Radio_VisitType1" type="radio" name="VisitType" value="1" checked="checked" /><label for="Radio_VisitType1">普通客户</label>
+                    <input id="Radio_VisitType2" type="radio" name="VisitType" value="2" /><label for="Radio_VisitType2">高级客户</label>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    邀请码
+                </th>
+                <td colspan="3">
+                    <input type="text" name="Key" class="easyui-validatebox" maxlength="100" style="width:545px;" required="true" value="" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    激活码
+                </th>
+                <td colspan="3">
+                    <input type="text" name="UserKey" id="UserKey" class="easyui-validatebox" maxlength="100" readonly="readonly" style="width:545px;" required="true" value="" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</form>

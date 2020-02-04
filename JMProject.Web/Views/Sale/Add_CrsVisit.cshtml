@@ -1,0 +1,124 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "选择客户";
+}<div class="divtool" style="font-size: 12px; height: 30px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height: 28px;">
+            <td style="width: 50px;">
+                <span>客户名称</span>
+            </td>
+            <td style="width: 160px;">
+                <input id="NameS" class="easyui-textbox" style="width: 150px;" />
+            </td>
+            <td style="width: 80px;">
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="divtool">
+    @Html.ToolButton("btnOK", "icon-save", "选择", false)
+    <input id="Vyear" name="Vyear" type="hidden" value="@ViewBag.Vyear" />
+    <input id="VisitType" name="VisitType" type="hidden" value="@ViewBag.VisitType" />
+    <input id="Saler" name="Saler" type="hidden" value="@ViewBag.Saler" />
+</div>
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="vertical-align: top;">
+            <table id="grid">
+            </table>
+        </td>
+    </tr>
+</table>
+<script type="text/javascript">
+
+    var offwidth = 10;
+    var offheight = 65;
+    $(function () {
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            });
+        });
+
+        $("#btnOK").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                var postData = {
+                    Id: row.ID
+                    , Vyear: $("#Vyear").val()
+                    , VisitType: $("#VisitType").val()
+                    , remake:''
+                };
+
+                $.ajax({
+                    url: "/Sale/Add_CrsVisit",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+        reload();
+    });
+
+    function reload() {
+        var queryData = {
+            Name: $("#NameS").val(),
+            DiQuS: "",//$("#DiQuS").combobox("getValues") + "",
+            userS: $("#Saler").val() + "",
+            dengjS: "", //$("#dengjS").combobox("getValues") + "",
+            Industry: "", //$("#IndustryID").combobox("getValues") + "",
+            zyxS: "",//$("#zyxS").combobox("getValues") + ""
+            Vyear: $("#Vyear").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Sale/GetData_SaleCustomer',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - offheight,
+            fitColumns: false,
+            idField: 'ID',
+            sortName: 'ID',
+            sortOrder: 'desc',
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'ID', title: '编号', width: 110 },
+                { field: 'Name', title: '单位全称', width: 280 },
+                { field: 'Code', title: '社会统一信用代码', width: 140 },
+                { field: 'HyName', title: '行业', width: 100 },
+                { field: 'Lxr', title: '联系人', width: 100 },
+                { field: 'Phone', title: '手机号', width: 100 },
+                { field: 'YwyName', title: '业务员', width: 100 }
+            ]]
+        });
+    }
+</script>

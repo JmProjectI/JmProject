@@ -1,0 +1,49 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "查看物流";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    AccountModel Account = (AccountModel)ViewBag.Account; 
+}
+<script type="text/javascript">
+
+    $(function () {
+        reload();
+    });
+
+    function reload() {
+        var queryData = {
+            LogisticCode: $("#LogisticCode").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Basic/GetData_Exp_Traces',
+            width: 785,
+            methord: 'post',
+            height: 550,
+            fitColumns: false,
+            idField: 'AcceptTime',
+            sortName: 'AcceptTime',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 30,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'AcceptTime', title: '发生时间', width: 200, halign: 'center' },
+                { field: 'AcceptStation', title: '发生事件', width: 350, halign: 'center' },
+                { field: 'Remark', title: '描述', width: 200, halign: 'center' }
+            ]],
+            onLoadSuccess: function (data) {}
+        });
+    };
+</script>
+<input id="LogisticCode" name="LogisticCode" type="hidden" value="@ViewBag.LogisticCode" />
+<table id="grid"></table>

@@ -1,0 +1,128 @@
+﻿@model JMProject.Model.Mobile.View_SaleCustom_Mobile
+@{
+    ViewBag.Title = "主页";
+    Layout = "~/Views/Shared/_LayoutMui.cshtml";
+}
+<style>
+    .list-block
+    {
+        margin: 0.05rem 0;
+    }
+</style>
+<input id="hid_id" type="hidden" value="@Model.ID" />
+<div id="page-customer" class="page">
+    <header class="bar bar-nav">
+        <a class="button button-link button-nav pull-left back" href="/Mobile/Index">
+            <span class="icon icon-left"></span>
+        </a>
+        <h1 class='title'>客户管理</h1>
+    </header>
+    <div class="content">
+        <div class="list-block">
+            <ul>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="Cdate" type="date" placeholder="创建日期" value="@Model.CDate">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="c1" name="ywy" class="chkyyw" type="checkbox" value="000004" jvalue="刘" @(Model.Ywy.IndexOf("000004") >= 0 ? "checked='checked'" : "") /><label for="c1">刘</label>
+                                <input id="c2" name="ywy" class="chkyyw" type="checkbox" value="000005" jvalue="李" @(Model.Ywy.IndexOf("000005") >= 0 ? "checked='checked'" : "") /><label for="c2">李</label>
+                                <input id="c3" name="ywy" class="chkyyw" type="checkbox" value="000006" jvalue="韩" @(Model.Ywy.IndexOf("000006") >= 0 ? "checked='checked'" : "") /><label for="c3">韩</label>
+                                <input id="c4" name="ywy" class="chkyyw" type="checkbox" value="000003" jvalue="邹" @(Model.Ywy.IndexOf("000003") >= 0 ? "checked='checked'" : "") /><label for="c4">邹</label>
+                                <input id="c5" name="ywy" class="chkyyw" type="checkbox" value="000002" jvalue="宋" @(Model.Ywy.IndexOf("000002") >= 0 ? "checked='checked'" : "") /><label for="c5">宋</label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="Name" type="text" placeholder="客户全称" value="@Model.Name">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="Lxr" type="text" placeholder="联系人" value="@Model.Lxr">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="Phone" type="text" placeholder="联系方式" value="@Model.Phone">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="UserName" type="text" placeholder="用户名" value="@Model.UserName">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input id="UserPwd" type="password" placeholder="密码" value="@Model.UserPwd">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="picker_Finance" placeholder="财政局" value="@Model.CzjName"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <input type="text" id="picker_Re" placeholder="区域" value="" sf="@Model.SfName" sj="@Model.UpName" dq="@Model.CityName"/>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="align-top">
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <textarea name="Remark">@Model.Remark</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="content-block">
+            <div class="row">
+                <div class="col-50">
+                    <a href="/Mobile/Index" class="button button-big button-fill button-danger back">返回</a></div>
+                <div class="col-50">
+                    <a href="#" class="button button-big button-fill button-success create-customers">提交</a></div>
+            </div>
+        </div>
+    </div>
+</div>

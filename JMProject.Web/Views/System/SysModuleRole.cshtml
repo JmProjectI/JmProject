@@ -1,0 +1,263 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "权限管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<input id="Rid" name="Rid" rtype="" type="hidden" value="" />
+<input id="Pid" name="Pid" type="hidden" value="" />
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr style="height: 30px">
+        <td>
+            <span id="RoleUser" style="font-size: 12px;"></span>
+        </td>
+        <td>
+            <span id="model" style="font-size: 12px;"></span>
+        </td>
+        <td>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 300px; vertical-align: top; border: 1px solid #95B8E7; padding-top: 3px;">
+            <ul id="tree">
+            </ul>
+        </td>
+        <td style="vertical-align: top; padding-left: 5px;">
+            <table id="grid">
+            </table>
+        </td>
+        <td style="width: 300px; vertical-align: top; padding-left: 5px;">
+            <table id="gridOpt">
+            </table>
+        </td>
+    </tr>
+</table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<script type="text/javascript">
+    var offwidth = 635;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").treegrid('load');
+        else
+            $("#grid").treegrid('reload');
+    };
+    function frameReturnByReloadOpt(flag) {
+        if (flag)
+            $("#gridOpt").datagrid('load');
+        else
+            $("#gridOpt").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+
+    $(function () {
+
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            });
+        });
+
+        InitTree();
+    });
+
+    function checkmodule(chk) {
+        var postData = {
+            RId: $("#Rid").val()
+            , RType: $("#Rid").attr("RType")
+            , ModuleID: $(chk).val()
+            , isCheck: $(chk).prop("checked")
+        };
+
+        $.ajax({
+            url: "/System/SetSysModuleRole",
+            type: "Post",
+            data: postData,
+            dataType: "json",
+            success: function (data) {
+                if (data.type == 1) {
+                    frameReturnByMes(data.message);
+                }
+                else {
+                    frameReturnByMes(data.message);
+                }
+            }
+        });
+    }
+
+    function checkmoduleOpt(chk) {
+        var postData = {
+            RId: $("#Rid").val()
+            , RType: $("#Rid").attr("RType")
+            , ModuleOpId: $(chk).val()
+            , isCheck: $(chk).prop("checked")
+        };
+
+        $.ajax({
+            url: "/System/SetSysModuleOptRole",
+            type: "Post",
+            data: postData,
+            dataType: "json",
+            success: function (data) {
+                if (data.type == 1) {
+                    frameReturnByMes(data.message);
+                }
+                else {
+                    frameReturnByMes(data.message);
+                }
+            }
+        });
+    } 
+
+    function InitTree() {
+        $('#tree').tree({
+            url: '/System/GetTree_SysRole?all=False&user=True',
+            onlyLeafCheck: true,
+            onLoadSuccess: function (node, data) {
+                if (data[0].attributes == "R") {
+                    $("#RoleUser").html("当前角色：" + data[0].text);
+                    $("#Rid").val(data[0].id);
+                }
+                else {
+                    $("#RoleUser").html("当前用户：" + data[0].text);
+                    $("#Rid").val(data[0].id);
+                }
+                $("#Rid").attr("RType", data[0].attributes);
+                reload();
+            },
+            onSelect: function (node) {
+                if (node.attributes == "R") {
+                    $("#RoleUser").html("当前角色：" + node.text);
+                    $("#Rid").val(node.id);
+                }
+                else {
+                    $("#RoleUser").html("当前用户：" + node.text);
+                    $("#Rid").val(node.id);
+                }
+                $("#Rid").attr("RType", node.attributes);
+                reload();
+            }
+        });
+    };
+
+    function reload() {
+        var queryData = {
+            Rid: $("#Rid").val(),
+            RType: $("#Rid").attr("RType")
+        };
+        InitGrid(queryData);
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').treegrid({
+            url: '/System/GetData_SysModuleRole',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: false, //自动设置宽度 
+            treeField: 'Id',
+            idField: 'Id',
+            pagination: false,
+            striped: false, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            checkOnSelect: false, selectOnCheck: false,
+            columns: [[
+                { field: 'Id', title: '编号', width: 120 },
+                {
+                    field: 'Icon', title: '图标', width: 50, align: 'center', formatter: function (value) {
+                        return "<span class=\"tree-icon " + value + " \" style=\"display:inline-block\"></span>";
+                    }
+                },
+                { field: 'Name', title: '名称', width: 180 },
+                {
+                    field: 'HavRole', title: '赋权', width: 60,
+                    formatter: function (value, rec, rowIndex) {
+                        if (value>0) {
+                            return "<input type=\"checkbox\"  name=\"check_module\" checked=\"checked\" onchange=\"checkmodule(this)\" value=\"" + rec.Id + "\" >";
+                        }
+                        else {
+                            return "<input type=\"checkbox\"  name=\"check_module\" onchange=\"checkmodule(this)\" value=\"" + rec.Id + "\" >";
+                        }
+                    }
+                },
+            ]],
+            onClickRow: function (index, data) {
+                var row = $('#grid').treegrid('getSelected');
+                if (row != null) {
+                    $("#Pid").val(row.Id);
+                    $("#model").html("当前模块：" + row.Name);
+                    reloadOpt();
+                }
+            },
+            onLoadSuccess: function (row, data) {
+                if (data.rows.length > 0) {
+                    $("#Pid").val(data.rows[0].Id);
+                    $("#model").html("当前模块：" + data.rows[0].Name);
+                    reloadOpt();
+                }
+            }
+        });
+    };
+
+    function reloadOpt() {
+        var queryData = {
+            ModuleId: $("#Pid").val(),
+            Rid: $("#Rid").val(),
+            RType: $("#Rid").attr("RType")
+        };
+        InitGridOpt(queryData);
+    };
+
+    function InitGridOpt(queryData) {
+        $('#gridOpt').datagrid({
+            url: '/System/GetData_SysModuleOperateRole',
+            width: 315,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: true,
+            sortName: 'Sort',
+            sortOrder: 'asc',
+            idField: 'Id',
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: false,
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                {
+                    field: 'IsValid', title: '赋权', width: 80, align: 'center', formatter: function (value, rec, rowIndex) {
+                        if (value) {
+                            if (rec.HavRole > 0) {
+                                return "<input type=\"checkbox\"  name=\"check_module_opt\" checked=\"checked\" onchange=\"checkmoduleOpt(this)\" value=\"" + rec.Id + "\" >";
+                            }
+                            else {
+                                return "<input type=\"checkbox\"  name=\"check_module_opt\" onchange=\"checkmoduleOpt(this)\" value=\"" + rec.Id + "\" >";
+                            }
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                { field: 'Name', title: '名称', width: 120 },
+                { field: 'KeyCode', title: '操作码', width: 100 },
+                { field: 'Sort', title: '排序', width: 100 },
+            ]]
+        });
+    }
+</script>

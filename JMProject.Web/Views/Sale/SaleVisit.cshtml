@@ -1,0 +1,421 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "拜访沟通";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script src="@Url.Content("~/Content/My97DatePicker/WdatePicker.js")" type="text/javascript"></script>
+<div class="divtool" style="font-size: 12px; height: 60px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height: 28px;">
+            <td style="min-width: 60px">
+                <span>客户名称</span>
+            </td>
+            <td style="min-width: 250px">
+                <input id="NameS" class="easyui-textbox" style="width: 240px;" />
+            </td>
+            <td style="min-width: 80px">
+                <span>需求分类</span>
+            </td>
+            <td style="min-width: 190px">
+                <input id="xqfl" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                <span>是否意向</span>
+            </td>
+            <td style="min-width: 190px">
+                <input id="sfyx" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                <span>联络状态</span>
+            </td>
+            <td style="min-width: 190px">
+                <input id="llzt" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                <span>处理状态</span>
+            </td>
+            <td style="min-width: 130px">
+                <select class="easyui-combobox" name="iscl" id="dlliscl" style="width: 120px;">
+                    <option value="">全部</option>
+                    <option value="0">未处理</option>
+                    <option value="1">已处理</option>
+                </select>
+            </td>
+        </tr>
+        <tr style="height: 28px;">
+            <td>
+                <span>联络日期</span>
+            </td>
+            <td>
+                <input id="txtDateS" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;
+                    width: 108px;" />
+                <span>-</span>
+                <input id="txtDateE" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;
+                    width: 108px;" />
+            </td>
+            <td>
+                <span>下次联络时间</span>
+            </td>
+            <td>
+                <input id="txtNextTimeS" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                    style="font-size: 12px; width: 78px;" />
+                <span>-</span>
+                <input id="txtNextTimeE" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                    style="font-size: 12px; width: 78px;" />
+            </td>
+            <td>
+                <span>业务员</span>
+            </td>
+            <td>
+                <input id="userS" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td>
+                <span>状态</span>
+            </td>
+            <td>
+                <input id="zt" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td>
+                <span>进度</span>
+            </td>
+            <td>
+                <input id="jd" class="easyui-combobox" style="width: 120px;" editable="false" />
+            </td>
+            <td style="min-width: 65px">
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="divtool">
+    @Html.ToolButton("btnCreate", "icon-add", Suggestion.Create, perm, "Create", false)
+    @Html.ToolButton("btnEdit", "icon-edit", Suggestion.Edit, perm, "Edit", false)
+    @Html.ToolButton("btnDelete", "icon-remove", Suggestion.Delete, perm, "Delete", true)
+    @Html.ToolButton("btnCreateS", "icon-add", "创建合同", perm, "CreateS", false)
+    @Html.ToolButton("btnSug", "pic_446", "处理意见", perm, "Sug", false)
+</div>
+<input id="hiduserS" name="hiduserS" type="hidden" value="@ViewBag.userS" />
+<input id="did" name="did" type="hidden" value="" />
+<input id="dtype" name="dtype" type="hidden" value="" />
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="min-width: 220px; max-width: 220px; vertical-align: top; border: 1px solid #95B8E7;
+            padding-top: 1px;">
+            <div id="divscroll" style="width: 100%; height: 400px; overflow-x: hidden; overflow-y: scroll">
+                <ul id="tree">
+                </ul>
+            </div>
+        </td>
+        <td style="vertical-align: top; padding-left: 5px;">
+            <table border="0" cellpadding="0" cellspacing="0" style="height: 20px; margin-bottom: 2px;">
+                <tr>
+                    <td style="width: 20px; height: 20px; background-color: pink;">
+                    </td>
+                    <td style="font-size: 12px; width: 150px; padding-left: 5px;">
+                        下次联络时间即将到期提示
+                    </td>
+                    <td style="width: 20px; height: 20px; background-color: #05ecff;">
+                    </td>
+                    <td style="font-size: 12px; padding-left: 5px;">
+                        处理意见未读提示
+                    </td>
+                </tr>
+            </table>
+            <table id="grid">
+            </table>
+        </td>
+    </tr>
+</table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<div id="modalwindowCus" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<div id="modalwindowPro" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<script type="text/javascript">
+    var offwidth = 240;
+    var offheight = 117;
+    function frameReturnByClose() {
+        $("#modalwindowCus").window('close');
+    };
+    function frameReturnClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnValuesClose(values) {
+        $("#modalwindowCus").window('close');
+        window.frames[0].BindCus(values);
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('reload');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+
+    function ShowCenter(mes) {
+        $.show_alert('@Suggestion.Tip', mes);
+    };
+    function ChooseProduct(rows) {
+        $("#modalwindowPro").window('close');
+        window.frames[0].AddRows(rows);
+    };
+    function OpenProductType() {
+        $("#modalwindowPro").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/FinProductTypeChoose'></iframe>");
+        $("#modalwindowPro").window({ title: '选择商品', width: 1000, height: 610, iconCls: 'icon-add' }).window('open');
+    };
+
+    function OpenCreateCustomer() {
+        $("#modalwindowCus").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Sale/Create_Customer'></iframe>");
+        $("#modalwindowCus").window({ title: '创建客户', width: 1120, height: 700, iconCls: 'icon-add' }).window('open');
+    };
+
+    function Bind() {
+        //是否意向
+        $('#sfyx').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=017&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName'
+        });
+        //联络状态
+        $('#llzt').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=018&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName'
+        });
+        //进度
+        $('#jd').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=020&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName'
+        });
+        //状态
+        $('#zt').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=023&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName'
+        });
+        //需求分类
+        $("#xqfl").combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=026',
+            multiple: true,
+            panelHeight: 300,
+            valueField: 'ItemID',
+            textField: 'ItemName'
+        }).combobox('clear');
+
+        //下次联络时间
+        //$('#NetContactTimeID').combobox({
+        //    url: '/Basic/GetComb_DictionaryItem?DicID=022',
+        //    valueField: 'ItemID',
+        //    textField: 'ItemName',
+        //    onLoadSuccess: function (node, data) {
+        //    }
+        //});
+
+        //业务员
+        $('#userS').combobox({
+            url: '/System/GetComb_Users?All=true',
+            valueField: 'Id',
+            textField: 'ZsName',
+            panelHeight: '300',
+            onLoadSuccess: function (node, data) {
+                if ($("#hiduserS").val().length > 0) {
+                    $("#userS").combobox('setValue', $("#hiduserS").val());
+                    $("#userS").combobox("disable");
+                }
+                reload();
+            }
+        });
+    };
+
+    $(function () {
+        $("#divscroll").height($(window).height() - offheight - 4);
+        InitTree();
+        Bind();
+        $(window).resize(function () {
+            $("#divscroll").height($(window).height() - offheight - 4);
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            });
+        });
+        $("#btnSearch").click(function () {
+            reload();
+        });
+        $("#btnCreate").click(function () {
+            $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Sale/Create_SaleVisit'></iframe>");
+            $("#modalwindow").window({ title: '@Suggestion.Create', width: 900, height: 670, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnEdit").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleVisit?Id=" + row.Id + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 900, height: 670, iconCls: 'icon-edit' }).window('open');
+                $.post("/Sale/Update_AuditState?Id=" + row.Id + "&userS=" + $("#hiduserS").val(), function (data) {
+                    if (data.type == 1) {
+                        reload();
+                    }
+                }, "json");
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/Sale/Delete_SaleVisit?Id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                frameReturnByReload(false);
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnSug").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                //if (row.AuditDate.length > 0) {
+                //    ShowCenter('此拜访记录 [已处理]');
+                //    return;
+                //}
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleVisitAudit?Id=" + row.Id + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 900, height: 670, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnCreateS").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                if (row.ZtName == "转订单") {
+                    ShowCenter('此拜访记录已 [转订单]');
+                    return;
+                }
+                $("#modalwindowCus").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleOrder?AddType=True&CId=" + row.SaleCustomID + "&VId=" + row.Id + "'></iframe>");
+                $("#modalwindowCus").window({ title: '创建合同', width: 1150, height: 510, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+
+    });
+
+    function InitTree() {
+        $('#tree').tree({
+            url: '/Basic/GetTree_Province?all=false',
+            onlyLeafCheck: true,
+            onLoadSuccess: function (node, data) {
+                $("#did").val(data[0].id);
+                $("#dtype").val(data[0].attributes);
+            },
+            onSelect: function (node) {
+                $("#did").val(node.id);
+                $("#dtype").val(node.attributes);
+                reload();
+            }
+        });
+    };
+
+    function reload() {
+        var queryData = {
+            Name: $("#NameS").val(),
+            userS: $('#userS').combobox('getValue'),
+            did: $("#did").val(),
+            dtype: $("#dtype").val(),
+            ContactDateS: $("#txtDateS").val(),
+            ContactDateE: $("#txtDateE").val(),
+            NextTimeS: $("#txtNextTimeS").val(),
+            NextTimeE: $("#txtNextTimeE").val(),
+            sfyx: $('#sfyx').combobox('getValue'),
+            llzt: $('#llzt').combobox('getValue'),
+            jd: $('#jd').combobox('getValue'),
+            zt: $('#zt').combobox('getValue'),
+            cl: $('#dlliscl').combobox('getValue'),
+            xqfl: $('#xqfl').combobox('getValues') + ""
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Sale/GetData_SaleVisit',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - offheight,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'Id',
+            sortOrder: 'desc',
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            showFooter: true,  //显示合计行
+            queryParams: queryData,
+            columns: [[
+                    { field: 'ck', checkbox: true },   //选择
+                    {field: 'Id', title: '编号', width: 80 }, //编号
+                    {field: 'Name', title: '客户名称', width: 280 }, //客户名称
+                    {field: 'Lxr', title: '联系人', width: 80 }, //联系人
+                    {field: 'NextTime', title: '下次联络时间', width: 120
+                     , formatter: function (value, row, index) {
+                         if (row.Name == "合计") {
+                             return "";
+                         }
+                         else {
+                             return value + " (" + row.EndDay + "日)";
+                         }
+                     }
+                }, //下次联络时间
+                    {field: 'YwyName', title: '业务员', width: 70 }, //业务员
+                    {field: 'DemandTypeName', title: '需求分类名称', width: 300 }, //需求分类名称
+                    {field: 'ContactDate', title: '联络日期', width: 90 }, //联络日期
+                    {field: 'ContactTime', title: '联络时间', width: 70 }, //联络时间
+                    {field: 'YxName', title: '是否意向', width: 80 }, //是否意向
+                    {field: 'Amount', title: '预计成交金额', width: 90 }, //预计成交金额
+                    {field: 'LlztName', title: '联络状态', width: 100 }, //联络状态
+                    {field: 'LlqkName', title: '联络情况', width: 100 }, //联络情况
+                    {field: 'JdName', title: '进度', width: 100 }, //进度
+                    {field: 'LlfsName', title: '联络方式', width: 80 }, //联络方式
+                    {field: 'ContactDetails', title: '联络详情', width: 100 }, //联络详情
+                    {field: 'Offer', title: '本次报价', width: 100 }, //本次报价
+                    {field: 'ContactTarget', title: '下次联络目标', width: 100 }, //下次联络目标
+                    {field: 'ZtName', title: '状态', width: 100 }, //状态
+                    {field: 'AuditDate', title: '处理日期', width: 100 }, //处理日期
+                    {field: 'ShRen', title: '处理人', width: 100 }, //处理人
+                    {field: 'AuditDetails', title: '处理意见', width: 100 }, //处理意见
+            //{field: 'ShztName', title: '处理状态', width: 100 }, //处理状态
+            ]],
+            onDblClickRow: function (index, row) {
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleVisit?Id=" + row.Id + "&LookType=true'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 900, height: 670, iconCls: 'icon-edit' }).window('open');
+                $.post("/Sale/Update_AuditState?Id=" + row.Id + "&userS=" + $("#hiduserS").val(), function (data) {
+                    if (data.type == 1) {
+                        reload();
+                    }
+                }, "json");
+            },
+            rowStyler: function (index, row) {
+                if (row.EndDay <= 2 && row.EndDay >= 0) {
+                    return 'background-color:pink;color:blue;';
+                }
+                else if (row.ShztName == "未读") {
+                    return 'background-color:#05ecff;color:blue;';
+                }
+            }
+        });
+    }
+</script>

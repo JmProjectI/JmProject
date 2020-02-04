@@ -1,0 +1,72 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.SysLog
+
+@{
+    ViewBag.Title = "日志详情";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<div class="divtool bgb">
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    操作员
+                </th>
+                <td>
+                    <input type="text" name="Operator" class="easyui-validatebox" maxlength="50" required="true" style="width:543px;" value="@Model.Operator" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    详细信息
+                </th>
+                <td>
+                    <textarea id="Message" name="Message" class="easyui-validatebox" cols="80" rows="30" maxlength="200" style="width:543px;height: 300px;">@Model.Message</textarea>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    操作菜单
+                </th>
+                <td>
+                    <input type="text" name="Module" class="easyui-validatebox" maxlength="20" required="true" style="width:543px;" value="@Model.Module" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    操作结果
+                </th>
+                <td>
+                    <input type="text" name="Type" class="easyui-validatebox" maxlength="20" required="true" style="width:543px;" value="@Model.Type" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    操作时间
+                </th>
+                <td>
+                    <input type="text" name="CreateTime" class="easyui-validatebox" maxlength="8" required="true" style="width:543px;" value="@Model.CreateTime" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

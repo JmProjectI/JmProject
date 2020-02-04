@@ -1,0 +1,70 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.View.View_SaleOrder
+@{
+    ViewBag.Title = "订单管理立即开票";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<link href="@Url.Content("~/Content/smart_wizard_vertical.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.smartWizard.js")" type="text/javascript"></script>
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<form id="CreateForm" method="post">
+    <table class="form_table" style="overflow-y: scroll;">
+        <tbody>
+            <tr>
+                <th>
+                    立即开票
+                </th>
+                <td>
+                    <input id="Radio_Y" name="IsValid" type="radio" value="1" @(Model.Fp != "" ? "checked=\"checked\"" : "") /><label
+                        for="Radio_Y">是</label>
+                    <input id="Radio_N" name="IsValid" type="radio" value="0" @(Model.Fp == "" ? "checked=\"checked\"" : "") /><label
+                        for="Radio_N">否</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+<script type="text/javascript">
+    /*保持*/
+    $("#btnSave").click(function () {
+        if ($("#CreateForm").form('validate')) {
+            var postData = {
+                Id: $("#Id").val()
+                , Flag: $("input[name='IsValid']:checked").val()
+            };
+
+            $.ajax({
+                url: "/Sale/Create_SaleOTS",
+                type: "Post",
+                data: postData,
+                dataType: "json",
+                success: function (data) {
+                    if (data.type == 1) {
+                        window.parent.frameReturnByMesTS(data.message);
+                        window.parent.frameRenCloseTS();
+                    }
+                    else {
+                        window.parent.frameReturnByMesTS(data.message);
+                    }
+                }
+            });
+        }
+        return false;
+    });
+
+    /*返回*/
+    $("#btnReturn").click(function () {
+        window.parent.frameRenCloseTS();
+    });
+</script>

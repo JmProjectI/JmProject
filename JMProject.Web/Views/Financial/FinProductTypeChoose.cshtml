@@ -1,0 +1,69 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "产品分类选择";
+}
+<div class="divtool">
+    @Html.ToolButton("btnOK", "icon-save", "选择", false)
+</div>
+<table id="grid"></table>
+<script type="text/javascript">
+    var offwidth = 10;
+
+    $(function () {
+        reload()
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            });
+        });
+
+        $("#btnOK").click(function () {
+            var rows = $('#grid').treegrid('getChecked');
+            if (rows != null && rows.length > 0) {
+                window.parent.ChooseProduct(rows);
+            } else {
+                window.parent.frameReturnByMes('@Suggestion.PlaseChoose');
+            }
+        });
+    });
+
+
+    function reload() {
+        var queryData = {
+            Pid: $("#Pid").val(),
+            Name: $("#txtSearch").val()
+        };
+        InitGrid(queryData);
+        $('#grid').treegrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').treegrid({
+            url: '/Financial/GetData_FinProductType',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: false,
+            treeField: 'Id',
+            sortOrder: 'asc',
+            idField: 'Id',
+            pagination: false,
+            checkbox: false,
+            striped: true, //奇偶行是否区分
+            singleSelect: false, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'Id', title: '编号', width: 180 },
+                { field: 'Name', title: '名称', width: 200 },
+                { field: 'Remake', title: '描述', width: 400 },
+            //{ field: '_parentId', title: '_parentId', width: 100 },
+            ]]
+        });
+    }
+</script>

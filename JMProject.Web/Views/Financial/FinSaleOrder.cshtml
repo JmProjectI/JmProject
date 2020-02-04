@@ -1,0 +1,758 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "销售单管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script src="@Url.Content("~/Content/My97DatePicker/WdatePicker.js")" type="text/javascript"></script>
+<div class="divtool" style="font-size: 12px; height: 60px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height: 28px;">
+            <td style="min-width: 60px">
+                <span>合同编号</span>
+            </td>
+            <td style="min-width: 200px">
+                <input id="txtSearch" class="easyui-textbox" style="width: 190px;" />
+            </td>
+            <td style="min-width: 60px">
+                <span>合同产品</span>
+            </td>
+            <td style="min-width: 260px">
+                <input id="dllOrderItem" name="OrderItem" class="easyui-combotree" style="width:250px;"/>
+            </td>
+            <td style="min-width: 60px">
+                <span>所属地区</span>
+            </td>
+            <td style="min-width: 190px">
+                <input id="DiQuS" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td>
+                <span>合同金额</span>
+            </td>
+            <td>
+                <input id="txtItemMoneyS" type="text" name="ItemMoney" class="easyui-validatebox"
+                    style="font-size: 12px; width: 75px;" />
+                <span>-</span>
+                <input id="txtItemMoneyE" type="text" name="ItemMoney" class="easyui-validatebox"
+                    style="font-size: 12px; width: 75px;" />
+            </td>
+            <td>
+                <span>发票状态</span>
+            </td>
+            <td>
+                <input id="fpS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td>
+                <span>出库状态</span>
+            </td>
+            <td>
+                <input id="ckS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td>
+                <span>账户</span>
+            </td>
+            <td>
+                <input id="AccountId" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>  
+            <td>
+            </td>
+        </tr>
+        <tr style="height: 28px;">
+            <td>
+                <span>客户名称</span>
+            </td>
+            <td>
+                <input id="NameS" class="easyui-textbox" style="width: 190px;" />
+            </td>
+            <td>
+                <span>合同日期</span>
+            </td>
+            <td>                
+                <input id="txtOrderDateS" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;width: 112px;" />
+                <span>-</span>
+                <input id="txtOrderDateE" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;width: 112px;" />
+            </td>
+            <td>
+                <span>回款日期</span>
+            </td>
+            <td>                
+                <input id="txtPayDateS" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;width: 75px;" />
+                <span>-</span>
+                <input id="txtPayDateE" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;width: 75px;" />
+            </td>
+            <td style="min-width: 60px">
+                <span>业务员</span>
+            </td>
+            <td style="min-width: 190px">
+                <input id="userS" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td style="min-width: 70px">
+                <span>回款状态</span>
+            </td>
+            <td style="min-width: 120px">
+                <input id="dzS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>            
+            <td style="min-width: 70px">
+                <span>提成状态</span>
+            </td>
+            <td style="min-width: 120px">
+                <select class="easyui-combobox" name="flagTc" id="ddlflagTc" style="width:110px;">
+                    <option value="">全部</option>
+                    <option value="0">未提成</option>
+                    <option value="1">已提成</option>
+                    <option value="2">部分提成</option>
+                </select>
+            </td>
+            <td>
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="divtool">
+    @Html.ToolButton("btnInvoice", "pic_34", "开票", perm, "Invoice", false)
+    @Html.ToolButton("btnPayment", "pic_257", "回款", perm, "Payment", false)
+    @*@Html.ToolButton("btnOutStock", "pic_123", "出库", perm, "OutStock", false)*@
+    @Html.ToolButton("btnCheck", "pic_140", "审核", perm, "Check", true)
+    @Html.ToolButton("btnAuthor", "pic_140", "授权", perm, "Author", false)
+    @Html.ToolButton("btnBonus", "pic_256", "提成", perm, "Bonus", true)
+    @Html.ToolButton("btnExport", "pic_163", "导出", false)
+    <input id="Pid" name="Pid" type="hidden" />
+</div>
+<table id="grid">
+</table>
+<table cellpadding="0" cellspacing="0" border="0" style="margin-top: 5px;">
+    <tr>
+        <td style="width: 50%; vertical-align: top;">
+            <table id="gridFP">
+            </table>
+        </td>
+        <td style="vertical-align: top; padding-left: 5px;">
+            <table id="gridHK">
+            </table>
+        </td>
+        @*<td style="width: 500px; vertical-align: top; padding-left: 5px;">
+            <table id="gridCK">
+            </table>
+        </td>*@
+    </tr>
+</table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<div id="modalwindowPro" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<script type="text/javascript">
+    var offwidth = 12;
+    var offheight = 100;
+    var mxheight = 200;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('reload');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+    function frameReturnByMesAlert(mes) {
+        $.show_alert('@Suggestion.Tip', mes);
+    };
+    function ChooseProduct(rows) {
+        $("#modalwindowPro").window('close');
+        window.frames[0].AddRows(rows);
+    };
+    function OpenProduct(TypeId) {
+        $("#modalwindowPro").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/FinProductChoose?TypeId=" + TypeId + "'></iframe>");
+        $("#modalwindowPro").window({ title: '选择商品', width: 1000, height: 610, iconCls: 'icon-add' }).window('open');
+    };
+
+    function BindComb() {
+
+        //合同产品
+        $('#dllOrderItem').combotree({
+            url: '/Financial/GetTree_FinProductType?all=false',
+            valueField: 'id',
+            textField: 'text',
+            multiple: true,
+            onSelect: function (node) {
+            },
+            onShowPanel: function () {
+                // 动态调整高度  
+                $(this).combotree('panel').height(600);
+            }
+        });
+
+        //地区
+        $("#DiQuS").combobox({
+            url: '/Basic/Get_CombCity?pid=',
+            multiple: true,
+            panelHeight: 600,
+            valueField: 'ID',
+            textField: 'Name',
+            groupField: 'CityPLName'
+        }).combobox('clear');
+
+        //业务员
+        $('#userS').combobox({
+            url: '/System/GetComb_Users?All=true',
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                reload();
+            }
+        });
+
+        //账户
+        $('#AccountId').combobox({
+            url: '/Basic/GetComb_BasicAccountAll',
+            valueField: 'Id',
+            textField: 'Key',
+            onLoadSuccess: function (node, data) {
+            }
+        });
+
+        //回款状态
+        $('#dzS').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=013&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName'
+        });
+
+        //发票状态
+        $('#fpS').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=012&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+
+            }
+        });
+
+        //出库状态
+        $('#ckS').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=014&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+
+            }
+        });
+    };
+
+    function getyyyyMMdd() {
+        var d = new Date();
+        var curr_date = d.getDate();
+        var curr_month = d.getMonth() + 1;
+        var curr_year = d.getFullYear();
+        String(curr_month).length < 2 ? (curr_month = "0" + curr_month) : curr_month;
+        String(curr_date).length < 2 ? (curr_date = "0" + curr_date) : curr_date;
+        var yyyyMMdd = curr_year + "-" + curr_month + "-" + curr_date;
+        return yyyyMMdd;
+    };
+
+    $(function () {
+
+        $("#txtOrderDateS").val(getyyyyMMdd());
+
+        BindComb();
+
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight - mxheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight - mxheight
+            });
+
+            $('#gridFP').datagrid('resize', {
+                width: ($(window).width() - offwidth) / 2,
+                height: mxheight
+            }).datagrid('resize', {
+                width: ($(window).width() - offwidth) / 2,
+                height: mxheight
+            });
+
+            $('#gridHK').datagrid('resize', {
+                width: ($(window).width() - offwidth) / 2 - 5,
+                height: mxheight
+            }).datagrid('resize', {
+                width: ($(window).width() - offwidth) / 2 - 5,
+                height: mxheight
+            });
+
+        });
+
+        //        //出库
+        //        $("#btnOutStock").click(function () {
+        //            var row = $('#grid').datagrid('getSelected');
+        //            if (row != null) {
+        //                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOutStock?OrderId=" + row.Id + "&AddType=True'></iframe>");
+        //                $("#modalwindow").window({ title: '出库', width: 800, height: 600, iconCls: 'icon-edit' }).window('open');
+        //            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        //        });
+
+        $("#btnCheck").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_SetFlag?setType=Check&Id=" + row.Id + "&Ieguid=" + guid() + "'></iframe>");
+                $("#modalwindow").window({ title: '审核', width: 500, height: 320, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnInvoice").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                if (row.InvoiceFlagName == "已开票") {
+                    frameReturnByMesAlert(row.Name + " [" + row.ItemNames + "] 已开票完成，无法开票");
+                    return;
+                }
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOrderInvoice?OrderId=" + row.Id + "&AddType=True'></iframe>");
+                $("#modalwindow").window({ title: '开票', width: 680, height: 340, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnPayment").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                if (row.InvoiceFlagName == "未开票") {
+                    frameReturnByMesAlert(row.Name + " [" + row.ItemNames + "] 还未开票，无法回款");
+                    return;
+                }
+                if (row.PaymentFlagName == "已回款") {
+                    frameReturnByMesAlert(row.Name + " [" + row.ItemNames + "] 已回款完成，无法回款");
+                    return;
+                }
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOrderPayment?OrderId=" + row.Id + "&AddType=True'></iframe>");
+                $("#modalwindow").window({ title: '回款', width: 680, height: 340, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnAuthor").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                var message = "";
+                if (row.flagDown == "0") {
+                    message = "确认要授权吗?";
+                }
+                else if (row.flagDown == "1") {
+                    message = "确认要取消授权吗?";
+                }
+                else {
+                    $.show_alert('@Suggestion.Tip', "无内控合同不能授权");
+                    return;
+                }
+                $.messager.confirm('@Suggestion.Tip', message, function (yes) {
+                    if (yes) {
+                        $.post('/Nksc/NkscFlagDown', { id: row.Id }, function (result) {
+                            if (result.type == "1") {
+                                $.messageBox5s('@Suggestion.Tip', result.message);
+                                reload();
+                            } else {
+                                $.show_alert('@Suggestion.Tip', result.message);
+                            }
+                        }, 'json');
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnBonus").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_SaleOrderTC?Id=" + row.Id + "&Ieguid=" + guid() + "'></iframe>");
+                $("#modalwindow").window({ title: '提成', width: 1150, height: 560, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+
+        //导出        
+        $("#btnExport").click(function () {
+            window.location.href = "/Financial/FinSaleOrderExcel?Id=" + $("#txtSearch").val() + "&NameS=" + $("#NameS").val()
+                    + "&OrderDateS=" + $("#txtOrderDateS").val() + "&OrderDateE=" + $("#txtOrderDateE").val()
+                    + "&DiQuS=" + $("#DiQuS").combobox("getValues") + "" + "&userS=" + $("#userS").combobox("getValues") + ""
+                    + "&dzS=" + $("#dzS").combobox("getValue") + ""
+                    + "&fpS=" + $("#fpS").combobox("getValue") + ""
+                    + "&ckS=" + $("#ckS").combobox("getValue") + ""
+                    + "&ItemNames=" + $("#dllOrderItem").combobox("getText") + ""
+                    + "&Tc=" + $("#ddlflagTc").combobox("getValues") + ""
+                    + "&ItemMoneyS=" + $("#txtItemMoneyS").val() + "&ItemMoneyE=" + $("#txtItemMoneyE").val()
+                    + "&Account=" + $("#AccountId").combobox("getValues") + ""
+                    + "&PayDateS=" + $("#txtPayDateS").val() + ""
+                    + "&PayDateE=" + $("#txtPayDateE").val() + "";
+        });
+
+    });
+
+    function reload() {
+        var queryData = {
+            Id: $("#txtSearch").val(),
+            NameS: $("#NameS").val(),
+            OrderDateS: $("#txtOrderDateS").val(),
+            OrderDateE: $("#txtOrderDateE").val(),
+            DiQuS: $("#DiQuS").combobox("getValues") + "",
+            userS: $("#userS").combobox("getValues") + "",
+            dzS: $("#dzS").combobox("getValues") + "",
+            fpS: $("#fpS").combobox("getValues") + "",
+            ckS: $("#ckS").combobox("getValues") + "",
+            ItemNames: $("#dllOrderItem").combobox('getText') + "",
+            Tc: $("#ddlflagTc").combobox("getValues") + "", 
+            ItemMoneyS: $("#txtItemMoneyS").val(),
+            ItemMoneyE: $("#txtItemMoneyE").val(),
+            Account: $("#AccountId").combobox("getValues") + "",
+            PayDateS: $("#txtPayDateS").val(),
+            PayDateE: $("#txtPayDateE").val()
+        };
+        InitGrid(queryData);
+    };
+
+    function InitGrid(queryData) {
+
+        $('#grid').datagrid({
+            url: '/Financial/GetData_FinSaleOrder', //invoice
+            title: '合同管理',
+            width: $(window).width() - offwidth,
+            height: $(window).height() - offheight - mxheight,
+            methord: 'post',
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'OrderDate',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 15,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            showFooter: true,  //显示合计行
+            queryParams: queryData,
+            frozenColumns: [[
+                { field: 'Id', title: '编号', width: 80, halign: 'center' },
+                { field: 'OrderDate', title: '日期', width: 70, halign: 'center' },
+                { field: 'CityName', title: '地区', width: 80, halign: 'center' },
+                { field: 'Invoice', title: '发票抬头', width: 180, halign: 'center' },
+            ]],
+            columns: [[
+                { field: 'Code', title: '社会统一信用代码', width: 120, halign: 'center' },
+                { field: 'InvoiceFlagName', title: '发票状态', width: 60, halign: 'center' },
+                { field: 'PaymentFlagName', title: '回款状态', width: 60, halign: 'center' },
+                { field: 'Remake', title: '备注', width: 110, halign: 'center' },
+                { field: 'Key', title: '账户', width: 40, halign: 'center' },
+                { field: 'SuiH', title: '地址、电话', width: 200, halign: 'center' },
+                { field: 'BankCard', title: '开户行及账户', width: 210, halign: 'center' },
+                { field: 'ItemNames', title: '明细项', width: 550, halign: 'center' },
+                { field: 'ItemMoney', title: '合同总金额', width: 70, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Invoicemoney', title: '开票金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Paymentmoney', title: '回款金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Receivablemoney', title: '应开金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return (parseFloat(row.ItemMoney) - parseFloat(row.Invoicemoney)).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'unTc', title: '应收金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return (parseFloat(row.ItemMoney) - parseFloat(row.Paymentmoney)).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'OutStockFlagName', title: '出库状态', width: 60, halign: 'center' },
+                { field: 'Tc', title: '提成状态', width: 60, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row.Tc > 0 && row.unTc > 0) {
+                            return "部分提成";
+                        }
+                        else if (row.Tc > 0 && row.unTc == 0) {
+                            return "已提成";
+                        }
+                        else if (row.Tc == 0 && row.unTc > 0) {
+                            return "未提成";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                { field: 'flagDown', title: '授权状态', width: 60, halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value == "") {
+                            return "";
+                        }
+                        else if (value == "0") {
+                            return "未授权";
+                        }
+                        else if (value == "1") {
+                            return "已授权";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                { field: 'ItemCount', title: '合计数量', width: 70, align: 'right', halign: 'center' },
+                { field: 'OSCount', title: '出库数量', width: 70, align: 'right', halign: 'center' },
+                { field: 'CheckFlagName', title: '审核状态', width: 70, halign: 'center' },
+                { field: 'CheckDate', title: '审核日期', width: 100, halign: 'center' },
+                { field: 'Finshed', title: '已完成', width: 70, halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row.Name == "合计") {
+                            return "";
+                        }
+                        else if (value) {
+                            return "已完成";
+                        }
+                        else {
+                            return "未完成";
+                        }
+                    }
+                },
+                { field: 'SalerName', title: '业务员', width: 70, halign: 'center' },
+                { field: 'TaxMoney', title: '合计税金', width: 100, align: 'right', halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'PresentMoney', title: '礼品金额', width: 100, align: 'right', halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'OtherMoney', title: '其他金额', width: 100, align: 'right', halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'ValidMoney', title: '有效回款', width: 100, align: 'right', halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'Remake', title: '备注', width: 100, halign: 'center' },
+                { field: 'ZsName', title: '经手人', width: 70, halign: 'center' },
+            ]],
+            onClickRow: function (index, row) {
+                reloadDesc(row.Id);
+            },
+            onLoadSuccess: function (data) {
+                if (data != null && data.total > 0) {
+                    reloadDesc(data.rows[0].Id);
+                }
+            }
+        });
+    }
+
+    function reloadDesc(Id) {
+        var queryData = {
+            OrderId: Id
+        };
+        InitGridFP(queryData);
+    };
+
+    function InitGridFP(queryData) {
+        $('#gridFP').datagrid({
+            url: '/Financial/GetData_FinOrderInvoice',
+            title: '发票管理',
+            width: ($(window).width() - offwidth) / 2,
+            methord: 'post',
+            height: mxheight,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'Invoicedate',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            showFooter: true,
+            queryParams: queryData,
+            columns: [[
+                { field: 'opt', title: '操作', width: 100, align: 'center', halign: 'center',
+                    formatter: function (value, row, index) {
+                        if (row.OrderId != "") {
+                            var e = '<a href="#" mce_href="#" onclick="editFP(\'' + row.Id + '\',\'' + row.OrderId + '\')">编辑</a> ';
+                            var d = '<a href="#" mce_href="#" onclick="delFP(\'' + row.Id + '\',\'' + row.OrderId + '\')">删除</a> ';
+                            return e + d;
+                        }
+                    }
+                },
+                { field: 'Id', title: '编号', width: 80, halign: 'center' },
+                { field: 'Key', title: '开票账户', width: 70, halign: 'center' },
+                { field: 'Invoicedate', title: '开票日期', width: 80, halign: 'center' },
+                { field: 'Invoicemoney', title: '发票金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Receivablemoney', title: '实收金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Remark', title: '描述', width: 150, halign: 'center' }
+            ]]
+        });
+
+        $('#gridHK').datagrid({
+            url: '/Financial/GetData_FinOrderPayment',
+            title: '回款管理',
+            width: ($(window).width() - offwidth) / 2 - 5,
+            methord: 'post',
+            height: mxheight,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'Paymentdate',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            showFooter: true,
+            queryParams: queryData,
+            columns: [[
+                { field: 'opt', title: '操作', width: 100, align: 'center', halign: 'center',
+                    formatter: function (value, row, index) {
+                        if (row.OrderId != "") {
+                            var e = '<a href="#" mce_href="#" onclick="editHK(\'' + row.Id + '\',\'' + row.OrderId + '\')">编辑</a> ';
+                            var d = '<a href="#" mce_href="#" onclick="delHK(\'' + row.Id + '\',\'' + row.OrderId + '\')">删除</a> ';
+                            return e + d;
+                        }
+                    }
+                },
+                { field: 'Id', title: '编号', width: 100, halign: 'center' },
+                { field: 'Key', title: '收款账户', width: 70, halign: 'center' },
+                { field: 'Paymentdate', title: '收款日期', width: 90, halign: 'center' },
+                { field: 'Paymentmoney', title: '收款金额', width: 90, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Remark', title: '描述', width: 100, halign: 'center' }
+            ]]
+        });
+
+        //        $('#gridCK').datagrid({
+        //            url: '/Financial/GetData_FinOutStock',
+        //            title: '出库管理',
+        //            width: 430,
+        //            methord: 'post',
+        //            height: mxheight,
+        //            fitColumns: false,
+        //            idField: 'Id',
+        //            sortName: 'OSdate',
+        //            sortOrder: 'desc',
+        //            pagination: true,
+        //            pageSize: 10,
+        //            pageList: [10, 20, 30, 40, 50],
+        //            striped: true, //奇偶行是否区分
+        //            singleSelect: true, //单选模式
+        //            showFooter: true,
+        //            queryParams: queryData,
+        //            columns: [[
+        //                { field: 'opt', title: '操作', width: 100, align: 'center', halign: 'center',
+        //                    formatter: function (value, row, index) {
+        //                        if (row.OrderId != "") {
+        //                            var e = '<a href="#" mce_href="#" onclick="editCK(\'' + row.OSId + '\',\'' + row.OrderId + '\')">编辑</a> ';
+        //                            var d = '<a href="#" mce_href="#" onclick="delCK(\'' + row.OSId + '\',\'' + row.OrderId + '\')">删除</a> ';
+        //                            return e + d;
+        //                        }
+        //                    }
+        //                },
+        //                { field: 'OSId', title: '编号', width: 120, halign: 'center' },
+        //                { field: 'OSdate', title: '出库日期', width: 90, halign: 'center' },
+        //                { field: 'OutStockCount', title: '出库总数', width: 70, align: 'right', halign: 'center' }
+        //            ]]
+        //        });
+    };
+
+    function editFP(Id, OrderId) {
+        $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOrderInvoice?Id=" + Id + "&OrderId=" + OrderId + "&AddType=Flase&Ieguid=" + guid() + "'></iframe>");
+        $("#modalwindow").window({ title: '开票', width: 680, height: 340, iconCls: 'icon-edit' }).window('open');
+    };
+
+    function delFP(Id, OrderId) {
+        $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+            if (r) {
+                $.post("/Financial/Delete_FinOrderInvoice?Id=" + Id + "&OrderId=" + OrderId, function (data) {
+                    if (data.type == 1) {
+                        frameReturnByReload(false);
+                    }
+                    $.messageBox5s('@Suggestion.Tip', data.message);
+                }, "json");
+            }
+        });
+    };
+
+    function editHK(Id, OrderId) {
+        $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOrderPayment?Id=" + Id + "&OrderId=" + OrderId + "&AddType=Flase&Ieguid=" + guid() + "'></iframe>");
+        $("#modalwindow").window({ title: '回款', width: 680, height: 340, iconCls: 'icon-edit' }).window('open');
+    };
+
+    function delHK(Id, OrderId) {
+        $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+            if (r) {
+                $.post("/Financial/Delete_FinOrderPayment?Id=" + Id + "&OrderId=" + OrderId, function (data) {
+                    if (data.type == 1) {
+                        frameReturnByReload(false);
+                    }
+                    $.messageBox5s('@Suggestion.Tip', data.message);
+                }, "json");
+            }
+        });
+    };
+
+    //    function editCK(OSId, OrderId) {
+    //        $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOutStock?OSId=" + OSId + "&OrderId=" + OrderId + "&AddType=Flase&Ieguid=" + guid() + "'></iframe>");
+    //        $("#modalwindow").window({ title: '出库', width: 800, height: 600, iconCls: 'icon-edit' }).window('open');
+    //    };
+
+    //    function delCK(OSId, OrderId) {
+    //        $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+    //            if (r) {
+    //                $.post("/Financial/Delete_FinOutStock?Id=" + OSId + "&OrderId=" + OrderId, function (data) {
+    //                    if (data.type == 1) {
+    //                        frameReturnByReload(false);
+    //                    }
+    //                    $.messageBox5s('@Suggestion.Tip', data.message);
+    //                }, "json");
+    //            }
+    //        });
+    //    };
+</script>

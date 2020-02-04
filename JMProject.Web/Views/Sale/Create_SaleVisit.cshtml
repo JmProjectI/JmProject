@@ -1,0 +1,611 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.View.View_SaleVisit
+@{
+    ViewBag.Title = "拜访沟通";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<link href="@Url.Content("~/Content/smart_wizard_vertical.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.smartWizard.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/SaleVisit_fj.js")" type="text/javascript"></script>
+<style type="text/css">
+    .form_table th
+    {
+        text-align: left;
+        text-indent: 0.5em;
+    }
+    .tabledetials tbody td
+    {
+        border-top: 1px solid #cccccc;
+    }
+</style>
+<script type="text/javascript">
+    function BindCus(values) {
+        //客户名称
+        $('#SaleCustomId').combobox({
+            url: '/Sale/GetData_SaleCustom_Comb',
+            valueField: 'ID',
+            textField: 'Name',
+            onLoadSuccess: function (node, data) {
+                if (values != "") {
+                    $("#SaleCustomId").combobox('setValue', values);
+                }
+                else {
+                    $("#SaleCustomId").combobox('setValue', '@Model.SaleCustomID');
+                }
+            },
+            onSelect: function (node) {
+                var postData = {
+                    Id: node.ID
+                };
+                $.ajax({
+                    url: "/Sale/GetLxrName",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        $("#LxrID").val(data.Lxr);
+                        $("#jmtbody").html("");
+                        if (data.rows.length < 1) {
+                            $("#jmexpan").hide();
+                            return;
+                        }
+                        $("#jmexpan").show();
+                        for (var i = 0; i < data.rows.length; i++) {
+                            var html = '<tr>'
+                                    + '   <td>' + (data.rows.length - i) + '</td>'
+                                    + '   <td>' + data.rows[i].ContactDate + '</td>'
+                                    + '   <td>' + data.rows[i].Offer + '</td>'
+                                    + '   <td>' + data.rows[i].ContactDetails + '</td>'
+                                    + '   <td></td>'
+                                    + '</tr>';
+                            $("#jmtbody").append(html);
+                        }
+                    }
+                });
+                var postData = {
+                    Id: node.ID
+                };
+                $.ajax({
+                    url: "/Sale/Get_LxrName",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        $("#LxrID").val(data.Lxr);
+                        $("#jm_tbody").html("");
+                        if (data.rows.length < 1) {
+                            $("#jm_expan").hide();
+                            return;
+                        }
+                        $("#jm_expan").show();
+                        for (var i = 0; i < data.rows.length; i++) {
+                            if (data.rows[i].AuditDetails != "") {
+                                var html = '<tr>'
+                                    + '   <td>' + (data.rows.length - i) + '</td>'
+                                    + '   <td>' + data.rows[i].AuditDetails + '</td>'
+                                    + '   <td></td>'
+                                    + '</tr>';
+                                $("#jm_tbody").append(html);
+                            }
+                            else {
+                                var html = '<tr>'
+                                    + '   <td>' + (data.rows.length - i) + '</td>'
+                                    + '   <td>无处理意见</td>'
+                                    + '   <td></td>'
+                                    + '</tr>';
+                                $("#jm_tbody").append(html);
+                            }
+                        }
+                    }
+                });
+                var postData = {
+                    Id: node.ID
+                };
+                $.ajax({
+                    url: "/Sale/Get_LxrUp",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        $("#LxrID").val(data.Lxr);
+                        $("#jm_tbody_up").html("");
+                        if (data.rows.length < 1) {
+                            $("#jm_expan_up").hide();
+                            return;
+                        }
+                        $("#jm_expan_up").show();
+
+                        for (var i = 0; i < data.rows.length; i++) {
+                            var len = data.rows[i].Fj.split("、");
+                            if (len.length < 2) {
+                                if (len[0] == "") {
+                                    var html = '<tr>'
+                                        + '   <td>' + (data.rows.length - i) + '</td>'
+                                        + '   <td>无附件</td>'
+                                        + '   <td></td>'
+                                        + '</tr>';
+                                    $("#jm_tbody_up").append(html);
+                                }
+                            }
+                            else {
+                                for (var j = 0; j < len.length; j++) {
+                                    if (len[j] != "") {
+                                        var html = '<tr>'
+                                        + '   <td>' + (data.rows.length - i) + '</td>'
+                                        + '   <td><a href="../../UploadSaleVisit/' + len[j] + '" title="' + len[j] + '" style="text-decoration:none;">' + len[j] + '</a></td>'
+                                        + '   <td></td>'
+                                        + '</tr>';
+                                        $("#jm_tbody_up").append(html);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    /*下拉框填充*/
+    function bindGroup() {
+        //客户名称
+        BindCus('');
+        //是否意向 
+        $('#IntentionID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=017',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#IntentionID").combobox('setValue', '@Model.Intention');
+            }
+        });
+        //联络状态
+        $('#ContactFlagID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=018',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#ContactFlagID").combobox('setValue', '@Model.ContactFlag');
+            }
+        });
+        //联络情况
+        $('#ContactSituationID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=019',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#ContactSituationID").combobox('setValue', '@Model.ContactSituation');
+            }
+        });
+        //进度
+        $('#ProgressID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=020',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#ProgressID").combobox('setValue', '@Model.Progress');
+            }
+        });
+        //联络方式
+        $('#ContactModeID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=021',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#ContactModeID").combobox('setValue', '@Model.ContactMode');
+            }
+        });
+
+        //状态
+        $('#FlagID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=023',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#FlagID").combobox('setValue', '@Model.Flag');
+            }
+        });
+
+        $("#DemandTypeID").combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=026',
+            multiple: true,
+            panelHeight: 300,
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                if ('@Model.DemandType' != "") {
+                    $("#DemandTypeID").combobox("setValues", "@Model.DemandType");
+                }
+            }
+        }).combobox('clear');
+    }
+
+    $(function () {
+        if ($("input[name='ContactDate']").val() == "") {
+            var myDate = new Date();
+            $("#ContactDateID").datebox('setValue', myDate.toLocaleDateString());
+        }
+
+        if ($("input[name='ContactTime']").val() == "") {
+            var myDate = new Date();
+            var h = myDate.getHours();       //获取当前小时数(0-23)
+            var m = myDate.getMinutes();     //获取当前分钟数(0-59)
+            $("#ContactTimeID").timespinner('setValue', h + ':' + m);
+        }
+        bindGroup();
+
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+
+                if ($("#IntentionID").combobox('getText') == "有意向") {
+                    if ($("input[name='Amount']").val() == "0" || $("input[name='Amount']").val() == "0.00") {
+                        window.parent.ShowCenter("请输入预计成交金额");
+                        return;
+                    }
+                }
+
+                var postData = {
+                    Id: $("#Id").val()
+                    , SaleCustomID: $("#SaleCustomId").combobox('getValue')
+                    , ContactDate: $("input[name='ContactDate']").val()
+                    , ContactTime: $("input[name='ContactTime']").val()
+                    , Intention: $("#IntentionID").combobox('getValue')
+                    , ContactFlag: $("#ContactFlagID").combobox('getValue')
+                    , ContactSituation: $("#ContactSituationID").combobox('getValue')
+                    , Progress: $("#ProgressID").combobox('getValue')
+                    , ContactMode: $("#ContactModeID").combobox('getValue')
+                    , ContactDetails: $("textarea[name='ContactDetails']").val()
+                    , Amount: $("input[name='Amount']").val()
+                    , Offer: $("input[name='Offer']").val()
+                    , NextTime: $("#NextTimeID").combobox('getValue')
+                    , ContactTarget: $("textarea[name='ContactTarget']").val()
+                    , Flag: $("#FlagID").combobox('getValue')
+                    , Ywy: $("#YwyId").val()
+                    , DemandType: $("#DemandTypeID").combobox("getValues") + ""
+                    , AuditDetails: $("textarea[name='AuditDetails']").val()
+                    , Fj: $("#HiddenFJ").val()
+                };
+
+                $.ajax({
+                    url: "/Sale/Create_SaleVisit",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+        /*创建客户*/
+        $("#btnAdd").click(function () {
+            window.parent.OpenCreateCustomer();
+        });
+
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnClose();
+        });
+    });
+</script>
+<div class="divtool bgb">
+    @if (ViewBag.Look)
+    {
+        @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+    }
+    else
+    { 
+        @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+        @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+        @Html.ToolButton("btnAdd", "icon-add", Suggestion.Add, false)
+    }
+</div>
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<input id="YwyId" name="Ywy" type="hidden" value="@Model.Ywy" />
+<form id="CreateForm" method="post">
+<div style="overflow-y: scroll; height: 575px;">
+    <table class="form_table" style="overflow-y: scroll;">
+        <tbody>
+            <tr>
+                <th>
+                    客户全称
+                </th>
+                <td colspan="3">
+                    <input id="SaleCustomId" type="text" name="SaleCustomID" class="easyui-combobox"
+                        style="width: 594px;" required="true" />
+                </td>
+                <td style="width: 95px;">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    联系人
+                </th>
+                <td>
+                    <input id="LxrID" type="text" name="Lxr" class="easyui-validatebox" value="@Model.Lxr" />
+                </td>
+                <th>
+                    联络方式
+                </th>
+                <td>
+                    <input id="ContactModeID" name="ContactMode" type="combobox" style="width: 208px;"
+                        class="easyui-combobox" required="true" editable="false" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    需求分类
+                </th>
+                <td colspan="3">
+                    <input id="DemandTypeID" name="DemandType" class="easyui-combobox" style="width: 594px;"
+                        required="true" editable="false" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    联络日期
+                </th>
+                <td>
+                    <input id="ContactDateID" type="text" name="ContactDate" class="easyui-datebox" required="true" editable="false" value="@Model.ContactDate" />
+                </td>
+                <th>
+                    联络时间
+                </th>
+                <td>
+                    <input id="ContactTimeID" type="text" name="ContactTime" class="easyui-timespinner" required="true" editable="false" value="@Model.ContactTime" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    联络状态
+                </th>
+                <td>
+                    <input id="ContactFlagID" name="ContactFlag" type="easyui-combobox" style="width: 208px;"
+                        class="easyui-combobox" maxlength="30" required="true" editable="false" />
+                </td>
+                <th>
+                    联络情况
+                </th>
+                <td>
+                    <input id="ContactSituationID" type="combobox" name="ContactSituation" class="easyui-combobox"
+                        style="width: 208px;" maxlength="30" required="true" editable="false" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    是否意向
+                </th>
+                <td>
+                    <input id="IntentionID" name="Intention" type="easyui-combobox" style="width: 208px;"
+                        class="easyui-combobox" required="true" editable="false" />
+                </td>
+                <th>
+                    预计成交金额
+                </th>
+                <td>
+                    <input type="text" name="Amount" class="easyui-validatebox" maxlength="100" value="@Model.Amount" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    进度
+                </th>
+                <td>
+                    <input id="ProgressID" type="combobox" name="Progress" class="easyui-combobox" style="width: 208px;"
+                        maxlength="30" required="true" editable="false" />
+                </td>
+                <th>
+                    本次报价
+                </th>
+                <td>
+                    <input type="text" name="Offer" class="easyui-validatebox" maxlength="100" value="@Model.Offer" />
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span>上次联络详情</span>
+                </th>
+                <td colspan="3" style="height: 31px;">
+                    <table class="tabledetials" border="0" cellpadding="0" cellspacing="0" style="width: 594px;">
+                        <thead>
+                            <tr>
+                                <td style="width: 40px;">
+                                    序号
+                                </td>
+                                <td style="width: 85px;">
+                                    日期
+                                </td>
+                                <td style="width: 55px;">
+                                    报价
+                                </td>
+                                <td>
+                                    联络详情
+                                </td>
+                                <td style="width: 35px;">
+                                    <a id="jmexpan" href="#" onclick="$('#jmtbody').toggle();" style="display: none">展/收</a>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody id="jmtbody" style="display: none;">
+                        </tbody>
+                    </table>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    本次联络详情
+                </th>
+                <td colspan="3">
+                    <textarea id="ContactDetailsID" name="ContactDetails" rows="3" required="true" class="easyui-validatebox"
+                        style="height: 60px; font-size: 14px; width: 586px;" maxlength="500">@Model.ContactDetails</textarea>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr style="height: 72px">
+                <th>
+                    下次联络目标
+                </th>
+                <td colspan="3">
+                    <textarea id="ContactTargetID" name="ContactTarget" rows="3" required="true" class="easyui-validatebox"
+                        style="height: 60px; font-size: 14px; width: 586px;" maxlength="500">@Model.ContactTarget</textarea>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    下次联络时间
+                </th>
+                <td>
+                    <input id="NextTimeID" name="NextTime" type="text" class="easyui-datebox" required="true" editable="false" value="@Model.NextTime" />
+                    @*<input id="NetContactTimeID" name="NetContactTime" type="easyui-combobox" style="width: 208px;"
+                        class="easyui-combobox" required="true" editable="false" />*@
+                </td>
+                <th>
+                    状态
+                </th>
+                <td>
+                    <input id="FlagID" name="Flag" type="easyui-combobox" style="width: 208px;" class="easyui-combobox"
+                        maxlength="30" required="true" editable="false" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span>上次处理意见</span>
+                </th>
+                <td colspan="3" style="height: 31px;">
+                    <table class="tabledetials" border="0" cellpadding="0" cellspacing="0" style="width: 594px;">
+                        <thead>
+                            <tr>
+                                <td style="width: 40px;">
+                                    序号
+                                </td>
+                                <td>
+                                    处理意见
+                                </td>
+                                <td style="width: 35px;">
+                                    <a id="jm_expan" href="#" onclick="$('#jm_tbody').toggle();" style="display: none">展/收</a>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody id="jm_tbody" style="display: none;">
+                        </tbody>
+                    </table>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr style="height: 72px">
+                <th>
+                    处理意见
+                </th>
+                <td colspan="3">
+                    <textarea id="AuditDetailsID" name="AuditDetails" rows="3" class="easyui-validatebox"
+                        readonly="readonly" style="height: 80px; font-size: 14px; width: 586px;" maxlength="500">@Model.AuditDetails</textarea>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span>上次资料/文件</span>
+                </th>
+                <td colspan="3" style="height: 31px;">
+                    <table class="tabledetials" border="0" cellpadding="0" cellspacing="0" style="width: 594px;">
+                        <thead>
+                            <tr>
+                                <td style="width: 40px;">
+                                    序号
+                                </td>
+                                <td>
+                                    资料名/文件名
+                                </td>
+                                <td style="width: 35px;">
+                                    <a id="jm_expan_up" href="#" onclick="$('#jm_tbody_up').toggle();" style="display: none">
+                                        展/收</a>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody id="jm_tbody_up" style="display: none;">
+                        </tbody>
+                    </table>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    上传资料/文件
+                </th>
+                <td colspan="3">
+                    <input id="HiddenFJ" name="id" type="hidden" value="@Model.Fj" />
+                    <div id="uploader" class="wu-example" style="width: 594px;">
+                        <!--用来存放文件信息-->
+                        <ul id="Vistlist" class="imglist" style="width: 594px;">
+                            <li id="picker"><a href="javascript:;" title="选择文件">
+                                <img class="fjimg" alt="选择文件" src="../../Image/up.jpg" style="height: 120px;" />
+                            </a></li>
+                            @if (Model.Fj != null)
+                            {
+                                for (int i = 0; i < Model.Fj.Split('、').Length; i++)
+                                {
+                                    string filename = Model.Fj.Split('、')[i];
+                                    if (!string.IsNullOrEmpty(filename))
+                                    {
+                                        string exp = filename.Split('.')[1];
+                                        if (exp == "doc" || exp == "docx")
+                                        {
+                                            exp = "docx";
+                                        }
+                                        else
+                                        {
+                                            exp = "xlsx";
+                                        }
+                                <li id="@string.Format("fileid_{0}", i + 1)">
+                                    <img alt="删除" onclick="deleteVisitFJ('@Model.Id','@string.Format("fileid_{0}", i + 1)','@filename')" style="cursor:pointer; position:absolute;right:15px;top:10px;" src="../../image/close.png" />
+                                    <a href="../../UploadSaleVisit/@filename" title="@filename">
+                                        <img class="fjimg" alt="@filename" src="@string.Format("../../image/{0}.png", exp)" /><span>@filename</span>
+                                    </a></li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</form>

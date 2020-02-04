@@ -1,0 +1,814 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "订单管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script src="@Url.Content("~/Content/My97DatePicker/WdatePicker.js")" type="text/javascript"></script>
+<div class="divtool" style="font-size: 12px; height: 60px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height: 28px;">
+            <td style="min-width: 60px">
+                <span>合同编号</span>
+            </td>
+            <td style="min-width: 200px">
+                <input id="txtSearch" class="easyui-textbox" style="width: 190px;" />
+            </td>
+            <td style="min-width: 60px">
+                <span>合同产品</span>
+            </td>
+            <td style="min-width: 260px">
+                <input id="dllOrderItem" name="OrderItem" class="easyui-combotree" style="width: 250px;" />
+            </td>
+            <td style="min-width: 60px">
+                <span>所属地区</span>
+            </td>
+            <td style="min-width: 190px">
+                <input id="DiQuS" class="easyui-combobox" style="width: 180px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                <span>业务员</span>
+            </td>
+            <td style="min-width: 120px">
+                <input id="userS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td style="min-width: 70px">
+                <span>回款状态</span>
+            </td>
+            <td style="min-width: 120px">
+                <input id="dzS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                <span>手册状态</span>
+            </td>
+            <td style="min-width: 130px">
+                <select class="easyui-combobox" name="flag" id="ddlflag" style="width: 120px;" panelheight="320">
+                    <option value="0">全部</option>
+                    <option value="1">未提交</option>
+                    <option value="7">已提交</option>
+                    <option value="2">A已初审</option>
+                    <option value="3">B已派工</option>
+                    <option value="5">C已编制完成</option>
+                    <option value="4">D用户核对中</option>
+                    <option value="6">E已定稿</option>
+                    <option value="8">F已装订</option>
+                    <option value="9">G装订修改</option>
+                    <option value="11">I手册已领取</option>
+                    <option value="13">J待定</option>
+                    <option value="n4">非用户核对中</option>
+                </select>
+            </td>
+            <td style="min-width: 60px">
+                行业
+            </td>
+            <td style="min-width: 130px">
+                <input id="IndustryID" class="easyui-combobox" style="width: 120px;" editable="false" />
+            </td>
+        </tr>
+        <tr style="height: 28px;">
+            <td>
+                <span>客户名称</span>
+            </td>
+            <td>
+                <input id="NameS" class="easyui-textbox" style="width: 190px;" />
+            </td>
+            <td>
+                <span>合同日期</span>
+            </td>
+            <td>
+                <input id="txtOrderDateS" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                    style="font-size: 12px; width: 112px;" />
+                <span>-</span>
+                <input id="txtOrderDateE" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                    style="font-size: 12px; width: 112px;" />
+            </td>
+            <td>
+                <span>合计金额</span>
+            </td>
+            <td>
+                <input id="txtItemMoneyS" type="text" name="ItemMoney" class="easyui-validatebox"
+                    style="font-size: 12px; width: 78px;" />
+                <span>-</span>
+                <input id="txtItemMoneyE" type="text" name="ItemMoney" class="easyui-validatebox"
+                    style="font-size: 12px; width: 78px;" />
+            </td>
+            <td>
+                <span>提成状态</span>
+            </td>
+            <td>
+                <select class="easyui-combobox" name="flagTc" id="ddlflagTc" style="width: 110px;">
+                    <option value="">全部</option>
+                    <option value="0">未提成</option>
+                    <option value="1">已提成</option>
+                    <option value="2">部分提成</option>
+                </select>
+            </td>
+            <td>
+                <span>发票状态</span>
+            </td>
+            <td>
+                <input id="fpS" class="easyui-combobox" style="width: 110px;" editable="false" />
+            </td>
+            <td>
+                <span>出库状态</span>
+            </td>
+            <td>
+                <input id="ckS" class="easyui-combobox" style="width: 120px;" editable="false" />
+            </td>
+            <td style="min-width: 60px">
+                合同状态
+            </td>
+            <td style="min-width: 130px">
+                <select class="easyui-combobox" name="flag" id="FlagID" style="width: 120px;" panelheight="260">
+                    <option value="-1">全部</option>
+                    <option value="0">正常</option>
+                    <option value="1">待定</option>
+                    <option value="2">待销售确认</option>
+                    <option value="3">待客户确认</option>
+                </select>
+                @*<input id="" class="easyui-combobox" style="width: 120px;" editable="false" />*@
+            </td>
+            <td>
+            </td>
+            <td>
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="divtool">
+    @Html.ToolButton("btnCreate", "icon-add", Suggestion.Create, perm, "Create", false)
+    @Html.ToolButton("btnEdit", "icon-edit", Suggestion.Edit, perm, "Edit", false)
+    @Html.ToolButton("btnDelete", "icon-remove", Suggestion.Delete, perm, "Delete", true)
+    @Html.ToolButton("btnOutStock", "pic_123", "出库", perm, "OutStock", true)
+    @Html.ToolButton("btnExport", "pic_163", "导出合同", false)
+    @Html.ToolButton("btnDaoRu", "pic_164", "导入合同", true)
+    @Html.ToolButton("btnDaoChu", "pic_163", "导出出库单", false)
+    @Html.ToolButton("btnImport", "pic_164", "导入出库单", true)
+    @Html.ToolButton("btnDaiDing", "icon-edit", "待定", perm, "daiding", false)
+    @Html.ToolButton("btnExpress", "pic_433", "快递", perm, "Express", false)
+    @Html.ToolButton("btnTuiSong", "icon-edit", "立即开票", perm, "TuiSong", false)
+    <input id="Pid" name="Pid" type="hidden" />
+</div>
+<input id="hiduserS" name="hiduserS" type="hidden" value="@ViewBag.userS" />
+<table id="grid">
+</table>
+<table cellpadding="0" cellspacing="0" border="0" style="margin-top: 5px;">
+    <tr>
+        <td style="width: 50%; vertical-align: top;">
+            <table id="gridCK">
+            </table>
+        </td>
+        <td style="vertical-align: top; padding-left: 5px;">
+            <table id="gridExp">
+            </table>
+        </td>
+    </tr>
+</table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<div id="modalwindowPro" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<div id="modalwindowDD" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<div id="modalwindowTS" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<script type="text/javascript">
+    var offwidth = 10;
+    var offheight = 100;
+    var mxheight = 200;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('load');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+    function frameReturnByMesAlert(mes) {
+        $.show_alert('@Suggestion.Tip', mes);
+    };
+    function frameRenCloseDD() {
+        $("#modalwindowDD").window('close');
+        $("#grid").datagrid('reload');
+    };
+    function frameReturnByMesDD(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+    function frameRenCloseTS() {
+        $("#modalwindowTS").window('close');
+        $("#grid").datagrid('reload');
+    };
+    function frameReturnByMesTS(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+    function ChooseProduct(rows) {
+        $("#modalwindowPro").window('close');
+        //console.log(window.frames);
+        window.frames["iftest"].AddRows(rows);
+        //window.frames["ifOut"].AddRows(rows);
+    };
+    function OpenProductType() {
+        $("#modalwindowPro").html("<iframe id='ifProduct' name='ifProduct' width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/FinProductTypeChoose'></iframe>");
+        $("#modalwindowPro").window({ title: '选择商品', width: 1000, height: 610, iconCls: 'icon-add' }).window('open');
+    };
+    function OpenProduct(TypeId) {
+        $("#modalwindowPro").html("<iframe id='ifProduct' name='ifProduct' width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/FinProductChoose?TypeId=" + TypeId + "'></iframe>");
+        $("#modalwindowPro").window({ title: '选择商品', width: 1000, height: 610, iconCls: 'icon-add' }).window('open');
+    };
+    
+   
+    function BindComb() {
+
+        //合同产品
+        $('#dllOrderItem').combotree({
+            url: '/Financial/GetTree_FinProductType?all=false',
+            valueField: 'id',
+            textField: 'text',
+            multiple: true,
+            onSelect: function (node) {
+            },
+            onShowPanel: function () {
+                // 动态调整高度  
+                $(this).combotree('panel').height(600);
+            }
+        });
+
+        //地区
+        $("#DiQuS").combobox({
+            url: '/Basic/Get_CombCity?pid=',
+            multiple: true,
+            panelHeight: 600,
+            valueField: 'ID',
+            textField: 'Name',
+            groupField: 'CityPLName'
+        }).combobox('clear');
+
+        //业务员
+        $('#userS').combobox({
+            url: '/System/GetComb_Users?All=true',
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                if ($("#hiduserS").val().length > 0) {
+                    $("#userS").combobox('setValue', $("#hiduserS").val());
+                    $("#userS").combobox("disable");
+                    $("#FlagID").combobox('setValue', "0");
+                }
+                reload();
+            }
+        });
+
+        //回款状态
+        $('#dzS').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=013&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+
+            }
+        });
+
+        //发票状态
+        $('#fpS').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=012&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+
+            }
+        });
+
+        //出库状态
+        $('#ckS').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=014&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+
+            }
+        });
+
+        //行业
+        $('#IndustryID').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=001&All=true',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                
+            }
+        });
+    };
+
+    function getyyyyMMdd() {
+        var d = new Date();
+        var curr_date = d.getDate();
+        var curr_month = d.getMonth() + 1;
+        var curr_year = d.getFullYear();
+        String(curr_month).length < 2 ? (curr_month = "0" + curr_month) : curr_month;
+        String(curr_date).length < 2 ? (curr_date = "0" + curr_date) : curr_date;
+        var yyyyMMdd = curr_year + "-" + curr_month + "-" + curr_date;
+        return yyyyMMdd;
+    }    
+
+    $(function () {
+
+        $("#txtOrderDateS").val(getyyyyMMdd());
+
+        BindComb();
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight - mxheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight - mxheight
+            });
+        });
+        $("#btnCreate").click(function () {
+            $("#modalwindow").html("<iframe id='iftest' name='iftest' width='100%' height='98%' scrolling='no' frameborder='0'' src='/Sale/Create_SaleOrder?Id=" + $("#Pid").val() + "&AddType=True'></iframe>");
+            $("#modalwindow").window({ title: '@Suggestion.Create', width: 1150, height: 510, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnEdit").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe id='iftest' name='iftest' width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleOrder?Id=" + row.Id + "&Ieguid=" + guid() + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 1150, height: 560, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/Sale/Delete_SaleOrder?Id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                frameReturnByReload(false);
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        //待定
+        $("#btnDaiDing").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindowDD").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleOrderDD?Id=" + row.Id + "&AddType=Flase'></iframe>");
+                $("#modalwindowDD").window({ title: '@Suggestion.Edit', width: 300, height: 200, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        //出库
+        $("#btnOutStock").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                if (row.OutStockFlagName == "已出库") {
+                    frameReturnByMesAlert(row.Name + " [" + row.ItemNames + "] 已出库完成，无法继续出库");
+                    return;
+                }
+                $("#modalwindow").html("<iframe id='iftest' name='iftest' width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOutStock?OrderId=" + row.Id + "&AddType=True'></iframe>");
+                $("#modalwindow").window({ title: '出库', width: 800, height: 600, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        //导出        
+        $("#btnExport").click(function () {
+            window.location.href = "/Sale/SaleOrderExcel?Id=" + $("#txtSearch").val() + "&NameS=" + $("#NameS").val()
+                    + "&OrderDateS=" + $("#txtOrderDateS").val() + "&OrderDateE=" + $("#txtOrderDateE").val()
+                    + "&DiQuS=" + $("#DiQuS").combobox("getValues") + "" + "&userS=" + $("#userS").combobox("getValues") + ""
+                    + "&dzS=" + $("#dzS").combobox("getValue") + ""
+                    + "&fpS=" + $("#fpS").combobox("getValue") + ""
+                    + "&ckS=" + $("#ckS").combobox("getValue") + ""
+                    + "&ItemNames=" + $("#dllOrderItem").combobox("getText") + ""
+                    + "&nkscflag=" + $("#ddlflag").combobox("getValues") + ""
+                    + "&ItemMoneyS=" + $("#txtItemMoneyS").val() + "&ItemMoneyE=" + $("#txtItemMoneyE").val()
+                    + "&Tc=" + $("#ddlflagTc").combobox("getValues") + "&Flag=true"
+                    + "&Industry=" +$("#IndustryID").combobox('getValue');
+        });
+        //导入合同
+        $("#btnDaoRu").click(function () {
+            window.parent.addTab('导入合同', '/Sale/ImportOrder', 'pic_164');
+        });
+        //导出出库单
+        $("#btnDaoChu").click(function () {
+            window.location.href = "/Sale/SaleOrderExcel?Id=" + $("#txtSearch").val() + "&NameS=" + $("#NameS").val()
+                    + "&OrderDateS=" + $("#txtOrderDateS").val() + "&OrderDateE=" + $("#txtOrderDateE").val()
+                    + "&DiQuS=" + $("#DiQuS").combobox("getValues") + "" + "&userS=" + $("#userS").combobox("getValues") + ""
+                    + "&dzS=" + $("#dzS").combobox("getValue") + ""
+                    + "&fpS=" + $("#fpS").combobox("getValue") + ""
+                    + "&ckS=" + $("#ckS").combobox("getValue") + ""
+                    + "&ItemNames=" + $("#dllOrderItem").combobox("getText") + ""
+                    + "&nkscflag=" + $("#ddlflag").combobox("getValues") + ""
+                    + "&ItemMoneyS=" + $("#txtItemMoneyS").val() + "&ItemMoneyE=" + $("#txtItemMoneyE").val()
+                    + "&Tc=" + $("#ddlflagTc").combobox("getValues") + "&Flag=false"
+                    + "&Industry=" + $("#IndustryID").combobox('getValue');
+        });
+        //导入出库单
+        $("#btnImport").click(function () {
+            window.parent.addTab('导入出库单', '/Sale/ImportExcel', 'pic_164');
+        });
+        //快递单
+        $("#btnExpress").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_Exp_Express?OrderId=" + row.Id + "&AddType=True'></iframe>");
+                $("#modalwindow").window({ title: '快递', width: 700, height: 300, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        //立即开票
+        $("#btnTuiSong").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindowTS").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleOrderTS?Id=" + row.Id + "&AddType=Flase'></iframe>");
+                $("#modalwindowTS").window({ title: '@Suggestion.Edit', width: 300, height: 200, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+    });
+    
+    function reload() {
+        var queryData = {
+            Id: $("#txtSearch").val(),
+            NameS: $("#NameS").val(),
+            OrderDateS: $("#txtOrderDateS").val(),
+            OrderDateE: $("#txtOrderDateE").val(),
+            DiQuS: $("#DiQuS").combobox("getValues") + "",
+            userS: $("#userS").combobox("getValues") + "",
+            dzS: $("#dzS").combobox("getValues") + "",
+            fpS: $("#fpS").combobox("getValues") + "",
+            ckS: $("#ckS").combobox("getValues") + "",
+            ItemNames: $("#dllOrderItem").combobox('getText') + "",
+            nkscflag: $("#ddlflag").combobox("getValues") + "",
+            Tc: $("#ddlflagTc").combobox("getValues") + "",
+            ItemMoneyS: $("#txtItemMoneyS").val(),
+            ItemMoneyE: $("#txtItemMoneyE").val(),
+            Industry: $("#IndustryID").combobox('getValue'),
+            Flag: $("#FlagID").combobox("getValue")
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Sale/GetData_SaleOrder',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - offheight - mxheight,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'Id',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            showFooter: true,  //显示合计行
+            queryParams: queryData,
+            frozenColumns: [[
+                { field: 'Id', title: '编号', width: 100, halign: 'center' },
+                { field: 'OrderDate', title: '日期', width: 100, halign: 'center' },
+                { field: 'CityName', title: '地区', width: 80, halign: 'center' },
+                { field: 'Name', title: '客户/发票抬头', width: 170, halign: 'center' },
+            ]],
+            columns: [[
+                { field: 'Lxr', title: '联系人', width: 70, halign: 'center' },
+                { field: 'Phone', title: '手机号', width: 100, halign: 'center' },
+                { field: 'Address', title: '邮寄地址', width: 200, halign: 'center' },
+            //{ field: 'Code', title: '社会统一信用代码', width: 150, halign: 'center' },
+                {field: 'nkscflag', title: '手册状态', sortable: false, width: 95,
+                formatter: function (value, row, index) {
+                    var flagname = "";
+                    if (value == '1') {
+                        flagname = "未提交";
+                    }
+                    else if (value == '2') {
+                        flagname = "A已初审";
+                    }
+                    else if (value == '3') {
+                        flagname = "B已派工";
+                    }
+                    else if (value == '5') {
+                        flagname = "C已编制完成";
+                    }
+                    else if (value == '4') {
+                        flagname = "D用户核对中";
+                    }
+                    else if (value == '6') {
+                        flagname = "E已定稿";
+                    }
+                    else if (value == '7') {
+                        flagname = "已提交"
+                    }
+                    else if (value == "8") {
+                        flagname = "F已装订";
+                    }
+                    else if (value == "9") {
+                        flagname = "G装订修改";
+                    }
+                    else if (value == "11") {
+                        flagname = "I手册已领取";
+                    }
+                    else if (value == "13") {
+                        flagname = "J待定";
+                    }
+                    else {
+                        flagname = "";
+                    }
+                    return "<a href=\"javascript:void(0);\" onclick=\"ShowNksc('" + row.Name + "','" + row.nid + "');\">" + flagname + "</a>";
+                }
+            },
+                { field: 'Flag', title: '合同状态', sortable: false, width: 60, halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return "正常";
+                        }
+                        else if (value == 1) {
+                            return "待定";
+                        }
+                        else if (value == 2) {
+                            return "待销售确认";
+                        }
+                        else if (value == 3) {
+                            return "待客户确认";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                { field: 'ItemNames', title: '合同明细', width: 150, halign: 'center' },
+                //{ field: 'ZyxName', title: '优先级', width: 80, halign: 'center' },
+                //{ field: 'TypeName', title: '客户类别', width: 80, halign: 'center' },
+                //{ field: 'HyName', title: '行业', width: 70, halign: 'center' },
+                {field: 'InvoiceFlagName', title: '发票状态', width: 70, halign: 'center' },
+                { field: 'PaymentFlagName', title: '回款状态', width: 70, halign: 'center' },
+                { field: 'OutStockFlagName', title: '出库状态', width: 70, halign: 'center' },
+                { field: 'Tc', title: '提成状态', width: 70, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row.Tc > 0 && row.unTc > 0) {
+                            return "部分提成";
+                        }
+                        else if (row.Tc > 0 && row.unTc == 0) {
+                            return "已提成";
+                        }
+                        else if (row.Tc == 0 && row.unTc > 0) {
+                            return "未提成";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                { field: 'ItemMoney', title: '合计金额', width: 100, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Invoicemoney', title: '开票金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Paymentmoney', title: '回款金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Receivablemoney', title: '应开金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return (parseFloat(row.ItemMoney) - parseFloat(row.Invoicemoney)).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'unTc', title: '应收金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return (parseFloat(row.ItemMoney) - parseFloat(row.Paymentmoney)).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'ItemCount', title: '合计数量', width: 70, align: 'right', halign: 'center' },
+                { field: 'OSCount', title: '出库数量', width: 70, align: 'right', halign: 'center' },
+                { field: 'TaxMoney', title: '合计税金', width: 100, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'PresentMoney', title: '礼品金额', width: 100, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'OtherMoney', title: '其他金额', width: 100, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'ValidMoney', title: '有效回款', width: 100, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Fp', title: '立即开票', width: 70, halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value == "1") {
+                            return "是";
+                        }
+                        else {
+                            return "否";
+                        }
+                    }
+                },
+                { field: 'CheckFlagName', title: '审核状态', width: 70, halign: 'center' },
+                { field: 'CheckDate', title: '审核日期', width: 100, halign: 'center' },
+                { field: 'Finshed', title: '已完成', width: 70, halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row.Name == "合计") {
+                            return "";
+                        }
+                        else if (value) {
+                            return "已完成";
+                        }
+                        else {
+                            return "未完成";
+                        }
+                    }
+                },
+                { field: 'SalerName', title: '业务员', width: 70, halign: 'center' },
+                { field: 'Remake', title: '备注', width: 100, halign: 'center' },
+                { field: 'ZsName', title: '经手人', width: 70, halign: 'center' },
+                { field: 'Key', title: '账户', width: 70, halign: 'center' }
+            ]],
+            onClickRow: function (index, row) {
+                reloadDesc(row.Id);
+            },
+            onLoadSuccess: function (data) {
+                if (data != null && data.total > 0) {
+                    reloadDesc(data.rows[0].Id);
+                }
+            }
+        });
+    }
+
+    function ShowNksc(dwqc, id) {
+        window.parent.addTab(dwqc, "/Nksc/Scxx?cid=" + id, "pic_1")
+    }
+
+    function reloadDesc(Id) {
+        var queryData = {
+            OrderId: Id
+        };
+        InitGridFP(queryData);
+    };
+
+    function InitGridFP(queryData) {
+        $('#gridCK').datagrid({
+            url: '/Financial/GetData_FinOutStock',
+            title: '出库管理',
+            width: ($(window).width() - offwidth) / 2 - 5,
+            methord: 'post',
+            height: mxheight,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'OSdate',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            showFooter: true,
+            queryParams: queryData,
+            columns: [[
+                { field: 'opt', title: '操作', width: 100, align: 'center', halign: 'center',
+                    formatter: function (value, row, index) {
+                        if (row.OrderId != "") {
+                            var e = '<a href="#" mce_href="#" onclick="editCK(\'' + row.OSId + '\',\'' + row.OrderId + '\')">编辑</a> ';
+                            var d = '<a href="#" mce_href="#" onclick="delCK(\'' + row.OSId + '\',\'' + row.OrderId + '\')">删除</a> ';
+                            return e + d;
+                        }
+                    }
+                },
+                { field: 'OSId', title: '编号', width: 120, halign: 'center' },
+                { field: 'OSdate', title: '出库日期', width: 90, halign: 'center' },
+                { field: 'ProPkey', title: '序列号', width: 90, halign: 'center' },
+                { field: 'OutStockCount', title: '出库总数', width: 70, align: 'right', halign: 'center' },
+                { field: 'ZsName', title: '经手人', width: 90, halign: 'center' }
+            ]]
+        });
+
+        $('#gridExp').datagrid({
+            url: '/Sale/GetData_Exp_Express',
+            title: '快递管理',
+            width: ($(window).width() - offwidth) / 2 - 5,
+            methord: 'post',
+            height: mxheight,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'ExpressTime',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            showFooter: true,
+            queryParams: queryData,
+            columns: [[
+                { field: 'opt', title: '操作', width: 100, align: 'center', halign: 'center',
+                    formatter: function (value, row, index) {
+                        if (row.OrderId != "") {
+                            return '<a href="#" mce_href="#" onclick="Subscriber(\'' + row.LogisticCode + '\')">订阅</a> <a href="#" mce_href="#" onclick="LookExp(\'' + row.LogisticCode + '\')">查看物流</a>';
+                        }
+                    }
+                },
+                { field: 'LogisticCode', title: '运单号', width: 120, halign: 'center' },
+                { field: 'ReceiverName', title: '收件人', width: 100, halign: 'center' },
+                { field: 'GoodsName', title: '发件物品', width: 150, halign: 'center' },
+                { field: 'State', title: '状态', width: 100, halign: 'center'
+                , formatter: function (value, row, index) {
+                    if (value == "0") {
+                        //0-无轨迹，1-已揽收，2-在途中，3-签收，4-问题件
+                        return "无轨迹";
+                    }
+                    else if (value == "1") {
+                        return "已揽收";
+                    }
+                    else if (value == "2") {
+                        return "在途中";
+                    }
+                    else if (value == "3") {
+                        return "签收";
+                    }
+                    else if (value == "4") {
+                        return "问题件:" + row.Reason;
+                    }
+                }
+                }
+            ]]
+        });
+
+    };
+
+    //订阅
+    function Subscriber(LogisticCode) {
+        $.post("/Sale/Subscriber?LogisticCode=" + LogisticCode, function (data) {
+            if (data.type == 1) {
+                $.messageBox5s('@Suggestion.Tip', data.message);
+            }
+            else {
+                $.show_alert('@Suggestion.Tip', data.message);
+            }
+        }, "json");
+    }
+
+    //查看物流
+    function LookExp(LogisticCode) {
+        $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Basic/Exp_Traces?LogisticCode=" + LogisticCode + "'></iframe>");
+        $("#modalwindow").window({ title: '物流详情', width: 800, height: 600, iconCls: 'icon-edit' }).window('open');
+    }
+
+    function editCK(OSId, OrderId) {
+        $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOutStock?OSId=" + OSId + "&OrderId=" + OrderId + "&AddType=Flase&Ieguid=" + guid() + "'></iframe>");
+        $("#modalwindow").window({ title: '出库', width: 800, height: 600, iconCls: 'icon-edit' }).window('open');
+    };
+
+    function delCK(OSId, OrderId) {
+        $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+            if (r) {
+                $.post("/Financial/Delete_FinOutStock?Id=" + OSId + "&OrderId=" + OrderId, function (data) {
+                    if (data.type == 1) {
+                        frameReturnByReload(false);
+                    }
+                    $.messageBox5s('@Suggestion.Tip', data.message);
+                }, "json");
+            }
+        });
+    };
+</script>

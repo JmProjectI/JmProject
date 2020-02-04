@@ -1,0 +1,68 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "产品模块选择";
+}
+<div class="divtool">
+    @Html.ToolButton("btnOK", "icon-save", "选择", false)
+</div>
+<table id="grid"></table>
+<script type="text/javascript">
+    var offwidth = 10;
+
+    $(function () {
+        reload()
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            });
+        });
+
+        $("#btnOK").click(function () {
+            var rows = $('#grid').treegrid('getChecked');
+            if (rows != null && rows.length > 0) {
+                window.parent.ChooseProduct(rows);
+            } else {
+                window.parent.frameReturnByMes('@Suggestion.PlaseChoose');
+            }
+        });
+    });
+
+
+    function reload() {
+        var queryData = {
+            DicID: ""
+        };
+        InitGrid(queryData);
+        $('#grid').treegrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').treegrid({
+            url: '/Financial/Get_FinProductModular',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: false,
+            idField: 'ItemID',
+            sortName: 'ItemID',
+            sortOrder: 'asc',
+            pagination: true,
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'ItemID', title: '编号', width: 180 },
+                { field: 'ItemName', title: '名称', width: 200 },
+                { field: 'ItemDesc', title: '描述', width: 400 },
+            ]]
+        });
+    }
+</script>

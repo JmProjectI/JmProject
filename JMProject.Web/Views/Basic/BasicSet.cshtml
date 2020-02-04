@@ -1,0 +1,88 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.BasicSet
+@{
+    ViewBag.Title = "订单管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Userid: $("#Userid").val()
+                    , PercentZ: $("input[name='PercentZ']").val()
+                    , PercentY: $("input[name='PercentY']").val()
+                    , PercentC: $("input[name='PercentC']").val()
+                    , PercentN: $("input[name='PercentN']").val()
+                };
+
+                $.ajax({
+                    url: "/Basic/Create_BasicSet",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }
+                        else {
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+    });
+</script>
+<input id="Userid" name="Userid" type="hidden" value="@Model.Userid" />
+<div class="divtool">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+</div>
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    上门[主管单位]
+                </th>
+                <td>
+                    <input type="text" id="PercentZ" name="PercentZ" class="easyui-validatebox easyui-numberbox" style="width:70px; text-align:right;" required="true" min="0" max="100" precision="0" value="@Model.PercentZ" /> %
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    上门[一般单位]
+                </th>
+                <td>
+                    <input type="text" id="PercentY" name="PercentY" class="easyui-validatebox easyui-numberbox" style="width:70px; text-align:right;" required="true" min="0" max="100" precision="0" value="@Model.PercentY" /> %
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    电话[财务软件]
+                </th>
+                <td>
+                    <input type="text" id="PercentC" name="PercentC" class="easyui-validatebox easyui-numberbox" style="width:70px; text-align:right;" required="true" min="0" max="100" precision="0" value="@Model.PercentC" /> %
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    电话[内控客户]
+                </th>
+                <td>
+                    <input type="text" id="PercentN" name="PercentN" class="easyui-validatebox easyui-numberbox" style="width:70px; text-align:right;" required="true" min="0" max="100" precision="0" value="@Model.PercentN" /> %
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

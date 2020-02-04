@@ -1,0 +1,115 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "选择产品";
+}<div class="divtool" style="font-size: 12px; height: 30px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr style="height: 28px;">
+            <td style="width: 50px;">
+                <span>序列号</span>
+            </td>
+            <td style="width: 160px;">
+                <input id="Pkey" class="easyui-textbox" style="width: 150px;" />
+            </td>
+            <td style="width: 80px;">
+                <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="reload()">查 询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="divtool">
+    @Html.ToolButton("btnOK", "icon-save", "选择", false)
+    <input id="Pid" name="Pid" type="hidden" value="@ViewBag.TypeId" />
+</div>
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="vertical-align: top;">
+            <table id="grid">
+            </table>
+        </td>
+    </tr>
+</table>
+<script type="text/javascript">
+    function BindComb() {
+        $('#ProductId').combotree({
+            url: '/Financial/GetTree_FinProductType?all=False',
+            valueField: 'id',
+            textField: 'text'
+        });
+    };
+
+    var offwidth = 10;
+    var offheight = 65;
+    $(function () {
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - offheight
+            });
+        });
+
+        $("#btnOK").click(function () {
+            var rows = $('#grid').datagrid('getChecked');
+            if (rows != null && rows.length > 0) {
+                window.parent.ChooseProduct(rows);
+            } else {
+                window.parent.frameReturnByMes('@Suggestion.PlaseChoose');
+            }
+        });
+        BindComb();
+        reload();
+    });
+
+    function reload() {
+        var queryData = {
+            Pid: $("#Pid").val(),
+            Name: $("#Pkey").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Financial/GetData_FinProduct',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - offheight,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'Id',
+            sortOrder: 'asc',
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true, //奇偶行是否区分
+            singleSelect: false, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'Id', title: '编号', width: 100 },
+                { field: 'stock', title: '库存数', width: 70 },
+                { field: 'TypeName', title: '分类', width: 100 },
+                { field: 'Name', title: '名称', width: 120 },
+                { field: 'Spec', title: '规格', width: 100 },
+                { field: 'Ucount', title: '许可用户数', width: 100 },
+                { field: 'Pkey', title: '序列号', width: 150 },
+                { field: 'Marketprice', title: '市场定价', width: 120 },
+                { field: 'Costprice', title: '成本价', width: 120 },
+                { field: 'InitialCount', title: '期初数量', width: 100 },
+                { field: 'InCount', title: '总入库数', width: 100 },
+                { field: 'OutCount', title: '总出库数', width: 100 },
+                { field: 'Remake', title: '描述', width: 200 },
+            ]],
+            rowStyler: function (index, row) {
+                if (row.stock < 1) {
+                    return 'color:Red;';
+                }
+            }
+        });
+    }
+</script>

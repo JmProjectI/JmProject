@@ -1,0 +1,237 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "地区管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+
+<input id="Pid" name="Pid" type="hidden" />
+<input id="Plid" name="Plid" type="hidden" />
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="min-width: 180px;">
+            &nbsp;
+        </td>
+        <td style="min-width: 500px;padding-left: 5px;">
+            <div class="divtool">
+                @Html.ToolButton("btnCreatePL", "icon-add", Suggestion.Create, perm, "CreatePL", false)
+                @Html.ToolButton("btnEditPL", "icon-edit", Suggestion.Edit, perm, "EditPL", false)
+                @Html.ToolButton("btnDeletePL", "icon-remove", Suggestion.Delete, perm, "DeletePL", false)
+            </div>
+        </td>
+        <td style="padding-left: 5px;">
+            <div class="divtool">
+                <input id="txtSearch" type="text" class="searchText" />
+                @Html.ToolButton("btnSearch", "icon-search", Suggestion.Search, true)
+                @Html.ToolButton("btnCreate", "icon-add", Suggestion.Create, perm, "Create", false)
+                @Html.ToolButton("btnEdit", "icon-edit", Suggestion.Edit, perm, "Edit", false)
+                @Html.ToolButton("btnDelete", "icon-remove", Suggestion.Delete, perm, "Delete", false)
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top; border: 1px solid #95B8E7; padding-top: 3px;">
+            <ul id="tree">
+            </ul>
+        </td>
+        <td style="vertical-align: top;padding-left: 5px;">
+            <table id="gridPl">
+            </table>
+        </td>
+        <td style="vertical-align: top;padding-left: 5px;">
+            <table id="grid">
+            </table>
+        </td>
+    </tr>
+</table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<script type="text/javascript">
+    var offwidth = 700;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('reload');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByReloadPl(flag) {
+        if (flag)
+            $("#gridPl").datagrid('reload');
+        else
+            $("#gridPl").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+
+    $(function () {
+        InitTree();
+        //reload();
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            });
+        });
+        $("#btnSearch").click(function () {
+            reload();
+        });
+        $("#btnCreate").click(function () {
+            $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Basic/Create_BasicCity?pid=" + $('#Plid').val() + "'></iframe>");
+            $("#modalwindow").window({ title: '@Suggestion.Create', width: 600, height: 285, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnEdit").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Basic/Create_BasicCity?Id=" + row.ID + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 600, height: 285, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/Basic/Delete_BasicCity?ID=" + row.ID, function (data) {
+                            if (data.type == 1) {
+                                frameReturnByReload(false);
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+
+        $("#btnCreatePL").click(function () {
+            $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Basic/Create_BasicCityPL?pid=" + $('#Plid').val() + "'></iframe>");
+            $("#modalwindow").window({ title: '@Suggestion.Create', width: 600, height: 285, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnEditPL").click(function () {
+            var row = $('#gridPl').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Basic/Create_BasicCityPL?Id=" + row.ID + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 600, height: 285, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDeletePL").click(function () {
+            var row = $('#gridPl').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/Basic/Delete_BasicCityPL?ID=" + row.ID, function (data) {
+                            if (data.type == 1) {
+                                frameReturnByReloadPl(false);
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+    });
+
+    function InitTree() {
+        $('#tree').tree({
+            url: '/Basic/GetTree_BasicProvince',
+            onlyLeafCheck: true,
+            onLoadSuccess: function (node, data) {
+                $("#Pid").val(data[0].id);
+                reloadPL();
+            },
+            onSelect: function (node) {
+                $("#Pid").val(node.id);
+                reloadPL();
+            }
+        });
+    };
+
+    function reloadPL() {
+        var queryData = {
+            Pid: $("#Pid").val()
+        };
+        InitGridPL(queryData);
+        $('#gridPl').datagrid('clearSelections');
+        $("#Plid").val('');
+        reload();
+    };
+
+    function InitGridPL(queryData) {
+        $('#gridPl').datagrid({
+            url: '/Basic/GetData_BasicCityPL',
+            width: 500,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: false,
+            idField: 'ID',
+            sortName: 'ID',
+            sortOrder: 'asc',
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'ID', title: '编号', width: 100 },
+                { field: 'Name', title: '名称', width: 200 }
+            ]],
+            onClickRow: function (index, data) {
+                var row = $('#gridPl').datagrid('getSelected');
+                if (row != null) {
+                    $("#Plid").val(row.ID);
+                    reload();
+                }
+            }
+        });
+    }
+
+    function reload() {
+        var queryData = {
+            Name: $("#txtSearch").val(),
+            Pid: $("#Plid").val(),
+            Sfid: $("#Pid").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Basic/GetData_BasicCity',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: false,
+            idField: 'ID',
+            sortName: 'ID',
+            sortOrder: 'asc',
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'ID', title: '编号', width: 100 },
+                { field: 'Name', title: '地区名称', width: 200 },
+                { field: 'Code', title: '区号', width: 100 },
+                { field: 'PostCode', title: '邮政编码', width: 100 },
+                { field: 'beizhu', title: '备注', width: 300 },
+            ]]
+        });
+    }
+</script>

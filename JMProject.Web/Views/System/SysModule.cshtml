@@ -1,0 +1,265 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "菜单管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<div id="imgBox" style="position: absolute;width: 602px; height: 405px;
+    background-color: #fff; box-shadow: 0px 0px 4px #aaa; border: 1px solid #aaa;
+    display: none;">
+    <ul style="list-style: none; margin: 0; padding: 0">
+        @for (int i = 1; i <= 470; i++)
+        {
+            <li style="width: 16px; height: 16px; float: left; margin: 3px;"><a class="easyui-linkbutton btnimg" plain="true" iconCls="@string.Format("pic_{0}", i)">
+            </a></li>
+        }
+    </ul>
+</div>
+<input id="Pid" name="Pid" type="hidden" value="" />
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="vertical-align: top;">
+            <div class="divtool">
+                @Html.ToolButton("btnCreate", "icon-add", Suggestion.Create, perm, "Create", false)
+                @Html.ToolButton("btnEdit", "icon-edit", Suggestion.Edit, perm, "Edit", false)
+                @Html.ToolButton("btnDelete", "icon-remove", Suggestion.Delete, perm, "Delete", false)
+            </div>
+        </td>
+        <td style="width: 300px; vertical-align: top;">
+            <div class="divtool">
+                @Html.ToolButton("btnCreateOpt", "icon-add", Suggestion.Create, perm, "CreateOpt", false)
+                @Html.ToolButton("btnEditOpt", "icon-edit", Suggestion.Edit, perm, "EditOpt", false)
+                @Html.ToolButton("btnDeleteOpt", "icon-remove", Suggestion.Delete, perm, "DeleteOpt", false)
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">
+            <table id="grid">
+            </table>
+        </td>
+        <td style="vertical-align: top; padding-left: 5px;">
+            <table id="gridOpt">
+            </table>
+        </td>
+    </tr>
+</table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+<script type="text/javascript">
+    var offwidth = 330;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").treegrid('load');
+        else
+            $("#grid").treegrid('reload');
+        parent.InitMenu();
+    };
+    function frameReturnByReloadOpt(flag) {
+        if (flag)
+            $("#gridOpt").datagrid('load');
+        else
+            $("#gridOpt").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+
+    function showBox(x, y) {
+        zindex = $('.window-mask').css("z-index");
+        y = $('.window').position().top + y + 15;
+        x = $('.window').position().left + x + 29;
+        $("#imgBox").css("left", x);
+        $("#imgBox").css("top", y);
+        $("#imgBox").css("z-index", parseInt(zindex) + 2);
+        $("#imgBox").show();
+    };
+
+    function hideBox() {
+        $("#imgBox").hide();
+    };
+
+    $(document).on("click", function () {
+        hideBox();
+    });
+
+    $(".btnimg").click(function () {
+        $("#imgBox").hide();
+        $('#childFrame').contents().find("#btnicon").attr("iconCls", $(this).attr("iconCls"));
+        $('#childFrame').contents().find("#btnicon").find("span.l-btn-icon").attr("class", "l-btn-icon " + $(this).attr("iconCls"));
+    });
+
+    $(function () {
+
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            });
+        });
+        $("#btnCreate").click(function () {
+            $("#modalwindow").html("<iframe id='childFrame' width='100%' height='98%' scrolling='no' frameborder='0'' src='/System/Create_SysModule?_parentId=" + $("#Pid").val() + "&AddType=True'></iframe>");
+            $("#modalwindow").window({ title: '@Suggestion.Create', width: 500, height: 300, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnEdit").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe id='childFrame' width='100%' height='98%' scrolling='no' frameborder='0' src='/System/Create_SysModule?Id=" + row.Id + "&Ieguid=" + guid() + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 500, height: 300, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/System/Delete_SysModule?Id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                frameReturnByReload(false);
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+
+        $("#btnCreateOpt").click(function () {
+            var variable1 = $("#Pid").val();
+            if (variable1 == null || variable1 == undefined || variable1 == '') {
+                $.messageBox5s('@Suggestion.Tip', '请选择一个末级菜单');
+                return;
+            }
+            else if (variable1.length<=2) {
+                $.messageBox5s('@Suggestion.Tip', '请选择一个末级菜单');
+                return;
+            }
+            $("#modalwindow").html("<iframe id='childFrame' width='100%' height='98%' scrolling='no' frameborder='0'' src='/System/Create_SysModuleOperate?ModuleId=" + $("#Pid").val() + "&AddType=True'></iframe>");
+            $("#modalwindow").window({ title: '@Suggestion.Create', width: 500, height: 300, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnEditOpt").click(function () {
+            var row = $('#gridOpt').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe id='childFrame' width='100%' height='98%' scrolling='no' frameborder='0' src='/System/Create_SysModuleOperate?Id=" + row.Id + "&IsValid=" + row.IsValid + "&Ieguid=" + guid() + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 500, height: 300, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDeleteOpt").click(function () {
+            var row = $('#gridOpt').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/System/Delete_SysModuleOperate?Id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                $("#gridOpt").datagrid('reload');
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+
+        reload();
+        reloadOpt();
+    });
+
+    function reload() {
+        var queryData = {};
+        InitGrid(queryData);
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').treegrid({
+            url: '/System/GetData_SysModule',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: false, //自动设置宽度 
+            treeField: 'Id',
+            idField: 'Id',
+            pagination: false,
+            striped: false, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            //            rowStyler: function (row) {
+            //                if (row._parentId == null) {
+            //                    return 'background-color:#fafafa;color:#000;font-weight:bold;';
+            //                }
+            //            },
+            columns: [[
+                { field: 'Id', title: '编号', width: 120 },
+                {
+                    field: 'Icon', title: '图标', width: 50, align: 'center', formatter: function (value) {
+                        return "<span class=\"tree-icon " + value + " \" style=\"display:inline-block\"></span>";
+                    }
+                },
+                { field: 'Name', title: '名称', width: 180 },
+                { field: 'Url', title: '链接', width: 200 },
+                { field: 'Sort', title: '排序', width: 100 },
+            ]],
+            onClickRow: function (index, data) {
+                var row = $('#grid').treegrid('getSelected');
+                if (row != null) {
+                    $("#Pid").val(row.Id);
+                    reloadOpt();
+                }
+            }
+        });
+    };
+
+    function reloadOpt() {
+        var queryData = {
+            ModuleId: $("#Pid").val()
+        };
+        InitGridOpt(queryData);
+    };
+
+    function InitGridOpt(queryData) {
+        $('#gridOpt').datagrid({
+            url: '/System/GetData_SysModuleOperate',
+            width: 315,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: true,
+            sortName: 'Sort',
+            sortOrder: 'asc',
+            idField: 'Id',
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: false,
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+            //                { field: 'Id', title: 'Id', width: 100 },
+            //                { field: 'ModuleId', title: 'ModuleId', width: 100 },
+                {field: 'Name', title: '名称', width: 120 },
+                { field: 'KeyCode', title: '操作码', width: 100 },
+                {
+                    field: 'IsValid', title: '是否验证', width: 80, align: 'center', formatter: function (value) {
+                        if (value) {
+                            return "<img src='/Image/pass.png'/>";
+                        } else {
+                            return "<img src='/Image/no.png'/>";
+                        }
+                    }
+                },
+                { field: 'Sort', title: '排序', width: 100 },
+            ]]
+        });
+    }
+</script>

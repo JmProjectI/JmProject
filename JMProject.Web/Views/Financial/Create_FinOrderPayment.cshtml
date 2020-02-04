@@ -1,0 +1,175 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.FinOrderPayment
+@{
+    ViewBag.Title = "回款管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script type="text/javascript">
+    function BindComb() {
+        //账户
+        $('#Paymentaccount').combobox({
+            url: '/Basic/GetComb_BasicAccount',
+            valueField: 'Id',
+            textField: 'Key',
+            onLoadSuccess: function (node, data) {
+                $("#Paymentaccount").combobox('setValue', '@ViewBag.AccountId');
+            },
+            onShowPanel: function () {
+                // 动态调整高度  
+                $(this).combobox('panel').height(140);
+            }
+        });
+
+        //发票
+        $('#OrderInvoice').combobox({
+            url: '/Financial/GetComb_OrderInvoice?Id=' + $("#OrderId").val(),
+            valueField: 'Id',
+            textField: 'Key',
+            onLoadSuccess: function (node, data) {
+                $("#OrderInvoice").combobox('setValue', '@Model.InvoiceId');
+            },
+            onShowPanel: function () {
+                // 动态调整高度  
+                //$(this).combobox('panel').height(140);
+            },
+            onSelect: function (record) {
+                var Items = $('#OrderInvoice').combobox('getData');
+                $.each(Items, function (index, content) {
+                    if (record.Id == content.Id) {
+                        if ($('#Paymentaccount').combobox('getValue') == "") {
+                            $('#Paymentaccount').combobox('setValue', content.AccountId);
+                        }
+                        if ($('#Paymentmoney').numberbox('getValue') == 0) {
+                            $.ajax({
+                                url: "/Financial/Cet_PaymentMoney",
+                                type: "Post",
+                                data: { InvoiceId: record.Id },
+                                dataType: "json",
+                                success: function (data) {
+                                    $("#Paymentmoney").numberbox('setValue', content.Receivablemoney - data.Paymentmoney);
+                                }
+                            });
+                        }
+                        return;
+                    }
+                });
+            }
+        });
+    }
+
+    $(function () {
+        BindComb();
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("#Id").val()
+                    , OrderId: $("input[name='OrderId']").val()
+                    , InvoiceId: $("input[name='OrderInvoice']").val()
+                    , Paymentaccount: $("input[name='Paymentaccount']").val()
+                    , Paymentdate: $("input[name='Paymentdate']").val()
+                    , Paymentmoney: $("input[name='Paymentmoney']").val()
+                    , Remark: $("input[name='Remark']").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Financial/Create_FinOrderPayment",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<input id="HidPaymentmoney" name="HidPaymentmoney" type="hidden" value="@ViewBag.Paymentmoney" />
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="OrderId" name="OrderId" type="hidden" value="@Model.OrderId" />
+<input id="InvoiceId" name="OrderId" type="hidden" value="@Model.InvoiceId" />
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<form id="CreateForm" method="post">
+<table class="form_table">
+    <tbody>
+        <tr>
+            <th>
+                发票
+            </th>
+            <td colspan="3">
+                <input id="OrderInvoice" type="text" name="OrderInvoice" class="easyui-validatebox easyui-combobox"
+                    style="width: 541px;" required="true" editable="false" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                回款日期
+            </th>
+            <td>
+                <input id="Paymentdate" type="text" name="Paymentdate" class="easyui-validatebox easyui-datebox" required="true" value="@Model.Paymentdate" />
+            </td>
+            <th>
+                回款账户
+            </th>
+            <td>
+                <input id="Paymentaccount" type="text" name="Paymentaccount" class="easyui-validatebox easyui-combobox"
+                    style="width: 208px;" required="true" editable="false" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                回款金额
+            </th>
+            <td>
+                <input id="Paymentmoney" type="text" name="Paymentmoney" class="easyui-validatebox easyui-numberbox" required="true" style="text-align: right;" min="0" max="100000000" precision="2" value="@Model.Paymentmoney" />
+            </td>
+            <th>
+            </th>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                描述
+            </th>
+            <td colspan="3">
+                <textarea id="Remark" name="Remark" class="easyui-validatebox" maxlength="100" style="height: 60px;width: 532px;">@Model.Remark</textarea>
+            </td>
+        </tr>
+        <tr>
+            <th colspan="4">
+                <fieldset>
+                    <legend>单据状态</legend><span class="sT">合同金额</span><span class="sV">@ViewBag.ItemMoney</span>
+                    <span class="sT">开票金额</span><span class="sV">@(ViewBag.Invoicemoney == "" ? "0.00" : ViewBag.Invoicemoney)</span>
+                    <span class="sT">回款金额</span><span class="sV">@(ViewBag.Paymentmoney == "" ? "0.00" : ViewBag.Paymentmoney)</span>
+                </fieldset>
+            </th>
+        </tr>
+    </tbody>
+</table>
+</form>

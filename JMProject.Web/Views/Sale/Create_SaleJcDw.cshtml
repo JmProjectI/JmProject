@@ -1,0 +1,90 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.View.View_Inspect
+@{
+    ViewBag.Title = "订单管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    AccountModel Account = (AccountModel)ViewBag.Account; 
+}
+<script type="text/javascript">
+    function BindComb() {
+        //客户
+        $('#SaleCustomId').combobox({
+            url: '/Sale/GetData_SaleCustom_Comb',
+            valueField: 'ID',
+            textField: 'Name',
+            onLoadSuccess: function (node, data) {
+                if ("@ViewBag.CId" != "") {
+                    $("#SaleCustomId").combobox('setValue', '@ViewBag.CId');
+                }
+                else {
+                    $("#SaleCustomId").combobox('setValue', '@Model.CustomerID');
+                }
+            }
+        });
+    }
+
+    $(function () {
+        BindComb();
+
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("#Id").val()
+                    , CustomerID: $("input[name='SaleCustomId']").val()
+                    , Content: $("input[name='Content']").val()
+                };
+
+                $.ajax({
+                    url: "/Sale/Create_SaleJcDw",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnClose();
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+        });
+
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnClose();
+        });
+    })
+</script>
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, true)
+</div>
+<form id="CreateForm" method="post">
+<table class="form_table">
+    <tbody>
+        <tr style="height: 38px;">
+            <th>
+                客户
+            </th>
+            <td>
+                <input type="text" id="SaleCustomId" name="SaleCustomId" style="width:200px;" class="easyui-combobox" required="true" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                年份
+            </th>
+            <td>
+                <input type="text" name="Content" class="easyui-validatebox" style="width:80px" maxlength="200" value="@Model.Content" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+</form>

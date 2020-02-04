@@ -1,0 +1,115 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "供应商管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<div class="divtool">
+    <input id="txtSearch" type="text" class="searchText"/>
+    @Html.ToolButton("btnSearch", "icon-search", Suggestion.Search, true)
+    @Html.ToolButton("btnCreate", "icon-add", Suggestion.Create, perm, "Create", false)
+    @Html.ToolButton("btnEdit", "icon-edit", Suggestion.Edit, perm, "Edit", false)
+    @Html.ToolButton("btnDelete", "icon-remove", Suggestion.Delete, perm, "Delete", false)
+</div>
+<table id="grid"></table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false"></div>
+<script type="text/javascript">
+    var offwidth = 10;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('load');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+
+    $(function () {
+        reload()
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            });
+        });
+        $("#btnSearch").click(function () {
+            reload();
+        });
+        $("#btnCreate").click(function () {
+            $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/Create_FinSupplier?AddType=True'></iframe>");
+            $("#modalwindow").window({ title: '@Suggestion.Create', width: 700, height: 300, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnEdit").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinSupplier?Id=" + row.Id + "&Ieguid=" + guid() + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 700, height: 300, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/Financial/Delete_FinSupplier?Id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                frameReturnByReload(false);
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+    });
+
+
+    function reload() {
+        var queryData = {
+            Name: $("#txtSearch").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Financial/GetData_FinSupplier',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'Id',
+            sortOrder: 'asc',
+            pagination: true,
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'Id', title: '编号', width: 100 },
+                { field: 'Name', title: '名称', width: 200 },
+                { field: 'Linkman', title: '联系人', width: 100 },
+                { field: 'Phone', title: '手机号', width: 130 },
+                { field: 'Tel', title: '座机号', width: 130 },
+                { field: 'Address', title: '地址', width: 240 },
+                { field: 'Remake', title: '描述', width: 300 },
+            ]]
+        });
+    }
+</script>

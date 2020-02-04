@@ -1,0 +1,124 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.WordTempKey
+@{
+    ViewBag.Title = "模板关键字";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    id: $("#id").val()
+                    , Zid: $("input[name='Zid']").val()
+                    , WordKey: $("input[name='WordKey']").val()
+                    , DBKey: $("input[name='DBKey']").val()
+                    , KeyType: $("#comKeyType").combobox('getValue')
+                    , Desc: $("input[name='Desc']").val()
+                    , ywType: $("input[name='ywType']").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Word/Create_WordTempKey",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+
+        //职务
+        $('#comKeyType').combobox({
+            url: '/Word/GetComb_WordTempType?All=false',
+            valueField: 'ID',
+            textField: 'Name',
+            onLoadSuccess: function (node, data) {
+                $("#comKeyType").combobox('setValue', '@Model.KeyType');
+            }
+        });
+    });
+</script>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="id" name="id" type="hidden" value="@Model.id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    替换方式
+                </th>
+                <td>
+                    <input id="comKeyType" name="KeyType" class="easyui-combobox" style="width: 358px;" editable="false" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    上级编号
+                </th>
+                <td>
+                    <input type="text" name="Zid" class="easyui-validatebox" maxlength="10" style="width: 350px;" required="true" value="@Model.Zid" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Word关键字
+                </th>
+                <td>
+                    <input type="text" name="WordKey" class="easyui-validatebox" maxlength="100" style="width: 350px;" required="true" value="@Model.WordKey" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    DB关键字
+                </th>
+                <td>
+                    <input type="text" name="DBKey" class="easyui-validatebox" maxlength="100" style="width: 350px;" value="@Model.DBKey" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    所属业务
+                </th>
+                <td>
+                    <input type="text" name="ywType" class="easyui-validatebox" maxlength="100" style="width: 350px;" value="@Model.ywType" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    描述
+                </th>
+                <td>
+                    <input type="text" name="Desc" class="easyui-validatebox" maxlength="100" style="width: 350px;" value="@Model.Desc" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

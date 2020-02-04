@@ -1,0 +1,76 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.DictionaryItem
+@{
+    ViewBag.Title = "字典维护";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+}
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                //$("#CreateForm").serialize()
+                var postData = {
+                    DicID: $("#DicID").val()
+                    , ItemID: $("#ItemID").val()
+                    , ItemName: $("input[name='ItemName']").val()
+                    , ItemDesc: $("textarea[name='ItemDesc']").val()
+                    , ItemFlag: $("#ItemFlag").val()
+                };
+
+                $.ajax({
+                    url: "/Basic/Create_DicItem",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<input id="DicID" name="DicID" type="hidden" value="@Model.DicID" />
+<input id="ItemID" name="ItemID" type="hidden" value="@Model.ItemID" />
+<input id="ItemFlag" name="ItemFlag" type="hidden" value="@Model.ItemFlag" />
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    名称
+                </th>
+                <td>
+                    <input type="text" name="ItemName" class="easyui-validatebox" maxlength="30" required="true" value="@Model.ItemName" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    描述
+                </th>
+                <td>
+                    <textarea id="ItemDesc" name="ItemDesc" class="easyui-validatebox" maxlength="100" style="height: 60px;">@Model.ItemDesc</textarea>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

@@ -1,0 +1,414 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.View.View_SaleVisit
+@{
+    ViewBag.Title = "处理意见";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<style type="text/css">
+    .form_table,.form_table tr th, .form_table tr td { border:1px solid #cccccc; }
+    .form_table tr
+    {
+        height:28px;
+    }
+    .form_table th
+    {
+        min-width:110px;
+        text-align: left;
+        text-indent: 0.5em;
+        font-weight:normal;
+    }
+    .form_table td
+    {
+        min-width:260px;
+        text-align: left;
+        text-indent: 0.5em;
+        color:Blue;
+    }
+    .tabledetials tbody td
+    {
+        min-width:0px;
+        border-top: 1px solid #cccccc;
+    }
+    #title1 tr td
+    {
+        min-width:0px;
+        border:1px solid #fff;
+    }
+    #title2 tr td
+    {
+        min-width:0px;
+        border:1px solid #fff;
+    }
+    #title3 tr td
+    {
+        min-width:0px;
+        border:1px solid #fff;
+    }
+</style>
+<script type="text/javascript">
+    function BindCus(values) {
+        var postData = {
+            Id: values
+        };
+        $.ajax({
+            url: "/Sale/GetLxrName",
+            type: "Post",
+            data: postData,
+            dataType: "json",
+            success: function (data) {
+                $("#jmtbody").html("");
+                if (data.rows.length < 1) {
+                    $("#jmexpan").hide();
+                    return;
+                }
+                $("#jmexpan").show();
+                for (var i = 0; i < data.rows.length; i++) {
+                    var html = '<tr>'
+                                    + '   <td>' + (data.rows.length - i) + '</td>'
+                                    + '   <td>' + data.rows[i].ContactDate + '</td>'
+                                    + '   <td>' + data.rows[i].Offer + '</td>'
+                                    + '   <td colspan="2">' + data.rows[i].ContactDetails + '</td>'
+                                    + '</tr>';
+                    $("#jmtbody").append(html);
+                }
+            }
+        });
+        var postData = {
+            Id: values
+        };
+        $.ajax({
+            url: "/Sale/Get_LxrName",
+            type: "Post",
+            data: postData,
+            dataType: "json",
+            success: function (data) {
+                $("#jm_tbody").html("");
+                if (data.rows.length < 1) {
+                    $("#jm_expan").hide();
+                    return;
+                }
+                $("#jm_expan").show();
+                for (var i = 0; i < data.rows.length; i++) {
+                    if (data.rows[i].AuditDetails != "") {
+                        var html = '<tr>'
+                                    + '   <td>' + (data.rows.length - i) + '</td>'
+                                    + '   <td colspan="2">' + data.rows[i].AuditDetails + '</td>'
+                                    + '</tr>';
+                        $("#jm_tbody").append(html);
+                    }
+                    else {
+                        var html = '<tr>'
+                                    + '   <td>' + (data.rows.length - i) + '</td>'
+                                    + '   <td colspan="2">无处理意见</td>'
+                                    + '</tr>';
+                        $("#jm_tbody").append(html);
+                    }
+                }
+            }
+        });
+        var postData = {
+            Id: values
+        };
+        $.ajax({
+            url: "/Sale/Get_LxrUp",
+            type: "Post",
+            data: postData,
+            dataType: "json",
+            success: function (data) {
+                $("#jm_tbody_up").html("");
+                if (data.rows.length < 1) {
+                    $("#jm_expan_up").hide();
+                    return;
+                }
+                $("#jm_expan_up").show();
+
+                for (var i = 0; i < data.rows.length; i++) {
+                    var len = data.rows[i].Fj.split("、");
+                    if (len.length < 2) {
+                        if (len[0] == "") {
+                            var html = '<tr>'
+                                        + '   <td>' + (data.rows.length - i) + '</td>'
+                                        + '   <td colspan="2">无附件</td>'
+                                        + '</tr>';
+                            $("#jm_tbody_up").append(html);
+                        }
+                    }
+                    else {
+                        for (var j = 0; j < len.length; j++) {
+                            if (len[j] != "") {
+                                var html = '<tr>'
+                                        + '   <td>' + (data.rows.length - i) + '</td>'
+                                        + '   <td colspan="2"><a href="../../UploadSaleVisit/' + len[j] + '" title="' + len[j] + '" style="text-decoration:none;">' + len[j] + '</a></td>'
+                                        + '</tr>';
+                                $("#jm_tbody_up").append(html);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    $(function () {
+        BindCus("@Model.SaleCustomID");
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+
+                var postData = {
+                    Id: $("#Id").val()
+                    , AuditDetails: $("textarea[name='AuditDetails']").val()
+                };
+
+                $.ajax({
+                    url: "/Sale/Create_SaleVisitAudit",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnClose();
+        });
+    });
+</script>
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<form id="CreateForm" method="post">
+    <div style="overflow-y: scroll; height: 575px;">
+        <table class="form_table" style="width:840px;margin-left:10px;">
+            <tbody>
+                <tr>
+                    <th>
+                        客户全称
+                    </th>
+                    <td colspan="3">
+                        @Model.Name
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        联系人
+                    </th>
+                    <td>
+                        @Model.Lxr
+                    </td>
+                    <th>
+                        联络方式
+                    </th>
+                    <td>
+                        @Model.LlfsName
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        需求分类
+                    </th>
+                    <td colspan="3">
+                        @Model.DemandTypeName
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        联络日期
+                    </th>
+                    <td>
+                        @Model.ContactDate
+                    </td>
+                    <th>
+                        联络时间
+                    </th>
+                    <td>
+                        @Model.ContactTime
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        联络状态
+                    </th>
+                    <td>
+                        @Model.LlztName
+                    </td>
+                    <th>
+                        联络情况
+                    </th>
+                    <td>
+                        @Model.LlqkName
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        是否意向
+                    </th>
+                    <td>
+                        @Model.YxName
+                    </td>
+                    <th>
+                        预计成交金额
+                    </th>
+                    <td>
+                        @Model.Amount
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        进度
+                    </th>
+                    <td>
+                        @Model.JdName
+                    </td>
+                    <th>
+                        本次报价
+                    </th>
+                    <td>
+                        @Model.Offer
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <span>上次联络详情</span>
+                    </th>
+                    <td colspan="3" style="height: 31px;">
+                        <table class="tabledetials" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
+                            <thead id="title1">
+                                <tr>
+                                    <td style="width: 40px;">
+                                        序号
+                                    </td>
+                                    <td style="width: 85px;">
+                                        日期
+                                    </td>
+                                    <td style="width: 55px;">
+                                        报价
+                                    </td>
+                                    <td>
+                                        联络详情
+                                    </td>
+                                    <td style="width: 40px;">
+                                        <a id="jmexpan" href="#" onclick="$('#jmtbody').toggle();" style="display: none">展/收</a>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody id="jmtbody" style="display: none;">
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        本次联络详情
+                    </th>
+                    <td colspan="3">
+                        <textarea id="ContactDetailsID" name="ContactDetails" rows="3" required="true" class="easyui-validatebox"
+                            readonly="readonly" style="height: 60px; font-size: 13px; width: 700px;" maxlength="500">@Model.ContactDetails</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        下次联络目标
+                    </th>
+                    <td colspan="3">
+                        <textarea id="ContactTargetID" name="ContactTarget" rows="3" required="true" class="easyui-validatebox"
+                            readonly="readonly" style="height: 60px; font-size: 13px; width: 700px;" maxlength="500">@Model.ContactTarget</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        下次联络时间
+                    </th>
+                    <td>
+                        @Model.NextTime
+                    </td>
+                    <th>
+                        状态
+                    </th>
+                    <td>
+                        @Model.ZtName
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <span>上次处理意见</span>
+                    </th>
+                    <td colspan="3" style="height: 31px;">
+                        <table class="tabledetials" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
+                            <thead id="title2">
+                                <tr>
+                                    <td style="width: 40px;">
+                                        序号
+                                    </td>
+                                    <td>
+                                        处理意见
+                                    </td>
+                                    <td style="width: 40px;">
+                                        <a id="jm_expan" href="#" onclick="$('#jm_tbody').toggle();" style="display: none">展/收</a>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody id="jm_tbody" style="display: none;">
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        处理意见
+                    </th>
+                    <td colspan="3">
+                        <textarea id="AuditDetailsID" name="AuditDetails" rows="3" class="easyui-validatebox"
+                            style="height: 80px; font-size: 13px; width: 700px;" maxlength="500">@Model.AuditDetails</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <span>上次资料/文件</span>
+                    </th>
+                    <td colspan="3" style="height: 31px;">
+                        <table class="tabledetials" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
+                            <thead id="title3">
+                                <tr>
+                                    <td style="width: 40px;">
+                                        序号
+                                    </td>
+                                    <td>
+                                        资料名/文件名
+                                    </td>
+                                    <td style="width: 40px;">
+                                        <a id="jm_expan_up" href="#" onclick="$('#jm_tbody_up').toggle();" style="display: none">
+                                            展/收</a>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody id="jm_tbody_up" style="display: none;">
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</form>

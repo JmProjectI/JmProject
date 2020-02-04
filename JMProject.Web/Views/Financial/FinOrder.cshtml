@@ -1,0 +1,134 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "入库单管理";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<div class="divtool">
+    <input id="txtSearch" type="text" class="searchText"/>
+    @Html.ToolButton("btnSearch", "icon-search", Suggestion.Search, true)
+    @Html.ToolButton("btnCreate", "icon-add", Suggestion.Create, perm, "Create", false)
+    @*@Html.ToolButton("btnEdit", "icon-edit", Suggestion.Edit, perm, "Edit", false)*@
+    @Html.ToolButton("btnDelete", "icon-remove", Suggestion.Delete, perm, "Delete", false)
+    <input id="Pid" name="Pid" type="hidden" />
+</div>
+<table id="grid"></table>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false"></div>
+<div id="modalwindowPro" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false"></div>
+<script type="text/javascript">
+    var offwidth = 10;
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    };
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid").datagrid('load');
+        else
+            $("#grid").datagrid('reload');
+    };
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Suggestion.Tip', mes);
+    };
+    function frameReturnByMesAlert(mes) {
+        $.show_alert('@Suggestion.Tip', mes);
+    }; 
+    function ChooseProduct(rows) {
+        $("#modalwindowPro").window('close');
+        window.frames[0].AddRows(rows);
+    };
+    function OpenProduct() {
+        $("#modalwindowPro").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/FinProductModularChoose'></iframe>");
+        $("#modalwindowPro").window({ title: '选择模块', width: 1000, height: 610, iconCls: 'icon-add' }).window('open');
+    };
+
+    $(function () {
+        reload()
+        $(window).resize(function () {
+            $('#grid').datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            }).datagrid('resize', {
+                width: $(window).width() - offwidth,
+                height: $(window).height() - 35
+            });
+        });
+        $("#btnSearch").click(function () {
+            reload();
+        });
+        $("#btnCreate").click(function () {
+            $("#modalwindow").html("<iframe id='childPage' nam='childPage' width='100%' height='98%' scrolling='no' frameborder='0'' src='/Financial/Create_FinOrder?AddType=True'></iframe>");
+            $("#modalwindow").window({ title: '@Suggestion.Create', width: 800, height: 500, iconCls: 'icon-add' }).window('open');
+        });
+        $("#btnEdit").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe id='childPage' nam='childPage' width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOrder?Id=" + row.Id + "&Ieguid=" + guid() + "'></iframe>");
+                $("#modalwindow").window({ title: '@Suggestion.Edit', width: 800, height: 500, iconCls: 'icon-edit' }).window('open');
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                    if (r) {
+                        $.post("/Financial/Delete_FinOrder?Id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                frameReturnByReload(false);
+                            }
+                            $.messageBox5s('@Suggestion.Tip', data.message);
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
+        });
+    });
+
+
+    function reload() {
+        var queryData = {
+            Id: $("#txtSearch").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Financial/GetData_FinOrder',
+            width: $(window).width() - offwidth,
+            methord: 'post',
+            height: $(window).height() - 35,
+            fitColumns: false,
+            idField: 'Id',
+            sortName: 'OrderDate',
+            sortOrder: 'desc',
+            pagination: true,
+            pageSize: 20,
+            pageList: [15, 20, 30, 40, 50],
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+                { field: 'Id', title: '编号', width: 120, halign: 'center' },
+                { field: 'OrderDate', title: '日期', width: 120, halign: 'center' },
+                { field: 'Name', title: '供应商', width: 200, halign: 'center' },
+                { field: 'ZsName', title: '经手人', width: 100, halign: 'center' },
+                //{ field: 'ItemCount', title: '合计数量', width: 100, halign: 'center', align: 'right' },
+                { field: 'ItemMoney', title: '合计金额', width: 100, halign: 'center' ,align:'right'
+                , formatter: function (value, row, index) {
+                    if (row != null) {
+                        return parseFloat(value).toFixed(2);
+                    }
+                }
+                },
+                { field: 'Remake', title: '描述', width: 300, halign: 'center' },
+            ]]
+        });
+    }
+</script>

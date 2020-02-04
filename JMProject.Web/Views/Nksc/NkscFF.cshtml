@@ -1,0 +1,33 @@
+﻿@model List<JMProject.Model.Sys.S_SWF>
+@{
+    ViewBag.Title = "手册分发";
+}
+<link href="@Url.Content("~/webuploader-0.1.5/webuploader.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/webuploader-0.1.5/webuploader.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/Scxx_scFF.js?version=190426")" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#divscroll").height($(window).height() - 10);
+    });
+</script>
+<style type="text/css">
+    ul.imglist li span
+    {
+        background-color:White;
+    }
+</style>
+<div id="divscroll" style="height: 700px; margin: 5px 1px 5px 5px; overflow-y: auto;">
+    <div id="uploader" class="wu-example">
+        <ul id="thelist" class="imglist" style="width: 100%;">
+            <li id="picker" style="width: 116px; padding: 0px;"><a href="javascript:;" title="选择文件">
+                <img class="fjimg" alt="选择文件" src="../../Image/up.jpg" style="height: 118x;" />
+            </a></li>
+            @foreach (var item in Model)
+            {
+                <li id="@item.id"><a href="javascript:;" title="@item.swfName">
+                    <img class="fjimg" alt="@item.swfName" src="../../image/Office.png" /><span style="font-size: 12px;">@item.swfName</span>
+                </a></li>
+            }
+        </ul>
+    </div>
+</div>

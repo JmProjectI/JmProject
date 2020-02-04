@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "客户";
+    Layout = "~/Views/Shared/_LayoutMui.cshtml";
+}
+@*<div id="tabbar-with-contact" class="mui-control-content mui-active">
+    <ul id="OA_task" class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+        <li class="mui-table-view-cell">
+            <div class="mui-slider-right mui-disabled">
+                <a jmevent="edit" class="mui-btn mui-btn-grey mui-icon mui-icon-compose"></a>
+                <a jmevent="phone" class="mui-btn mui-btn-yellow mui-icon mui-icon-phone"></a>
+                <a jmevent="send"  class="mui-btn mui-btn-red mui-icon mui-icon-chat"></a>
+            </div>
+            <div class="mui-slider-handle">
+                <div class="mui-slider-cell">
+                    <div class="oa-contact-cell mui-table">
+                        <div class="oa-contact-content mui-table-cell">
+                            <div class="mui-clearfix">
+                                <h4 class="oa-contact-name">叶文洁</h4>
+                                <span class="oa-contact-position mui-h6">董事长</span>
+                            </div>
+                            <p class="oa-contact-email mui-h6">yewenjie@sina.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>*@
+<div id="tabbar-with-chat" class="mui-control-content">
+    <ul class="mui-table-view mui-table-view-chevron">
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 1</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 2</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 3</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 4</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 5</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 6</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 1</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 2</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 3</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 4</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 5</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 6</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 1</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 2</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 3</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 4</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 5</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 6</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 1</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 2</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 3</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 4</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 5</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 6</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 1</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 2</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 3</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 4</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 5</a></li>
+        <li class="mui-table-view-cell"><a href="" class="mui-navigate-right">Item 6</a></li>
+    </ul>
+</div>
+//    (function ($) {
+//        var btnArray = ['确认', '取消'];
+//        $('#OA_task').on('tap', '.mui-btn', function (event) {
+//            var elem = this;
+//            var jmevent = jq(elem).attr("jmevent");
+//            var li = elem.parentNode.parentNode;
+//            if (jmevent == "edit") {
+//                mui.alert('修改');
+//                setTimeout(function () {
+//                    mui.swipeoutClose(li);
+//                }, 0);
+//            }
+//            else if (jmevent == "phone") {
+//                window.location.href = 'tel://'+jq(elem).attr("jmtel");
+//            }
+//            else if (jmevent == "send") {
+//                mui.confirm('确认删除该条记录？', 'Hello MUI', btnArray, function (e) {
+//                    if (e.index == 0) {
+//                        elem.parentNode.removeChild(li);
+//                    } else {
+//                        setTimeout(function () {
+//                            mui.swipeoutClose(li);
+//                        }, 0);
+//                    }
+//                });
+//            }
+//        });
+
+//        BindKH();
+
+//    })(mui);
+
+//    function BindKH() {
+//        jq("#OA_task").empty();
+
+//        jq.ajax({
+//            url: "/Mobile/GetCustom",
+//            type: "Post",
+//            data: { Name: '' },
+//            dataType: "json",
+//            success: function (data) {
+//                if (data.total < 0) {
+//                    window.location.href = '/P';
+//                }
+//                else if (data.total > 0) {
+//                    jq.each(data.rows, function (index, value) {
+//                        var html = '<li id="' + value.ID + '" class="mui-table-view-cell">'
+//                                 + '   <div class="mui-slider-right mui-disabled">'
+//                                 + '       <a jmevent="edit" class="mui-btn mui-btn-grey mui-icon mui-icon-compose"></a>'
+//                                 + '       <a jmevent="phone" jmtel="' + value.Phone + '" class="mui-btn mui-btn-yellow mui-icon mui-icon-phone"></a>'
+//                                 + '       <a jmevent="send"  class="mui-btn mui-btn-red mui-icon mui-icon-chat"></a>'
+//                                 + '   </div>'
+//                                 + '   <div class="mui-slider-handle">'
+//                                 + '       <div class="mui-slider-cell">'
+//                                 + '           <div class="oa-contact-cell mui-table">'
+//                                 + '               <div class="oa-contact-content mui-table-cell">'
+//                                 + '                   <div class="mui-clearfix">'
+//                                 + '                       <h4 class="oa-contact-name">' + value.Name + '</h4>'
+//                                 + '                       <span class="oa-contact-position mui-h6">' + value.Lxr + ' ' + value.Phone + ' ' + value.Address + '</span>'
+//                                 + '                   </div>'
+//                                 + '                   <p class="oa-contact-email mui-h6">合同：' + value.ItemMoney + ' 发票：' + value.Invoicemoney + ' 到账：' + value.Paymentmoney + '</p>'
+//                                 + '               </div>'
+//                                 + '           </div>'
+//                                 + '       </div>'
+//                                 + '   </div>'
+//                                 + '</li>';
+//                        jq("#OA_task").append(html);
+//                    });
+//                }
+//            }
+//        });
+//    };

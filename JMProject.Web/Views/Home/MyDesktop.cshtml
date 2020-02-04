@@ -1,0 +1,54 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@{
+    ViewBag.Title = "我的桌面";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script src="@Url.Content("~/ScriptsBll/MyDesktop.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    function frameReturnClose() {
+        $("#modalwindow").window('close');
+    };
+</script>
+<input id="hiduserS" name="hiduserS" type="hidden" value="@ViewBag.userS" />
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false,collapsible:false,maximizable:false">
+</div>
+@if (ViewBag.YwyType == "Ywy")
+{
+    <table border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
+        <tr style="height: 50%;">
+            <td style="width: 50%; padding-left: 20px; padding-top: 10px;">
+                <div style="height: 22px;">
+                    你有<span id="RowsCount"></span>条新处理意见未读！
+                </div>
+                <table id="grid">
+                </table>
+            </td>
+            <td style="width: 50%; padding-top: 10px;">
+                <div style="height: 22px;">
+                </div>
+                <table id="gridHK">
+                </table>
+            </td>
+        </tr>
+        <tr style="height:30px;">
+            <td></td>
+            <td></td>
+        </tr>
+        <tr style="height: 50%;">
+            <td style="width: 50%; padding-left: 20px; padding-top: 10px;">
+                <table id="gridCustomTx">
+                </table>
+            </td>
+            <td style="width: 50%; padding-top: 10px;">
+                <table id="gridBuyTx">
+                </table>
+            </td>
+        </tr>
+    </table>
+}

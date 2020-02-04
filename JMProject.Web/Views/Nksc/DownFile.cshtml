@@ -1,0 +1,49 @@
+﻿@model List<JMProject.Model.Management>
+@{
+    ViewBag.Title = "下载文档";
+}
+<link href="@Url.Content("~/webuploader-0.1.5/webuploader.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/webuploader-0.1.5/webuploader.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/Scxx_DownFile.js")" type="text/javascript"></script>
+<input id="HiddenAdmin" type="hidden" value="@ViewBag.Admin" />
+<div id="uploader" class="wu-example">
+    <!--用来存放文件信息-->
+    <ul id="thelist" class="imglist" style="width: 100%;">
+        @if (ViewBag.Admin == "1")
+        {
+            <li id="picker"><a href="javascript:;" title="选择文件">
+                <img class="fjimg" alt="选择文件" src="../../Image/up.jpg" style="height: 120px;" />
+            </a></li>
+        }
+        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                string imgname = "";
+                string[] ext = item.name.Split('.');
+                if (ext[1] == "doc" || ext[1] == "docx")
+                {
+                    imgname = "word.png";
+                }
+                else if (ext[1] == "xls" || ext[1] == "xlsx")
+                {
+                    imgname = "xls.png";
+                }
+                else
+                {
+                    imgname = "exe.png";
+                }
+                
+                <li id="@item.id">
+                    @if (ViewBag.Admin == "1")
+                    {
+                        <img alt="删除" onclick="deleteFJ('@item.id','@item.name')" style="cursor:pointer; position:absolute;right:15px;top:10px;" src="../../image/close.png" />
+                    }
+                    <a href="../../DownFile/@item.name" title="@item.name">
+                        <img class="fjimg" alt="@item.name" src="../../image/@imgname" /><span style="font-size: 12px;">@item.name</span>
+                    </a>
+                </li>
+            }
+        }
+    </ul>
+</div>

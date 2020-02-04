@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CB907EE1-23F9-48A1-856C-572699D7E6A9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JMProject.BLL</RootNamespace>
+    <AssemblyName>JMProject.BLL</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BasicAccountBLL.cs" />
+    <Compile Include="BasicCityBLL.cs" />
+    <Compile Include="BasicCityPLBLL.cs" />
+    <Compile Include="BasicSetBLL.cs" />
+    <Compile Include="CrsVisitBLL.cs" />
+    <Compile Include="DictionaryBLL.cs" />
+    <Compile Include="Exp_ExpressBLL.cs" />
+    <Compile Include="Exp_TracesBLL.cs" />
+    <Compile Include="FinOrderBLL.cs" />
+    <Compile Include="FinOrderInvoiceBLL.cs" />
+    <Compile Include="FinOrderPaymentBLL.cs" />
+    <Compile Include="FinOutStockBLL.cs" />
+    <Compile Include="FinProductBLL.cs" />
+    <Compile Include="FinProductItemBLL.cs" />
+    <Compile Include="FinProductTypeBLL.cs" />
+    <Compile Include="FinSalesCommissionBLL.cs" />
+    <Compile Include="FinSupplierBLL.cs" />
+    <Compile Include="JsDataBLL.cs" />
+    <Compile Include="ModuleRoleBLL.cs" />
+    <Compile Include="BasicProvinceBLL.cs" />
+    <Compile Include="Nksc_UpdateBLL.cs" />
+    <Compile Include="InspectBLL.cs" />
+    <Compile Include="SaleCustomerBLL.cs" />
+    <Compile Include="SaleOrderBLL.cs" />
+    <Compile Include="SaleOrderItemBLL.cs" />
+    <Compile Include="SalePlanBLL.cs" />
+    <Compile Include="SaleVisitBLL.cs" />
+    <Compile Include="SysLogBLL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SysModuleBLL.cs" />
+    <Compile Include="SysModuleOperateBLL.cs" />
+    <Compile Include="SysRoleBLL.cs" />
+    <Compile Include="SysUserBLL.cs" />
+    <Compile Include="NkscBLL.cs" />
+    <Compile Include="ManagementBLL.cs" />
+    <Compile Include="TecCusServiceBLL.cs" />
+    <Compile Include="WeiXinApiBLL.cs" />
+    <Compile Include="WordTempFileBLL.cs" />
+    <Compile Include="WordTempKeyBLL.cs" />
+    <Compile Include="WordTempLCTBLL.cs" />
+    <Compile Include="WordTempTypeBLL.cs" />
+    <Compile Include="WordTempXZBLL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JMProject.Common\JMProject.Common.csproj">
+      <Project>{9496CD76-412F-4F59-A62C-79B89EFB4BA1}</Project>
+      <Name>JMProject.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JMProject.Dal\JMProject.Dal.csproj">
+      <Project>{183F651A-5B3B-4781-B588-9BC2F1D0A6D4}</Project>
+      <Name>JMProject.Dal</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JMProject.Model\JMProject.Model.csproj">
+      <Project>{7F3DF65A-E4D8-4C45-A658-40B012401817}</Project>
+      <Name>JMProject.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

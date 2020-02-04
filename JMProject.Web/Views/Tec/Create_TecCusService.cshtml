@@ -1,0 +1,173 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.TecCusService
+@{
+    ViewBag.Title = "服务管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("#Id").val()
+                    , GroupId: ''
+                    , Custom: $("input[name='Custom']").val()
+                    , Ywy: $("input[name='Ywy']").val()
+                    , ServiceType: $("input[name='ServiceType']").val()
+                    , BugType: $("input[name='BugType']").val()
+                    , StartDate: $("input[name='StartDate']").val()
+                    , TakeDay: $("input[name='TakeDay']").val()
+                    , TakeTime: $("input[name='TakeTime']").val()
+                    , Remake: $("input[name='Remake']").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Tec/Create_TecCusService",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+
+        //业务员
+        $('#Ywy').combobox({
+            url: '/System/GetComb_Users?RoleId=06',
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                $("#Ywy").combobox('setValue', '@Model.Ywy');
+            }
+        });
+
+        //客户
+        $('#Custom').combobox({
+            url: '/Sale/GetData_SaleCustom_Comb',
+            valueField: 'ID',
+            textField: 'Name',
+            onLoadSuccess: function (node, data) {
+                $("#Custom").combobox('setValue', '@Model.Custom');
+            },
+            onSelect: function (record) {
+                
+            }
+        });
+
+        //服务类型
+        $('#ServiceType').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=030',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#ServiceType").combobox('setValue', '@Model.ServiceType');
+            }
+        });
+
+        //问题类型
+        $('#BugType').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=031',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#BugType").combobox('setValue', '@Model.BugType');
+            }
+        });
+    });
+</script>
+<style>
+tr{height:32px;}
+</style>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    服务客户
+                </th>
+                <td>
+                    <input type="text" id="Custom" name="Custom" class="easyui-combobox" required="true" />
+                </td>
+                <th>
+                    技术员
+                </th>
+                <td>
+                    <input type="text" id="Ywy" name="Ywy" class="easyui-combobox" required="true" editable="false" value="@Model.Ywy" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    开始日期
+                </th>
+                <td>
+                    <input type="text" name="StartDate" class="easyui-validatebox easyui-datebox" maxlength="18" required="true" value="@Model.StartDate" />
+                </td>
+                <th>
+                    次数
+                </th>
+                <td>
+                    <input type="text" name="TakeDay" class="easyui-validatebox" maxlength="9" required="true" value="@Model.TakeDay" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    上门类型
+                </th>
+                <td>
+                    <input type="text" id="ServiceType" name="ServiceType" class="easyui-combobox" required="true" />
+                </td>
+                <th>
+                    问题类型
+                </th>
+                <td>
+                    <input type="text" id="BugType" name="BugType" class="easyui-combobox" required="true" />
+                </td>
+            </tr>
+            <tr style="display:none">
+                <th>
+                    耗时小时
+                </th>
+                <td>
+                    <input type="text" name="TakeTime" class="easyui-validatebox" maxlength="9" required="true" value="@Model.TakeTime" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    描述
+                </th>
+                <td colspan="3">
+                    <input type="text" name="Remake" class="easyui-validatebox" style="width:542px" maxlength="100" value="@Model.Remake" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

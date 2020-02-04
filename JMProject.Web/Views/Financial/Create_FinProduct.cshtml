@@ -1,0 +1,319 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.FinProduct
+@{
+    ViewBag.Title = "产品管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+}
+<script type="text/javascript">
+    var editIndex = undefined; //上一次编辑行索引
+
+    function bindGroup() {
+        $('#TypeId').combotree({
+            url: '/Financial/GetTree_FinProductType?all=False',
+            valueField: 'id',
+            textField: 'text',
+            onLoadSuccess: function (node, data) {
+                $("#TypeId").combotree('setValue', '@Model.TypeId');
+            }
+        });
+    }
+
+    function AddRows(rows) {
+        $.each(rows, function (index, item) {
+            $('#grid').datagrid('appendRow', {
+                ModularID: item.ItemID,
+                TypeName: item.ItemName,
+                CbMoney: '0',
+                JcMoney: '0',
+                CsCount: '1',
+                AddCount: '0',
+                AddMoney: '0',
+                SumCount: '1',
+                sumMoney: '0'
+            });
+        });
+    };
+
+    $(function () {
+        bindGroup();
+        reload();
+
+        /*保持*/
+        $("#btnSave").click(function () {
+            if (editIndex != undefined) {
+                $('#grid').datagrid('endEdit', editIndex);
+                editIndex = undefined;
+            }
+            $('#grid').datagrid('clearSelections');
+            var rows = $('#grid').datagrid('getRows');
+
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("#Id").val()//编号
+                    , TypeId: $("input[name='TypeId']").val()//产品分类
+                    , Name: $("input[name='Name']").val()//产品名称
+                    , Pkey: $("input[name='Pkey']").val()//序列号
+                    , Marketprice: $("input[name='Marketprice']").val()//市场定价
+                    , Costprice: $("input[name='Costprice']").val()//成本价
+                    , Remake: $("textarea[name='Remake']").val()//描述
+                    , Products: JSON.stringify(rows)
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Financial/Create_FinProduct",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+
+        /*添加产品*/
+        $("#btnAdd").click(function () {
+            window.parent.OpenProduct();
+        });
+
+        /*删除产品*/
+        $("#btnRemove").click(function () {
+            if (editIndex == undefined) {
+                window.parent.frameReturnByMes('@Suggestion.PlaseChoose');
+                return;
+            }
+            $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                if (r) {
+                    $('#grid').datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+                    editIndex = undefined;
+                }
+            });
+        });
+
+        function reload() {
+            var queryData = {
+                Id: $("#Id").val()
+            };
+            InitGrid(queryData);
+            $('#grid').datagrid('clearSelections');
+        };
+
+        function InitGrid(queryData) {
+            $('#grid').datagrid({
+                url: '/Financial/GetData_FinProductItem',
+                width: 784,
+                methord: 'post',
+                height: 300,
+                fitColumns: false,
+                idField: 'ItemID',
+                sortName: 'ItemID',
+                sortOrder: 'asc',
+                pagination: false,
+                striped: true, //奇偶行是否区分
+                singleSelect: true, //单选模式
+                queryParams: queryData,
+                columns: [[
+                    { field: 'TypeName', title: '模块名称', width: 100 },
+                    { field: 'CbMoney', title: '成本价', width: 110, editor: { type: 'numberbox', options: { precision: 2}} },
+                    { field: 'JcMoney', title: '基础价', width: 100, editor: { type: 'numberbox', options: { precision: 2}} },
+                    { field: 'CsCount', title: '初始用户数', width: 70, editor: { type: 'numberbox', options: { precision: 0}} },
+                    { field: 'AddCount', title: '增加用户数', width: 70, editor: { type: 'numberbox', options: { precision: 0}} },
+                    { field: 'AddMoney', title: '增加金额', width: 80, editor: { type: 'numberbox', options: { precision: 0}} },
+                    { field: 'SumCount', title: '用户数合计', width: 100, editor: { type: 'numberbox', options: { precision: 0}} },
+                    { field: 'sumMoney', title: '金额合计', width: 120, editor: { type: 'numberbox', options: { precision: 2}} },
+                ]],
+                onClickCell: onClickCell
+            });
+
+            function endEditing() {
+                if (editIndex == undefined) { return true }
+                if ($('#grid').datagrid('validateRow', editIndex)) {
+                    $('#grid').datagrid('endEdit', editIndex);
+                    editIndex = undefined;
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            function onClickCell(index, field) {
+                if (editIndex != index) {
+                    if (endEditing()) {
+                        $('#grid').datagrid('selectRow', index).datagrid('beginEdit', index);
+
+                        var editors = $('#grid').datagrid('getEditors', index);
+                        var CbMoneyEditor = editors[0]; //成本价
+                        var JcMoneyEditor = editors[1]; //基础价
+                        var CsCountEditor = editors[2]; //基础价
+                        var AddCountEditor = editors[3]; //增加用户数
+                        var AddMoneyEditor = editors[4]; //增加金额
+                        var SumCountEditor = editors[5]; //用户数合计
+                        var costEditor = editors[6]; //金额合计
+
+                        $(CbMoneyEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(CbMoneyEditor.target).numberbox('setValue', oldValue);
+                                }
+                            }
+                        });
+
+                        $(JcMoneyEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(JcMoneyEditor.target).numberbox('setValue', oldValue);
+                                }
+                                SumJinE();
+                            }
+                        });
+
+                        $(CsCountEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(CsCountEditor.target).numberbox('setValue', oldValue);
+                                }
+                                SumCount();
+                            }
+                        });
+
+                        $(AddCountEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(AddCountEditor.target).numberbox('setValue', oldValue);
+                                }
+                                SumCount();
+                            }
+                        });
+
+                        $(AddMoneyEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                if (newValue == '') {
+                                    $(AddMoneyEditor.target).numberbox('setValue', oldValue);
+                                }
+                                SumJinE();
+                            }
+                        });
+
+                        $(SumCountEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                SumCount();
+                            }
+                        });
+
+                        $(costEditor.target).numberbox({
+                            'onChange': function (newValue, oldValue) {
+                                SumJinE();
+                            }
+                        });
+
+                        function SumCount() {
+                            var cost = parseInt(CsCountEditor.target.val()) + parseInt(AddCountEditor.target.val());
+                            $(SumCountEditor.target).numberbox('setValue', cost);
+                        }
+
+                        function SumJinE() {
+                            var cost = parseFloat(JcMoneyEditor.target.val()) + parseFloat(AddMoneyEditor.target.val());
+                            $(costEditor.target).numberbox('setValue', cost);
+                        }
+
+                        var ed = $('#grid').datagrid('getEditor', { index: index, field: field });
+                        if (ed) {
+                            ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                        }
+                        editIndex = index;
+                    } else {
+                        setTimeout(function () {
+                            $('#grid').datagrid('selectRow', editIndex);
+                        }, 0);
+                    }
+                }
+            }
+        };
+    });
+</script>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+    @Html.ToolButton("btnAdd", "icon-add", "添加行", false)
+    @Html.ToolButton("btnRemove", "icon-remove", "删除行", true)
+    <div style="text-align: right; color: #3CB371; float: right; width: 500px; height: 30px;
+        font-size: 12px; margin-right: 10px;">
+        总入库数：@Model.InCount 、 总出库数：@Model.OutCount 、库存总数：@Model.stock
+    </div>
+</div>
+<form id="CreateForm" method="post">
+<table class="form_table">
+    <tbody>
+        <tr>
+            <th>
+                产品名称
+            </th>
+            <td colspan="3">
+                <input type="text" name="Name" class="easyui-validatebox" maxlength="50" style="width:592px;" required="true" value="@Model.Name" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                产品分类
+            </th>
+            <td>
+                <input type="text" id="TypeId" name="TypeId" class="easyui-combotree" maxlength="30"
+                    required="true" />
+            </td>
+            <th>
+                序列号
+            </th>
+            <td>
+                <input type="text" name="Pkey" class="easyui-validatebox" maxlength="50" value="@Model.Pkey" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                成本价
+            </th>
+            <td>
+                <input type="text" name="Costprice" class="easyui-validatebox easyui-numberbox" style="text-align: right;" min="0" max="999999999" precision="2" value="@Model.Costprice" />
+            </td>
+            <th>
+                市场定价
+            </th>
+            <td>
+                <input type="text" name="Marketprice" class="easyui-validatebox easyui-numberbox" style="text-align: right;" min="0" max="9999999999" precision="2" value="@Model.Marketprice" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                描述
+            </th>
+            <td colspan="3">
+                <textarea id="Remake" name="Remake" class="easyui-validatebox" maxlength="200" style="width: 592px;
+                    height: 50px;">@Model.Remake</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <table id="grid">
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</form>

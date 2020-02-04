@@ -1,0 +1,105 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.FinSupplier
+@{
+    ViewBag.Title = "供应商管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+}
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("#Id").val()
+                    , Name: $("input[name='Name']").val()
+                    , Linkman: $("input[name='Linkman']").val()
+                    , Phone: $("input[name='Phone']").val()
+                    , Tel: $("input[name='Tel']").val()
+                    , Address: $("input[name='Address']").val()
+                    , Remake: $("textarea[name='Remake']").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Financial/Create_FinSupplier",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    名称
+                </th>
+                <td>
+                    <input type="text" name="Name" class="easyui-validatebox" maxlength="40" required="true" value="@Model.Name" />
+                </td>
+                <th>
+                    联系人
+                </th>
+                <td>
+                    <input type="text" name="Linkman" class="easyui-validatebox" maxlength="10" value="@Model.Linkman" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    手机号
+                </th>
+                <td>
+                    <input type="text" name="Phone" class="easyui-validatebox" maxlength="30" value="@Model.Phone" />
+                </td>
+                <th>
+                    座机号
+                </th>
+                <td>
+                    <input type="text" name="Tel" class="easyui-validatebox" maxlength="30" value="@Model.Tel" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    地址
+                </th>
+                <td colspan="3">
+                    <input type="text" name="Address" class="easyui-validatebox" style="width:543px" maxlength="100" value="@Model.Address" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    描述
+                </th>
+                <td colspan="3">
+                    <textarea id="Remake" name="Remake" class="easyui-validatebox" maxlength="200" style="width:543px;height: 60px;">@Model.Remake</textarea>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

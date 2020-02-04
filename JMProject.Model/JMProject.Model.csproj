@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7F3DF65A-E4D8-4C45-A658-40B012401817}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JMProject.Model</RootNamespace>
+    <AssemblyName>JMProject.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BasicAccount.cs" />
+    <Compile Include="BasicCity.cs" />
+    <Compile Include="BasicProvince.cs" />
+    <Compile Include="BasicSet.cs" />
+    <Compile Include="CrsVisit.cs" />
+    <Compile Include="Dictionary.cs" />
+    <Compile Include="DictionaryItem.cs" />
+    <Compile Include="Esayui\EasyUIJsonTree.cs" />
+    <Compile Include="Esayui\ExcelModel.cs" />
+    <Compile Include="Esayui\GridPager.cs" />
+    <Compile Include="Esayui\EasyUIModel.cs" />
+    <Compile Include="Exp_Express.cs" />
+    <Compile Include="Exp_Traces.cs" />
+    <Compile Include="FinOrder.cs" />
+    <Compile Include="FinOrderInvoice.cs" />
+    <Compile Include="FinOrderItem.cs" />
+    <Compile Include="FinOrderPayment.cs" />
+    <Compile Include="FinOutStock.cs" />
+    <Compile Include="FinOutStockItem.cs" />
+    <Compile Include="FinProduct.cs" />
+    <Compile Include="FinProductItem.cs" />
+    <Compile Include="FinProductType.cs" />
+    <Compile Include="FinSalesCommission.cs" />
+    <Compile Include="FinSupplier.cs" />
+    <Compile Include="JsData.cs" />
+    <Compile Include="Mobile\View_SaleCustom_Mobile.cs" />
+    <Compile Include="Mobile\View_SaleOrder_Mobile.cs" />
+    <Compile Include="Mobile\View_WordTempKey.cs" />
+    <Compile Include="NkReport\NkReport.cs" />
+    <Compile Include="Nksc_Bxyw.cs" />
+    <Compile Include="Nksc_cghtsq.cs" />
+    <Compile Include="Nksc_fz.cs" />
+    <Compile Include="Nksc_inspect.cs" />
+    <Compile Include="Nksc_Jkyw.cs" />
+    <Compile Include="Nksc_ksgwzr.cs" />
+    <Compile Include="Nksc_kszn.cs" />
+    <Compile Include="Nksc_qlqd.cs" />
+    <Compile Include="Nksc_Update.cs" />
+    <Compile Include="Nksc_Zcyw.cs" />
+    <Compile Include="OrderCount.cs" />
+    <Compile Include="SaleCustom.cs" />
+    <Compile Include="SaleOrder.cs" />
+    <Compile Include="SaleOrderItem.cs" />
+    <Compile Include="SalePlan.cs" />
+    <Compile Include="SaleVisit.cs" />
+    <Compile Include="SysLog.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SysModule.cs" />
+    <Compile Include="SysModuleOperate.cs" />
+    <Compile Include="SysRole.cs" />
+    <Compile Include="SysUser.cs" />
+    <Compile Include="Sys\AccountModel.cs" />
+    <Compile Include="Sys\S_CustomReprot.cs" />
+    <Compile Include="Sys\S_FinOutStockItem.cs" />
+    <Compile Include="Sys\ServiceTime.cs" />
+    <Compile Include="Sys\SysModuleOperateRole.cs" />
+    <Compile Include="Sys\SysModuleRole.cs" />
+    <Compile Include="Sys\permModel.cs" />
+    <Compile Include="Sys\S_Order.cs" />
+    <Compile Include="Sys\S_qlqd.cs" />
+    <Compile Include="Sys\S_SysModule.cs" />
+    <Compile Include="Sys\S_YJDZ.cs" />
+    <Compile Include="Sys\S_SWF.cs" />
+    <Compile Include="Sys\S_SCustom.cs" />
+    <Compile Include="TecCusService.cs" />
+    <Compile Include="View\TecCusServiceWeek.cs" />
+    <Compile Include="View\View_BasicCityPL.cs" />
+    <Compile Include="View\View_CrsVisit.cs" />
+    <Compile Include="View\View_DesktopInvoice.cs" />
+    <Compile Include="View\View_FinProductItem.cs" />
+    <Compile Include="View\View_Inspect.cs" />
+    <Compile Include="View\View_KS.cs" />
+    <Compile Include="View\View_OutStock.cs" />
+    <Compile Include="View\View_SaleOrder.cs" />
+    <Compile Include="View\View_SaleOrderItem.cs" />
+    <Compile Include="View\View_BasicCity.cs" />
+    <Compile Include="View\View_FinOrder.cs" />
+    <Compile Include="View\View_FinOrderItem.cs" />
+    <Compile Include="View\View_FinProduct.cs" />
+    <Compile Include="View\View_SaleCustom.cs" />
+    <Compile Include="View\View_FinSalesCommission.cs" />
+    <Compile Include="View\View_SalePlan.cs" />
+    <Compile Include="View\View_SaleVisit.cs" />
+    <Compile Include="View\View_FinOutStockItem.cs" />
+    <Compile Include="View\View_FinOrderInvoice.cs" />
+    <Compile Include="View\View_FinOutStock.cs" />
+    <Compile Include="View\View_FinOrderPayment.cs" />
+    <Compile Include="Nksc.cs" />
+    <Compile Include="View\View_Full.cs" />
+    <Compile Include="Management.cs" />
+    <Compile Include="Nksc_wtfk.cs" />
+    <Compile Include="View\View_Nksc.cs" />
+    <Compile Include="Nksc_Version.cs" />
+    <Compile Include="BasicCityPL.cs" />
+    <Compile Include="View\View_SaleVisit_AuditDetails.cs" />
+    <Compile Include="View\View_SaleVisit_History.cs" />
+    <Compile Include="View\View_SaleVisit_LlztTx.cs" />
+    <Compile Include="View\View_SaleVisit_Up.cs" />
+    <Compile Include="View\View_TecCusService.cs" />
+    <Compile Include="WeiXin\SaleWeiXin.cs" />
+    <Compile Include="WeiXin\DiQu.cs" />
+    <Compile Include="WeiXin\WeiXinCusFinishOrderXx.cs" />
+    <Compile Include="WeiXin\WeiXinInformation.cs" />
+    <Compile Include="WeiXin\WeiXinOrder.cs" />
+    <Compile Include="WeiXin\WeiXinQueRenXinX.cs" />
+    <Compile Include="WeiXin\WeiXinRemittance.cs" />
+    <Compile Include="WeiXin\WeiXinSaleCustom.cs" />
+    <Compile Include="WeiXin\WeiXinYwyOrderXx.cs" />
+    <Compile Include="WeiXin\WeiXinProductType.cs" />
+    <Compile Include="WeiXin\WeiXinRegister.cs" />
+    <Compile Include="WeiXin\WeiXinWeb.cs" />
+    <Compile Include="WeiXin\WeiXinYwyQueRen.cs" />
+    <Compile Include="WeiXin\WeiXinYwyReturnCus.cs" />
+    <Compile Include="WeiXin\WeiXin_GetWeb.cs" />
+    <Compile Include="WeiXin\YwyAndWeiXin.cs" />
+    <Compile Include="WordTempFile.cs" />
+    <Compile Include="WordTempKey.cs" />
+    <Compile Include="WordTempLCT.cs" />
+    <Compile Include="WordTempType.cs" />
+    <Compile Include="WordTempXZ.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JMProject.Dal\JMProject.Dal.csproj">
+      <Project>{183F651A-5B3B-4781-B588-9BC2F1D0A6D4}</Project>
+      <Name>JMProject.Dal</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,571 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.View.View_SaleOrder
+@{
+    ViewBag.Title = "订单管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    AccountModel Account = (AccountModel)ViewBag.Account; 
+}
+<style type="text/css">
+    .webuploader-pick
+    {
+        background: #00b7ee;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+    .webuploader-pick-hover
+    {
+        background: #00a2d4;
+    }
+</style>
+<script type="text/javascript">
+    var applicationPath = window.applicationPath === "" ? "" : window.applicationPath || "../../";
+    var GUID = WebUploader.Base.guid(); //一个GUID
+    var editIndex = undefined; //上一次编辑行索引
+
+    function getCurentDateStr() {
+        var now = new Date();
+        var year = now.getFullYear();       //年  
+        var month = now.getMonth() + 1;     //月  
+        var day = now.getDate();            //日  
+        var clock = year + "-";
+        if (month < 10) clock += "0";
+        clock += month + "-";
+        if (day < 10) clock += "0";
+        clock += day;
+        return clock;
+    };
+
+    function getEndDateStr() {
+        var now = new Date();
+        var year = now.getFullYear() + 1;       //年  
+        var month = now.getMonth() + 1;     //月  
+        var day = now.getDate();            //日  
+        var clock = year + "-";
+        if (month < 10) clock += "0";
+        clock += month + "-";
+        if (day < 10) clock += "0";
+        clock += day;
+        return clock;
+    };
+
+    function BindComb() {
+
+        //业务员
+        $('#Saler').combobox({
+            url: '/System/GetComb_Users',
+            valueField: 'Id',
+            textField: 'ZsName',
+            onLoadSuccess: function (node, data) {
+                $("#Saler").combobox('setValue', '@Model.Saler');
+            }
+        });
+
+        //客户
+        $('#SaleCustomId').combobox({
+            url: '/Sale/GetData_SaleCustom_Comb',
+            valueField: 'ID',
+            textField: 'Name',
+            onLoadSuccess: function (node, data) {
+                if ("@ViewBag.CId" != "") {
+                    $("#SaleCustomId").combobox('setValue', '@ViewBag.CId');
+                }
+                else {
+                    $("#SaleCustomId").combobox('setValue', '@Model.SaleCustomId');
+                }
+            },
+            onSelect: function (record) {
+                if ($("#Saler").combobox('getValue').length <= 0) {
+                    $.ajax({
+                        url: '/Sale/GetData_SaleCustom_Model',
+                        type: "Post",
+                        data: { ID: record.ID },
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.Ywy.indexOf(",") < 0) {
+                                $("#Saler").combobox('setValue', data.Ywy);
+                            }
+                            else {
+                                $('#Saler').combobox('clear');
+                            }
+                            //$("#span_CityName").html(data.CityName);
+                        }
+                    });
+                }
+            }
+        });
+
+        //账户
+        $('#AccountId').combobox({
+            url: '/Basic/GetComb_BasicAccount',
+            valueField: 'Id',
+            textField: 'Key',
+            onLoadSuccess: function (node, data) {
+                $("#AccountId").combobox('setValue', '@Model.AccountId');
+            },
+            onShowPanel: function () {
+                // 动态调整高度  
+                $(this).combobox('panel').height(140);
+            }
+        });
+
+        //合同类别 
+        $('#OrderType').combobox({
+            url: '/Basic/GetComb_DictionaryItem?DicID=016',
+            valueField: 'ItemID',
+            textField: 'ItemName',
+            onLoadSuccess: function (node, data) {
+                $("#OrderType").combobox('setValue', '@Model.OrderType');
+            }
+        });
+    };
+
+    function AddRows(rows) {
+        $.each(rows, function (index, item) {
+            $('#grid').datagrid('appendRow', {
+                ProdectType: item.Id,
+                TypeName: item.Name,
+                ProdectDesc: "",
+                ItemCount: 1,
+                ItemPrice: 0,
+                ItemMoney: 0,
+                TaxMoney: 0,
+                PresentMoney: '0',
+                OtherMoney: '0',
+                Service: '是',
+                SerDateS: getCurentDateStr(),
+                SerDateE: getEndDateStr(),
+                TcFlag: '000106',
+                TcName: '未提成',
+                TcDate: ''
+            });
+        });
+    };
+
+    $(function () {
+        InitWebUpload();
+
+        if ($("input[name='OrderDate']").val().length == 0) {
+            $("input[name='OrderDate']").val(getCurentDateStr());
+        }
+
+        BindComb();
+        reload();
+        /*保持*/
+        $("#btnSave").click(function () {
+            if (editIndex != undefined) {
+                $('#grid').datagrid('endEdit', editIndex);
+                editIndex = undefined;
+            }
+            $('#grid').datagrid('clearSelections');
+            var rows = $('#grid').datagrid('getRows');
+            if (rows == null || rows.length < 1) {
+                window.parent.frameReturnByMes('请添加商品');
+                return false;
+            }
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    Id: $("input[name='Id']").val()
+                    , OrderDate: $("input[name='OrderDate']").val()
+                    , SaleCustomId: $("input[name='SaleCustomId']").val()
+                    , AccountId: $("input[name='AccountId']").val()
+                    , OrderType: $("input[name='OrderType']").val()
+                    , Saler: $("input[name='Saler']").val()
+                    , Remake: $("input[name='Remake']").val()
+                    , Products: JSON.stringify(rows)
+                    , UserId: $("input[name='UserId']").attr("Uid")
+                    , Enclosure: $("input[name='Enclosure']").val()
+                    , VId: $("#VId").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Sale/Create_SaleOrder",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+
+        /*添加产品*/
+        $("#btnAdd").click(function () {
+            window.parent.OpenProductType();
+        });
+
+        /*删除产品*/
+        $("#btnRemove").click(function () {
+            if (editIndex == undefined) {
+                window.parent.frameReturnByMes('@Suggestion.PlaseChoose');
+                return;
+            }
+            $.messager.confirm('@Suggestion.Tip', '@Suggestion.YouWantToDelete', function (r) {
+                if (r) {
+                    var row = $('#grid').datagrid('getSelected');
+                    if (row != null) {
+                        var postData = {
+                            Id: row.ItemId
+                        };
+
+                        $.ajax({
+                            url: "/Sale/Get_OrderToOutStock",
+                            type: "Post",
+                            data: postData,
+                            dataType: "json",
+                            success: function (data) {
+                                if (data.type == 1) {
+                                    window.parent.frameReturnByMesAlert(data.message);
+                                }
+                                else {
+                                    $('#grid').datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+                                    editIndex = undefined;
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+    function reload() {
+        var queryData = {
+            Id: $("#Id").val()
+        };
+        InitGrid(queryData);
+        $('#grid').datagrid('clearSelections');
+    };
+
+    function InitGrid(queryData) {
+        $('#grid').datagrid({
+            url: '/Sale/GetData_SaleOrderItem',
+            width: 1134,
+            methord: 'post',
+            height: 300,
+            fitColumns: false,
+            idField: 'ItemId',
+            sortName: 'ItemId',
+            sortOrder: 'asc',
+            pagination: false,
+            striped: true, //奇偶行是否区分
+            singleSelect: true, //单选模式
+            queryParams: queryData,
+            columns: [[
+              { field: 'TypeName', title: '商品分类', width: 90 },
+              { field: 'ProdectDesc', title: '商品参数(站点数)', width: 200, editor: { type: 'text'} },
+              { field: 'ItemCount', title: '成交数量', width: 60, editor: { type: 'numberbox', options: { precision: 0}} },
+              { field: 'ItemPrice', title: '成交单价', width: 80, editor: { type: 'numberbox', options: { precision: 2}} },
+              { field: 'ItemMoney', title: '成交金额', width: 80, editor: { type: 'numberbox', options: { precision: 2}} },
+              { field: 'TaxMoney', title: '税金', width: 70, editor: { type: 'numberbox', options: { precision: 2}} },
+              { field: 'PresentMoney', title: '礼品金额', width: 75, editor: { type: 'numberbox', options: { precision: 2}} },
+              { field: 'OtherMoney', title: '其他费用', width: 75, editor: { type: 'numberbox', options: { precision: 2}} },
+              { field: 'Service', title: '含服务', width: 50, editor: { type: 'checkbox', options: { on: '是', off: '否'}} },
+              { field: 'SerDateS', title: '服务开始日期', width: 100, editor: { type: 'datebox'} },
+              { field: 'SerDateE', title: '服务结束日期', width: 100, editor: { type: 'datebox'} },
+              { field: 'TcName', title: '提成状态', width: 70
+              , formatter: function (value, row, index) {
+                  if (row.TcName == "") {
+                      return "未提成";
+                  }
+                  else {
+                      return value;
+                  }
+              }
+              },
+              { field: 'TcDate', title: '提成日期', width: 80 }
+            ]],
+            onClickCell: onClickCell,
+            onLoadSuccess: function (data) {
+                //加印手册
+                if ($("#nktype").val() == "2") {
+                    $('#grid').datagrid('appendRow', {
+                        ProdectType: '0205',
+                        TypeName: '加印手册',
+                        ProdectDesc: "加印",
+                        ItemCount: 1,
+                        ItemPrice: 0,
+                        ItemMoney: 0,
+                        TaxMoney: 0,
+                        PresentMoney: '0',
+                        OtherMoney: '0',
+                        Service: '否',
+                        SerDateS: '',
+                        SerDateE: '',
+                        TcFlag: '000106',
+                        TcName: '未提成',
+                        TcDate: ''
+                    });
+                }
+                //更新手册
+                else if ($("#nktype").val() == "3") {
+                    $('#grid').datagrid('appendRow', {
+                        ProdectType: '0204',
+                        TypeName: '内控手册更新',
+                        ProdectDesc: "更新",
+                        ItemCount: 1,
+                        ItemPrice: 0,
+                        ItemMoney: 0,
+                        TaxMoney: 0,
+                        PresentMoney: '0',
+                        OtherMoney: '0',
+                        Service: '否',
+                        SerDateS: '',
+                        SerDateE: '',
+                        TcFlag: '000106',
+                        TcName: '未提成',
+                        TcDate: ''
+                    });
+                }
+            }
+        });
+    };
+
+    function endEditing() {
+        if (editIndex == undefined) { return true }
+        if ($('#grid').datagrid('validateRow', editIndex)) {
+            $('#grid').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    function onClickCell(index, field) {
+        if (editIndex != index) {
+            if (endEditing()) {
+                $('#grid').datagrid('selectRow', index).datagrid('beginEdit', index);
+
+                var editors = $('#grid').datagrid('getEditors', index);
+                var amountEditor = editors[1]; //数量
+                var priceEditor = editors[2]; //单价
+                var costEditor = editors[3]; //金额
+                var TaxEditor = editors[4]; //税金
+                //var PresentEditor = editors[5];//礼品
+                //var OtherEditor = editors[6];//其他
+                var ServiceEditor = editors[7]; //包含服务
+                var SerDateSEditor = editors[8]; //服务开始
+                var SerDateEEditor = editors[9]; //服务结束
+
+                $(ServiceEditor.target).change(function () {
+                    if ($(this).is(':checked')) {
+                        $(SerDateSEditor.target).datebox({ disabled: false });
+                        $(SerDateEEditor.target).datebox({ disabled: false });
+                    }
+                    else {
+                        $(SerDateSEditor.target).datebox('setValue', '')
+                        $(SerDateEEditor.target).datebox('setValue', '')
+                        $(SerDateSEditor.target).datebox({ disabled: true });
+                        $(SerDateEEditor.target).datebox({ disabled: true });
+                    }
+                });
+
+                $(priceEditor.target).numberbox({
+                    'onChange': function (newValue, oldValue) {
+                        calculate();
+                    }
+                });
+
+                $(amountEditor.target).numberbox({
+                    'onChange': function (newValue, oldValue) {
+                        calculate();
+                    }
+                });
+
+                function calculate() {
+                    var cost = priceEditor.target.val() * amountEditor.target.val();
+                    $(costEditor.target).numberbox('setValue', cost);
+                    $(TaxEditor.target).numberbox('setValue', cost * 0.05);
+                }
+
+                var ed = $('#grid').datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                editIndex = index;
+            } else {
+                setTimeout(function () {
+                    $('#grid').datagrid('selectRow', editIndex);
+                }, 0);
+            }
+        }
+    };
+
+    function InitWebUpload() {
+        var $ = jQuery;
+        var $list = $('#thelist');
+        var uploader = WebUploader.create({
+            // 选完文件后，是否自动上传。
+            auto: true,
+            // swf文件路径
+            swf: applicationPath + 'webuploader-0.1.5/Uploader.swf',
+            // 文件接收服务端。
+            server: applicationPath + 'Home/Upload',
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#picker',
+            chunked: true, //开始分片上传
+            chunkSize: 2048000, //每一片的大小
+            formData: {
+                guid: GUID //自定义参数，待会儿解释
+            },
+            accept: {
+                title: 'Word文件或excel文件',
+                extensions: 'doc,docx,xls,xlsx',
+                mimeTypes: 'application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'//
+            },
+            // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+            resize: false
+        });
+        // 当有文件被添加进队列的时候
+        uploader.on('fileQueued', function (file) {
+        });
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on('uploadProgress', function (file, percentage) {
+        });
+
+        // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+        uploader.on('uploadSuccess', function (file, response) {
+            $.post('/Home/Merge', { guid: GUID, fileName: file.name }, function (data) {
+                $("input[name='Enclosure']").val(file.name);
+                $.messager.show({ title: '系统提示', msg: message })
+            });
+        });
+
+        // 文件上传失败，显示上传出错。
+        uploader.on('uploadError', function (file) {
+            //$('#' + file.id).find('p.state').text('上传出错');
+            alert('上传出错');
+        });
+
+        // 完成上传完了，成功或者失败，先删除进度条。
+        uploader.on('uploadComplete', function (file) {
+            //$('#' + file.id).find('.progress').fadeOut();
+        });
+
+        //所有文件上传完毕
+        uploader.on("uploadFinished", function () {
+            //提交表单
+        });
+
+        //开始上传
+        $("#ctlBtn").click(function () {
+            uploader.upload();
+        });
+    };
+</script>
+<input id="nktype" name="nktype" type="hidden" value="@ViewBag.nktype" />
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<input id="VId" name="VId" type="hidden" value="@ViewBag.VId" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, true)
+    @Html.ToolButton("btnAdd", "icon-add", "添加商品", false)
+    @Html.ToolButton("btnRemove", "icon-remove", "删除商品", false)
+</div>
+<form id="CreateForm" method="post">
+<table class="form_table">
+    <tbody>
+        <tr style="height: 38px;">
+            <th>
+                日期
+            </th>
+            <td>
+                @*<input type="text" name="OrderDate" class="easyui-validatebox Wdate" required="true" value="" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd',minDate:'%y-%M-01',maxDate:'%y-%M-%ld'})" />*@
+                <input type="text" name="OrderDate" class="easyui-validatebox Wdate" required="true" value="@Model.OrderDate" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})" />
+            </td>
+            <th>
+                客户
+            </th>
+            <td>
+                <input type="text" id="SaleCustomId" name="SaleCustomId" class="easyui-combobox"
+                    required="true" />
+            </td>
+            <th>
+                业务员
+            </th>
+            <td>
+                <input type="text" id="Saler" name="Saler" class="easyui-combobox" required="true" editable="false" value="@Model.Saler" />
+            </td>
+        </tr>
+        <tr style="height: 38px;">
+            <th>
+                合同类别
+            </th>
+            <td>
+                <input type="text" id="OrderType" name="OrderType" class="easyui-combobox" required="true" />
+            </td>
+            <th>
+                账户
+            </th>
+            <td>
+                <input type="text" id="AccountId" name="AccountId" class="easyui-combobox" />
+            </td>
+            <th>
+                附件
+            </th>
+            <td>
+                <div id="uploadimg" style="width: 208px; height: 30px; overflow: hidden;">
+                    <input type="text" name="Enclosure" class="easyui-validatebox" style="width:152px;float:left;" readonly="readonly" value="@Model.Enclosure" />
+                    <div id="picker">
+                        浏览</div>
+                </div>
+            </td>
+        </tr>
+        <tr style="height: 38px;">
+            <th>
+                备注
+            </th>
+            <td colspan="3">
+                <input type="text" name="Remake" class="easyui-validatebox" style="width:532px" maxlength="200" value="@Model.Remake" />
+            </td>
+            <th>
+                经手人
+            </th>
+            <td>
+                <input type="text" name="UserId" class="easyui-validatebox" maxlength="6" readonly="readonly" required="true" value="@Account.ZsName" Uid="@Account.Id" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <table id="grid">
+                </table>
+            </td>
+        </tr>
+        @if (!ViewBag.AddType && false)
+        {
+            <tr>
+                <th colspan="6">
+                    <fieldset>
+                        <legend>单据状态</legend><span class="sT">发票状态</span><span class="sV">@Model.InvoiceFlagName</span>
+                        <span class="sT">发票金额</span><span class="sV">0.00</span> <span class="sT">回款状态</span><span
+                            class="sV">@Model.PaymentFlagName</span> <span class="sT">回款金额</span><span class="sV">0.00</span>
+                        <span class="sT">出库状态</span><span class="sV">@Model.OutStockFlagName</span><span
+                            class="sT">审核状态</span><span class="sV">@Model.CheckFlagName</span> <span class="sT">
+                                审核日期</span><span class="sV">@Model.CheckDate</span> <span class="sT">完成状态</span><span
+                                    class="sV">@(Model.Finshed ? "已完成" : "未完成")</span>
+                    </fieldset>
+                </th>
+            </tr>   
+        }
+    </tbody>
+</table>
+</form>

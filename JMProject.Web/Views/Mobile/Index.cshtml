@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "主页";
+    Layout = "~/Views/Shared/_LayoutMui.cshtml";
+}
+<style>
+    .list-block
+    {
+        margin: 0.05rem 0;
+    }
+    .list-block .item-text
+    {
+        height: 1.05rem;
+    }
+    .list-block .mynew
+    {
+        min-height: 1.05rem;
+        padding: 0rem;
+        font-size: .75rem;
+    }
+</style>
+<div class="page-group">
+    <!-- 单个page ,第一个.page默认被展示-->
+    <div id="page-main" class="page">
+        <!-- 标题栏 -->
+        <header class="bar bar-nav">
+            <a class="icon icon-search pull-left open-panel"></a>
+            <h1 class="title">客户系统</h1>
+            <a class="icon icon-card pull-right" href="/Mobile/CreateCustomer"></a>
+        </header>
+        <!-- 工具栏 -->
+        <nav class="bar bar-tab">
+            <a class="tab-item external active" href="#">
+                <span class="icon icon-friends"></span>
+                <span class="tab-label">客户管理</span>
+            </a>
+@*            <a class="tab-item external" href="/Mobile/SaleOrder">
+                <span class="icon icon-computer"></span>
+                <span class="tab-label">合同管理</span>
+            </a>*@
+            <a class="tab-item external" href="/Mobile/SaleVisit">
+                <span class="icon icon-message"></span>
+                <span class="tab-label">拜访沟通</span>
+            </a>
+        </nav>
+        <!-- 这里是页面内容区 -->
+        <div class="content infinite-scroll infinite-scroll-bottom" data-distance="100">
+            <div class="list-block media-list">
+                <ul jmpage="1" maxitems="0">
+                    <li>@*<div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title-row">
+                                    <div class="item-title">Facebook</div>
+                                </div>
+                                <div class="item-subtitle">子标题</div>
+                                <div class="item-text">此处是文本内容...</div>
+                                <div class="card-footer no-border mynew">
+                                    <a href="#" class="link icon icon-phone"></a>
+                                    <a href="#" class="link icon icon-edit create-actions"></a>
+                                </div>
+                            </div>
+                        </div>*@ </li>
+                </ul>
+            </div>
+            <!-- 加载提示符 -->
+            <div class="infinite-scroll-preloader">
+                <div class="preloader">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- popup, panel 等放在这里 -->
+<div class="panel-overlay">
+</div>
+<!-- 侧边栏 -->
+<div class="panel panel-left panel-reveal theme-dark" id="panel-left-search">
+    <div class="list-block" style="margin-top: 1rem;">
+        <ul>
+            <!-- Text inputs -->
+            <li>
+                <div class="item-content">
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input id="customerName" type="text" placeholder="客户名称">
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="content-block">
+        <p>
+            <div class="col-50">
+                <a href="#" class="button button-fill search-customer">查询</a></div>
+        </p>
+        <p>
+            <div class="col-50">
+                <a href="#" class="button button-fill button-danger close-panel">取消</a></div>
+        </p>
+    </div>
+</div>

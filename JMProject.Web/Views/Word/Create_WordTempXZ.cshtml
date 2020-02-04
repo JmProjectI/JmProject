@@ -1,0 +1,105 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.WordTempXZ
+@{
+    ViewBag.Title = "小组关键字";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    ID: $("#ID").val()
+                    , dkey: $("input[name='dkey']").val()
+                    , zz: $("input[name='zz']").val()
+                    , fz: $("input[name='fz']").val()
+                    , qtks: $("input[name='qtks']").val()
+                    , cy: $("input[name='cy']").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Word/Create_WordTempXZ",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="ID" name="ID" type="hidden" value="@Model.ID" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr>
+                <th>
+                    Wrod关键字
+                </th>
+                <td>
+                    <input type="text" name="dkey" class="easyui-validatebox" maxlength="30" readonly="readonly" required="true" value="@Model.dkey" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    正职字段名
+                </th>
+                <td>
+                    <input type="text" name="zz" class="easyui-validatebox" maxlength="50" required="true" value="@Model.zz" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    副职字段名
+                </th>
+                <td>
+                    <input type="text" name="fz" class="easyui-validatebox" maxlength="50" required="true" value="@Model.fz" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    牵头科室字段名
+                </th>
+                <td>
+                    <input type="text" name="qtks" class="easyui-validatebox" maxlength="50" value="@Model.qtks" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    成员字段名
+                </th>
+                <td>
+                    <input type="text" name="cy" class="easyui-validatebox" maxlength="50" required="true" value="@Model.cy" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

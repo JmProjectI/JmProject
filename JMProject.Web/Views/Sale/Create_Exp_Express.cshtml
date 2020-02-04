@@ -1,0 +1,138 @@
+﻿@using JMProject.Model.Sys;
+@using JMProject.Common
+@using JMProject.Web.Core;
+@model JMProject.Model.Exp_Express
+@{
+    ViewBag.Title = "快递管理";
+    Layout = "~/Views/Shared/_LayoutEedit.cshtml";
+    List<permModel> perm = (List<permModel>)ViewBag.Perm;
+    if (perm == null)
+    {
+        perm = new List<permModel>();
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        /*保持*/
+        $("#btnSave").click(function () {
+            if ($("#CreateForm").form('validate')) {
+                var postData = {
+                    LogisticCode: $("input[name='LogisticCode']").val()
+                    , ShipperCode: $("#ShipperCode").val()
+                    , OrderId: $("#OrderId").val()
+                    , ReceiverName: $("input[name='ReceiverName']").val()
+                    , Tel: $("input[name='Tel']").val()
+                    , Mobile: $("input[name='Mobile']").val()
+                    , ProvinceName: $("input[name='ProvinceName']").val()
+                    , CityName: $("input[name='CityName']").val()
+                    , ExpAreaName: $("input[name='ExpAreaName']").val()
+                    , Address: $("input[name='Address']").val()
+                    , GoodsName: $("input[name='GoodsName']").val()
+                    , State: $("input[name='State']").val()
+                    , Reason: $("input[name='Reason']").val()
+                    , AddType: $("#AddType").val()
+                };
+
+                $.ajax({
+                    url: "/Sale/Create_Exp_Express",
+                    type: "Post",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1) {
+                            window.parent.frameReturnByMes(data.message);
+                            window.parent.frameReturnByReload(false);
+                            window.parent.frameReturnByClose()
+                        }
+                        else {
+                            window.parent.frameReturnByMes(data.message);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+        /*返回*/
+        $("#btnReturn").click(function () {
+            window.parent.frameReturnByClose();
+        });
+    });
+</script>
+<input id="AddType" name="AddType" type="hidden" value="@ViewBag.AddType" />
+<input id="OrderId" name="OrderId" type="hidden" value="@Model.OrderId" />
+<input id="ShipperCode" name="ShipperCode" type="hidden" value="@Model.ShipperCode" />
+<input id="State" name="State" type="hidden" value="@Model.State" />
+<div class="divtool bgb">
+    @Html.ToolButton("btnSave", "icon-save", Suggestion.Save, false)
+    @Html.ToolButton("btnReturn", "icon-return", Suggestion.Return, false)
+</div>
+<form id="CreateForm" method="post">
+    <table class="form_table">
+        <tbody>
+            <tr style="height:30px;">
+                <th>
+                    运单号
+                </th>
+                <td>
+                    <input type="text" name="LogisticCode" class="easyui-validatebox" maxlength="30" required="true" value="@Model.LogisticCode" />
+                </td>
+                <th>
+                    收件人名称
+                </th>
+                <td>
+                    <input type="text" name="ReceiverName" class="easyui-validatebox" maxlength="30" required="true" value="@Model.ReceiverName" />
+                </td>
+            </tr>
+            <tr style="height:30px;">
+                <th>
+                    收件人电话
+                </th>
+                <td>
+                    <input type="text" name="Tel" class="easyui-validatebox" maxlength="20" value="@Model.Tel" />
+                </td>
+                <th>
+                    收件人手机
+                </th>
+                <td>
+                    <input type="text" name="Mobile" class="easyui-validatebox" maxlength="20" value="@Model.Mobile" />
+                </td>
+            </tr>
+            <tr style="height:30px;">
+                <th>
+                    收件省
+                </th>
+                <td>
+                    <input type="text" name="ProvinceName" class="easyui-validatebox" maxlength="20" required="true" value="@Model.ProvinceName" />
+                </td>
+                <th>
+                    收件市
+                </th>
+                <td>
+                    <input type="text" name="CityName" class="easyui-validatebox" maxlength="20" required="true" value="@Model.CityName" />
+                </td>
+            </tr>
+            <tr style="height:30px;">
+                <th>
+                    收件区
+                </th>
+                <td>
+                    <input type="text" name="ExpAreaName" class="easyui-validatebox" maxlength="20" value="@Model.ExpAreaName" />
+                </td>
+                <th>
+                    物品名称
+                </th>
+                <td>
+                    <input type="text" name="GoodsName" class="easyui-validatebox" maxlength="60" value="@Model.GoodsName" />
+                </td>
+            </tr>
+            <tr style="height:30px;">
+                <th>
+                    收件地址
+                </th>
+                <td colspan="3">
+                    <input type="text" name="Address" class="easyui-validatebox" maxlength="200" required="true" style="width:543px;" value="@Model.Address" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

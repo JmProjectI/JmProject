@@ -12,6 +12,7 @@ using JMProject.Model.Esayui;
 namespace JMProject.BLL
 {
     //111111111122
+    //20200207-新增加
     public class BasicAccountBLL
     {
         DBHelperSql dao = new DBHelperSql();

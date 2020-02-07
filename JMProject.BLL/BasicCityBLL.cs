@@ -14,6 +14,7 @@ namespace JMProject.BLL
 {
     public class BasicCityBLL
     {
+        //123
         DBHelperSql dao = new DBHelperSql();
         public BasicCityBLL()
         { }

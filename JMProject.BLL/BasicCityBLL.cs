@@ -12,7 +12,7 @@ using JMProject.Model.View;
 
 namespace JMProject.BLL
 {
-    //20200206
+    //20200206 - 新添加
     public class BasicCityBLL
     {
         DBHelperSql dao = new DBHelperSql();

@@ -9,7 +9,7 @@ namespace JMProject.Web.Controllers
     public class NkReportController : Controller
     {
         //
-        // GET: /NkReport/
+        //修改修改修改
 
         public ActionResult Index()
         {

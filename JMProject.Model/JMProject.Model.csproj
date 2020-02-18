@@ -78,6 +78,9 @@
     <Compile Include="Mobile\View_SaleOrder_Mobile.cs" />
     <Compile Include="Mobile\View_WordTempKey.cs" />
     <Compile Include="NkReport\NkReport.cs" />
+    <Compile Include="NkReport\NkReport_MJLSGX.cs" />
+    <Compile Include="NkReport\NkReport_MJBMBS.cs" />
+    <Compile Include="NkReport\View\View_NkReport.cs" />
     <Compile Include="Nksc_Bxyw.cs" />
     <Compile Include="Nksc_cghtsq.cs" />
     <Compile Include="Nksc_fz.cs" />

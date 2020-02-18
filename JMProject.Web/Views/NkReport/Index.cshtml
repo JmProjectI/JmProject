@@ -1,5 +1,938 @@
-﻿@{
-    ViewBag.Title = "Index";
+﻿@model JMProject.Model.View.View_Full
+@{
+    ViewBag.Title = "报告信息";
 }
+<link href="@Url.Content("~/webuploader-0.1.5/webuploader.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Content/smart_wizard_vertical.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.smartWizard.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/webuploader-0.1.5/webuploader.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/My97DatePicker/WdatePicker.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/ScriptsBll/nkbg.js?v=200213")" type="text/javascript"></script>
 
-<h2>Index</h2>
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="width: 170px; vertical-align: top;">
+            <div id="hisNkReport" class="easyui-datalist" title="报告年度" style="float:left;width:160px;height:100px">
+            </div>
+        </td>
+        <td style="vertical-align: top; padding-left: 5px;">
+            
+ <div id="wizard" class="swMain" style="float:left;width: 100%; height: 100%;">
+    <ul>
+        <li><a href="#step-1"><span class="stepDesc">封面&基础信息</span></a></li>
+        <li><a href="#step-2"><span class="stepDesc">佐证材料附件池</span></a></li>
+        <li><a href="#step-3"><span class="stepDesc">内部控制执行情况</span></a></li>
+    </ul>
+    <!--封面代码-->
+    <div id="step-1">
+        <h2 class="StepTitle">
+            封面代码
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    单位名称
+                </td>
+                <td class="con" colspan="3">
+                    <input id="txtDWMC" name="DWMC" type="text" class="easyui-validatebox easyui-tooltip" style="width: 522px"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    报表类型
+                </td>
+                <td class="con" style="width: 200px;">
+                    <input id="txtBBLX" name="BBLX" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+                <td class="dec" style="width: 120px;">
+                    单位负责人
+                </td>
+                <td class="con">
+                    <input id="txtDWFZR" name="DWFZR" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    分管内控负责人
+                </td>
+                <td class="con" style="width: 200px;">
+                    <input id="txtFGNKFZR" name="FGNKFZR" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+                <td class="dec" style="width: 120px;">
+                    牵头部门负责人
+                </td>
+                <td class="con">
+                    <input id="txtQTBMFZR" name="QTBMFZR" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    填表人
+                </td>
+                <td class="con" style="width: 200px;">
+                    <input id="txtTBR" name="TBR" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+                <td class="dec" style="width: 120px;">
+                    电话号码
+                </td>
+                <td class="con">
+                    <input id="txtDHHM" name="DHHM" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    单位地址
+                </td>
+                <td class="con" colspan="3">
+                    <input id="txtDWDZ" name="DWDZ" type="text" class="easyui-validatebox easyui-tooltip" style="width: 522px"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    邮政编码
+                </td>
+                <td class="con" style="width: 200px;">
+                    <input id="txtYZBM" name="YZBM" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+                <td class="dec" style="width: 120px;">
+                    组织机构代码
+                </td>
+                <td class="con">
+                    <input id="txtZZJGDM" name="ZZJGDM" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    隶属关系
+                </td>
+                <td class="con" style="width: 200px;">
+                    <select id="cboLSGX" class="easyui-combotree"  name="LSGX" style="width:196px;"/>
+                </td>
+                <td class="dec" style="width: 120px;">
+                    归属部门
+                </td>
+                <td class="con">
+                    <select id="cboBMBSDM" class="easyui-combobox"  name="BMBSDM" style="width:196px;"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    单位预算级次
+                </td>
+                <td class="con" style="width: 200px;">
+                    <select id="cboDWYSJC" class="easyui-combobox"  name="DWYSJC" style="width:196px;"/>
+                </td>
+                <td class="dec" style="width: 120px;">
+                    单位所在地区
+                </td>
+                <td class="con">
+                    <select id="cboDWSZDQ" class="easyui-combotree"  name="DWSZDQ" style="width:196px;"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    单位基本性质
+                </td>
+                <td class="con" style="width: 200px;">
+                    <select id="cboDWJBXZ" class="easyui-combobox"  name="DWJBXZ" style="width:196px;"/>
+                </td>
+                <td class="dec" style="width: 120px;">
+                    支出功能分类
+                </td>
+                <td class="con">
+                    <select id="cboZCGNFL" class="easyui-combotree"  name="ZCGNFL" style="width:196px;"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    预算管理级次
+                </td>
+                <td colspan="3" class="con" style="width: 200px;">
+                    <select id="cboYSGLJC" class="easyui-combotree"  name="YSGLJC" style="width:196px;"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 180px;">
+                    内部控制体系建设的开展进度
+                </td>
+                <td colspan="3" class="con" style="width: 200px;">
+                    <select id="cboJSJD" class="easyui-combobox"  name="JSJD" style="width:196px;"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 180px;">
+                    内部控制适用的管理业务领域
+                </td>
+                <td colspan="3" class="con" style="width: 200px;">
+                    <input id="cboSYLY" class="easyui-combobox" name="SYLY" style="width:522px;" />
+                </td>
+            </tr>            
+            <tr>
+                <td class="dec" style="width: 120px;">
+                    报送日期
+                </td>
+                <td colspan="3" class="con" style="width: 200px;">
+                    <input id="txtBSRQ" name="BSRQ" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" />
+                </td>
+            </tr>
+        </table>
+        <h2 class="StepTitle" style="margin-top:10px !important; ">
+            基础信息
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="dec" style="width: 180px;">
+                    支出年度
+                </td>
+                <td class="con" style="width: 200px;">
+                    <input id="txtZcnd" name="Zcnd" type="text" onclick="WdatePicker({dateFmt:'yyyy'})" />
+                </td>
+                <td class="dec" style="width: 180px;">
+                    支出金额
+                </td>
+                <td class="con">
+                    <input id="txtDWFZR" name="DWFZR" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 180px;">
+                    同级财政预算拨款资金（元）
+                </td>
+                <td class="con" style="width: 200px;">
+                    <input id="txtFGNKFZR" name="FGNKFZR" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+                <td class="dec" style="width: 180px;">
+                    内设机构数量（个）
+                </td>
+                <td class="con">
+                    <input id="txtQTBMFZR" name="QTBMFZR" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="width: 180px;">
+                    单位编制人数（在职人员）
+                </td>
+                <td class="con" style="width: 200px;">
+                    <input id="txtTBR" name="TBR" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+                <td class="dec" style="width: 180px;">
+                    年末实有人数
+                </td>
+                <td class="con">
+                    <input id="txtDHHM" name="DHHM" type="text" class="easyui-validatebox easyui-tooltip" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!--佐证材料附件池-->
+    <div id="step-2">
+        <h2 class="StepTitle">
+            佐证材料附件池
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="dec" style="min-width:50px;width:50px;">
+                    1
+                </td>
+                <td class="dec" style="width:120px;">
+                    内控组织材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    2
+                </td>
+                <td class="dec">
+                    会议和培训材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    3
+                </td>
+                <td class="dec">
+                    考核评价材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    4
+                </td>
+                <td class="dec">
+                    岗位职责材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    5
+                </td>
+                <td class="dec">
+                    轮岗情况材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    6
+                </td>
+                <td class="dec">
+                    不适用证明材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    7
+                </td>
+                <td class="dec">
+                    业务制度
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    8
+                </td>
+                <td class="dec">
+                    业务流程图
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    9
+                </td>
+                <td class="dec">
+                    预算材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    10
+                </td>
+                <td class="dec">
+                    收支材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    11
+                </td>
+                <td class="dec">
+                    政府采购材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    12
+                </td>
+                <td class="dec">
+                    国有资产材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    13
+                </td>
+                <td class="dec">
+                    建设项目材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    14
+                </td>
+                <td class="dec">
+                    合同材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    15
+                </td>
+                <td class="dec">
+                    信息系统材料
+                </td>
+                <td class="con">
+                    
+                </td>
+            </tr>
+         </table>
+    </div>
+    <!--内部控制执行情况-->
+    <div id="step-3">
+        <h2 class="StepTitle">
+            内部控制执行情况
+        </h2>
+        <table class="tab_form" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="dec" style="min-width:50px;width:50px;">
+                    1
+                </td>
+                <td class="dec" rowspan="6" style="width:120px;">
+                    预算业务管理
+                </td>
+                <td class="dec" style="width:160px;">
+                    1.重大预算事项决策情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec" style="width:140px;">
+                    重大预算事项数
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec" style="width:140px;">
+                    执行集体议事决策规则的重大预算事项数量
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    2
+                </td>
+                <td class="dec">
+                    2.项目支出绩效目标设定比例
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    预算编制范围内全部预算项目数
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    绩效目标申报项目数
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    3
+                </td>
+                <td class="dec">
+                    3.单位整体支出绩效目标设定比例
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    支出预算金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    设定整体绩效目标的预算支出金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    4
+                </td>
+                <td class="dec">
+                    4.预算批复细化程度
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    支出预算金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    预算细化分解至各部门（或附属单位）项目的指标金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    5
+                </td>
+                <td class="dec">
+                    5.预算执行管控程度
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    12（个月）
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    执行预算分析的月份数
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    6
+                </td>
+                <td class="dec">
+                    6.项目支出绩效目标完成情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    绩效目标申报项目数
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    绩效评价达标项目数
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    7
+                </td>
+                <td class="dec" rowspan="5">
+                    收支业务管理
+                </td>
+                <td class="dec">
+                    1.收支分级授权实施情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    一般授权实施金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    特殊授权实施金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    8
+                </td>
+                <td class="dec">
+                    2.非税收入管控情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    应上缴非税收入金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    实际上缴非税收入金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    9
+                </td>
+                <td class="dec">
+                    3.收入入账管控情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    收入预算金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    收入实际入账金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    10
+                </td>
+                <td class="dec">
+                    4.支出管理精细程度
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    本单位适用的支出事项款级科目数
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    已严格执行管控制度的支出事项款级科目数
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    11
+                </td>
+                <td class="dec">
+                    5.支出付款管控情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    支出预算金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    实际付款的支出金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    12
+                </td>
+                <td class="dec" rowspan="3">
+                    政府采购业务管理
+                </td>
+                <td class="dec">
+                    1.采购预算完成情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    本年计划采购金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    本年实际采购金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    13
+                </td>
+                <td class="dec">
+                    2.采购合同匹配情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    本年实际采购金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    合同约定的本年采购金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    14
+                </td>
+                <td class="dec">
+                    3.采购验收管控情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    本年实际采购金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    已验收的采购金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    15
+                </td>
+                <td class="dec" rowspan="4">
+                    国有资产业务管理
+                </td>
+                <td class="dec">
+                    1.资产账实相符程度
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    年末总资产账面金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    年末资产清查总额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    16
+                </td>
+                <td class="dec">
+                    2.固定资产验收管控情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    固定资产本期增加额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    固定资产验收金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    17
+                </td>
+                <td class="dec">
+                    3.固定资产处置规范程度
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    固定资产本期减少额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    固定资产处置审批金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    18
+                </td>
+                <td class="dec">
+                    4.全部资产处置收益管理情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    资产处置收入总额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    实际上缴资产处置收入
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    19
+                </td>
+                <td class="dec" rowspan="2">
+                    建设项目业务管理
+                </td>
+                <td class="dec">
+                    1.项目投资计划完成情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    年度投资计划总额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    年度实际投资额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    20
+                </td>
+                <td class="dec">
+                    2.项目资金管控情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    本年完工项目的预算金额
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    本年完工项目的决算金额
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    21
+                </td>
+                <td class="dec" rowspan="2">
+                    合同业务管理
+                </td>
+                <td class="dec">
+                    1.合同订立规范情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    合同订立数
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    经合法性审查的合同数
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+            <tr>
+                <td class="dec" style="min-width:50px;">
+                    22
+                </td>
+                <td class="dec">
+                    2.合同执行规范情况
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    当期应完成合同数
+                </td>
+                <td class="con">
+                    
+                </td>
+                <td class="dec">
+                    到期完成合同数
+                </td>
+                <td class="con">
+                    
+                </td>                
+            </tr>
+         </table>
+    </div>
+</div>
+        </td>
+    </tr>
+</table>
+
+<div id="zzdiv" style="width:100px; height:100px;position:fixed;left:180px; top :10px;background-color:#000;opacity:0.1;z-index:999;display:none">
+</div>

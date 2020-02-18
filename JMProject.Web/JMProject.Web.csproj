@@ -99,6 +99,7 @@
     <Compile Include="Controllers\FinancialController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MobileController.cs" />
+    <Compile Include="Controllers\NkReportController.cs" />
     <Compile Include="Controllers\NkscController.cs" />
     <Compile Include="Controllers\ReportJmController.cs" />
     <Compile Include="Controllers\SaleController.cs" />
@@ -6986,7 +6987,9 @@
     <Content Include="Content\My97DatePicker\开发包\skin\whyGreen\img.gif" />
     <Content Include="Content\smart_wizard_vertical.css" />
     <Content Include="Content\suimobile\sm-city-picker.js" />
+    <Content Include="ScriptsBll\nkbg.js" />
     <Content Include="ScriptsBll\NkscPhoto_fj.js" />
+    <Content Include="ScriptsBll\NkReport.js" />
     <Content Include="UserPDF\null.jpg" />
     <Content Include="DownFile\pdf阅读器.exe" />
     <Content Include="fav.ico" />
@@ -7859,6 +7862,8 @@
     <Content Include="Views\Tec\TecCusService.cshtml" />
     <Content Include="Views\Tec\Create_TecCusService.cshtml" />
     <Content Include="Views\Sale\Create_JsKey.cshtml" />
+    <Content Include="Views\NkReport\Index.cshtml" />
+    <Content Include="Views\NkReport\Report.cshtml" />
     <None Include="webuploader-0.1.5\README.md" />
     <None Include="wordTemp\temp1.docx" />
     <None Include="wordTemp\temp2.docx" />

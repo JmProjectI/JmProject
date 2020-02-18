@@ -69,6 +69,7 @@
     <Compile Include="JsDataBLL.cs" />
     <Compile Include="ModuleRoleBLL.cs" />
     <Compile Include="BasicProvinceBLL.cs" />
+    <Compile Include="NkReportBLL.cs" />
     <Compile Include="Nksc_UpdateBLL.cs" />
     <Compile Include="InspectBLL.cs" />
     <Compile Include="SaleCustomerBLL.cs" />

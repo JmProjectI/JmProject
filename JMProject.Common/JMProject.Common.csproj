@@ -48,7 +48,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Interop.SQLDMO">
-      <HintPath>..\..\..\..\个人\自定义控件\Interop.SQLDMO.dll</HintPath>
+      <HintPath>..\..\..\..\DLL资料\Interop.SQLDMO.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">

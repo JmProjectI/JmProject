@@ -92,7 +92,8 @@ namespace JMProject.BLL
         {
             string Order = string.Empty;
             string Table = "View_NkReport";
-            string Fields = "[OrderId],[Id],[CustomId],[Years],[Flag],[Name],[Invoice]";
+            string Fields = "[OrderId],[CustomId],[Id],[Years],[Flag],[Name],[Invoice],[MxId],[Tjrq],[Tsyqtext],[Shrq],[Shr],"
+                + "[Zzrq],[Zzr],[Yjrq],[Yjr],[Fsrq],[Fsr],[Lsr],[ShrName],[ZzrName],[YjrName],[LsrName]";
             if (!string.IsNullOrEmpty(Where))
             {
                 Where = "Where 1=1 " + Where;

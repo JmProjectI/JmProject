@@ -52,7 +52,7 @@ namespace JMProject.Web.Controllers
         {
             NkReportBLL bll = new NkReportBLL();
             List<NkReport_MJLSGX> result = bll.Select_NkReport_MJLSGX("and _parentId='" + parent.id + "'", "", tName);
-            if (result!=null && result.Count>0)
+            if (result != null && result.Count > 0)
             {
                 parent.state = "closed";
             }
@@ -104,7 +104,7 @@ namespace JMProject.Web.Controllers
                     break;
             }
             NkReportBLL bll = new NkReportBLL();
-            IList<NkReport_MJBMBS> result = bll.Select_NkReport_MJBMBS("", "",tName);
+            IList<NkReport_MJBMBS> result = bll.Select_NkReport_MJBMBS("", "", tName);
             return Json(result);
         }
         #endregion
@@ -137,10 +137,20 @@ namespace JMProject.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Report_Data(GridPager pager)
+        public ActionResult Report_Data(string Id, string DiQuS, string NameS, string flag,
+            string NkscSBDateS, string NkscSBDateE, string Uname, string IsProgress, GridPager pager)
         {
-            string where = "";
+            string where = " where 1=1 ";
             NkReportBLL bll = new NkReportBLL();
+            if (!string.IsNullOrEmpty(NameS))
+            {
+                where += " and Name like '%" + NameS + "%'";
+            }
+            if (IsProgress != "1")
+            {
+                where = " and (T1.Id IN (SELECT MAX(Id) AS Id FROM dbo.NkReport_Progress GROUP BY Zid))";
+            }
+
             IList<View_NkReport> list = bll.SelectAll(where, pager);
 
             var griddata = new { total = pager.totalRows, rows = list };

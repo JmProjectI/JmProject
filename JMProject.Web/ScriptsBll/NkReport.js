@@ -15,13 +15,17 @@ $(function () {
     Event()
 });
 
-function Event() {
-    
-    //查看报告
+function Event() {    
+    //查看报告信息
     $("#btnNksc").click(function () {
         ChaJcXx(); //查看手册
     });
-
+    //查看报告历史工作
+    $("#btnGzls").click(function () {
+        ChaHistory();
+        //qishen(); //弃审
+    });
+    
     //手册状态
     $("#btnFlag1").click(function () {
         
@@ -129,20 +133,14 @@ function createColumnMenu() {
 /*刷新*/
 function reload() {
     var queryData = {
-//        type: 'select',
-//        DiQuS: $("#DiQuS").combobox("getValues") + "",
-//        NameS: $("#NameS").val(),
-//        flag: $("#ddlflag").combobox("getValue"),
-//        fkflag: $("#fkflagid").combobox("getValue"),
-//        riqiS: $("#txtStart").val(),
-//        riqiE: $("#txtEnd").val(),
-//        NkscDateS: $("#txtNkscDateS").val(),
-//        NkscDateE: $("#txtNkscDateE").val(),
-//        NkscSBDateS: $("#txtNkscSBDateS").val(),
-//        NkscSBDateE: $("#txtNkscSBDateE").val(),
-//        fkpdfflag: $("#dllfkpdfflag").combobox("getValue"),
-//        VersionS: $("#VersionS").combobox("getValue"),
-//        IsUpdate: $("#dllisupdate").combobox("getValue")
+        type: 'select',
+        DiQuS: $("#DiQuS").combobox("getValues") + "",
+        NameS: $("#NameS").val(),
+        flag: $("#ddlflag").combobox("getValue"),
+        NkscSBDateS: $("#txtNkscSBDateS").val(),
+        NkscSBDateE: $("#txtNkscSBDateE").val(),
+        Uname: $("#userS").combobox("getValue"),
+        IsProgress:'0'
     };
     InitGrid(queryData);
     $('#grid').datagrid('uncheckAll');
@@ -253,6 +251,114 @@ function InitGrid(queryData) {
     })
 };
 
+/*查看报告基础信息*/
+function ChaJcXx() {
+    var row = $("#grid").datagrid("getSelected");
+    if (row) {
+        window.parent.addTab(row.Name, "/NkReport/Index?Id=" + row.Id, "pic_1")
+    }
+    else {
+        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
+    }
+};
+
+/*查看报告历史工作*/
+function ChaHistory() {
+    var row = $("#grid").datagrid("getSelected");
+    if (row) {
+        $("#dlgReport").dialog("open").dialog('setTitle', row.Name + ' 报告历史工作');
+        reloadReport(row.Id);
+    }
+    else {
+        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
+    }
+};
+
+function reloadReport(Rid) {
+    var queryData = {
+        Id: Rid,
+        IsProgress: '1'
+    };
+    InitGridReport(queryData);
+    $('#gridReport').datagrid('clearSelections');
+};
+
+function InitGridReport(queryData) {
+    $('#gridReport').datagrid({
+        url: '/NkReport/Report_Data',
+        width: 1080,
+        methord: 'post',
+        height: 455,
+        fitColumns: false,
+        idField: 'Id',
+        sortName: 'Name',
+        sortOrder: 'desc',
+        pagination: true,
+        pageSize: 20,
+        pageList: [15, 20, 30, 40, 50],
+        striped: true, //奇偶行是否区分
+        singleSelect: true, //单选模式
+        showFooter: true,  //显示合计行
+        queryParams: queryData,
+        frozenColumns: [[
+        //                { field: 'Id', title: '编号', width: 100, halign: 'center' },
+                {field: 'OrderDate', title: '日期', width: 100, halign: 'center' },
+        //                { field: 'CityName', title: '地区', width: 80, halign: 'center' },
+        //        {field: 'Name', title: '客户/发票抬头', width: 170, halign: 'center' },
+                {field: 'ItemNames', title: '合同明细', width: 150, halign: 'center' },
+        ]],
+        columns: [[
+                { field: 'InvoiceFlagName', title: '发票状态', width: 70, halign: 'center' },
+                { field: 'PaymentFlagName', title: '回款状态', width: 70, halign: 'center' },
+                { field: 'OutStockFlagName', title: '出库状态', width: 70, halign: 'center' },
+                { field: 'Finshed', title: '已完成', width: 60, halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (row.Name == "合计") {
+                            return "";
+                        }
+                        else if (value) {
+                            return "已完成";
+                        }
+                        else {
+                            return "未完成";
+                        }
+                    }
+                },
+                { field: 'ItemMoney', title: '合计金额', width: 100, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Invoicemoney', title: '开票金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Receivablemoney', title: '应收金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'Paymentmoney', title: '回款金额', width: 80, align: 'right', halign: 'center'
+                    , formatter: function (value, row, index) {
+                        if (value != null) {
+                            return parseFloat(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: 'ItemCount', title: '合计数量', width: 70, align: 'right', halign: 'center' },
+                { field: 'OSCount', title: '出库数量', width: 70, align: 'right', halign: 'center' },
+                { field: 'SalerName', title: '业务员', width: 70, halign: 'center' }
+         ]]
+    });
+}
+
 /*生成手册*/
 function add(stype, B5, x4) {
     var row = $("#grid").datagrid("getSelected");
@@ -304,17 +410,6 @@ function create_hyjy() {
                 window.location.href = "/Word/BuildWord_Hyjy?id=" + row.id;
             }
         });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-};
-
-/*查看基础信息*/
-function ChaJcXx() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        window.parent.addTab(row.Name, "/NkReport/Index?Id=" + row.Id, "pic_1")
     }
     else {
         $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');

@@ -963,6 +963,8 @@ namespace JMProject.Web.Controllers
                 bool isCreateNksc = false;
                 //是否更新手册
                 bool isUpdateNksc = false;
+                //是否创建内控报告
+                bool isNkReport = false;
                 FinProductTypeBLL bllproType = new FinProductTypeBLL();
 
                 model.InvoiceFlag = "000063";//未开票
@@ -994,6 +996,10 @@ namespace JMProject.Web.Controllers
                     if (!isUpdateNksc && "0204" == item.ProdectType.ToStringEx())
                     {
                         isUpdateNksc = true;
+                    }
+                    if (!isNkReport && "0203" == item.ProdectType.ToStringEx())
+                    {
+                        isNkReport = true;
                     }
 
                     item.TcDate = string.IsNullOrEmpty(item.TcDate) ? "" : item.TcDate;
@@ -1032,6 +1038,21 @@ namespace JMProject.Web.Controllers
                         nkup.versionE = nkbll.GetMaxVersion();
                         nkup.UpdateFlag = "0";
                         new Nksc_UpdateBLL().Insert(nkup);
+                    }
+                    if (isNkReport)
+                    {
+                        //创建内控报告主表
+                        NkReport report = new NkReport();
+                        report.OrderId = model.Id;
+                        report.CustomId = model.SaleCustomId;
+                        new NkReportBLL().Insert(report);
+
+                        //创建内控报告进度表
+                        NkReport_Progress progress = new NkReport_Progress();
+                        progress.Id = new NkReportBLL().MaxId();
+                        progress.Zid = report.Id;
+                        progress.Tjrq = DateTime.Now.ToString("yyyy-MM-dd");
+                        new NkReportBLL().Insert(progress);
                     }
                     LogHelper.AddLogUser(GetUserId(), "添加订单管理:" + model.Id, Suggestion.Succes, "订单管理");
                     return Json(JsonHandler.CreateMessage(1, Suggestion.Succes), JsonRequestBehavior.AllowGet);
@@ -1968,6 +1989,21 @@ namespace JMProject.Web.Controllers
                         nksc.NkscDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                         nksc.version = MaxVersion;
                         tsqls.Add(nksc.ToString(), null);
+                    }
+                    else if (item.ProdectType.StartsWith("0203"))//内控报告
+                    {
+                        //创建内控报告主表
+                        NkReport report = new NkReport();
+                        report.OrderId = main.OrderMain.Id;
+                        report.CustomId = main.OrderMain.SaleCustomId;
+                        tsqls.Add(report.ToString(), null);
+
+                        //创建内控报告进度表
+                        NkReport_Progress progress = new NkReport_Progress();
+                        progress.Id = new NkReportBLL().MaxId();
+                        progress.Zid = report.Id;
+                        progress.Tjrq = DateTime.Now.ToString("yyyy-MM-dd");
+                        tsqls.Add(progress.ToString(), null);
                     }
                     else if (item.ProdectType.StartsWith("0204"))//更新手册
                     {

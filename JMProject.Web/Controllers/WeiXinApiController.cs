@@ -204,6 +204,8 @@ namespace JMProject.Web.Controllers
 
                         //创建内控报告进度表
                         NkReport_Progress progress = new NkReport_Progress();
+                        progress.Id = new NkReportBLL().MaxId();
+                        progress.Zid = report.Id;
                         progress.Tjrq = DateTime.Now.ToString("yyyy-MM-dd");
                         tsqls.Add(progress.ToString(), null);
                     }

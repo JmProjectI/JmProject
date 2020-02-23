@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using JMProject.Dal.TbColAttribute;
 
 namespace JMProject.Model
 {
@@ -27,6 +28,7 @@ namespace JMProject.Model
         /// <summary>
         /// 编号
         /// </summary>
+        [PrimaryKey]
         public string Id { get; set; }
 
         /// <summary>

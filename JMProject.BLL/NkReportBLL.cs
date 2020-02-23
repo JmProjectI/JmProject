@@ -117,5 +117,32 @@ namespace JMProject.BLL
             return dao.ProExecSelect<View_NkReport>("Proc_Page", sp);
         }
         #endregion
+
+        public string MaxId()
+        {
+            string id = "";
+            string date = DateTime.Now.ToString("yyyyMMdd");
+            String tsql = "select max(Id) from NkReport_Progress";
+            string result = dao.GetScalar(tsql).ToStringEx();
+            if (result == "")
+            {
+                id = "000001";
+            }
+            else
+            {
+                id = (int.Parse(result) + 1).ToString("000000");
+            }
+            return id;
+        }
+
+        public int Insert(NkReport model)
+        {
+            return dao.Insert<NkReport>(model);
+        }
+
+        public int Insert(NkReport_Progress model)
+        {
+            return dao.Insert<NkReport_Progress>(model);
+        }
     }
 }

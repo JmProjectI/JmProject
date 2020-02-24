@@ -140,7 +140,7 @@ namespace JMProject.Web.Controllers
         public ActionResult Report_Data(string DiQuS, string NameS, string flag,
             string NkscSBDateS, string NkscSBDateE, string Uname, GridPager pager)
         {
-            string where = " where 1=1 ";
+            string where = "";
             NkReportBLL bll = new NkReportBLL();
             if (!string.IsNullOrEmpty(DiQuS))
             {

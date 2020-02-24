@@ -137,18 +137,31 @@ namespace JMProject.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Report_Data(string Id, string DiQuS, string NameS, string flag,
-            string NkscSBDateS, string NkscSBDateE, string Uname, string IsProgress, GridPager pager)
+        public ActionResult Report_Data(string DiQuS, string NameS, string flag,
+            string NkscSBDateS, string NkscSBDateE, string Uname, GridPager pager)
         {
             string where = " where 1=1 ";
             NkReportBLL bll = new NkReportBLL();
+            if (!string.IsNullOrEmpty(DiQuS))
+            {
+                where += " and ";
+                string dqwhere = "";
+                foreach (string item in DiQuS.Split(','))
+                {
+                    if (dqwhere == "")
+                    {
+                        dqwhere += "Region = '" + item + "'";
+                    }
+                    else
+                    {
+                        dqwhere += " or Region = '" + item + "'";
+                    }
+                }
+                where += "(" + dqwhere + ")";
+            }
             if (!string.IsNullOrEmpty(NameS))
             {
                 where += " and Name like '%" + NameS + "%'";
-            }
-            if (IsProgress != "1")
-            {
-                where = " and (T1.Id IN (SELECT MAX(Id) AS Id FROM dbo.NkReport_Progress GROUP BY Zid))";
             }
 
             IList<View_NkReport> list = bll.SelectAll(where, pager);
@@ -156,6 +169,19 @@ namespace JMProject.Web.Controllers
             var griddata = new { total = pager.totalRows, rows = list };
             return Json(griddata);
         }
+
+        [HttpPost]
+        public ActionResult SysReport_Data(string Id, GridPager pager)
+        {
+            NkReportBLL bll = new NkReportBLL();
+            string where = " where Zid='" + Id + "'";
+
+            IList<View_SysNkReport> list = bll.ReportSelectAll(where, pager);
+
+            var griddata = new { total = pager.totalRows, rows = list };
+            return Json(griddata);
+        }
+
         #endregion
     }
 }

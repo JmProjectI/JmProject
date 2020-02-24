@@ -19,5 +19,21 @@ namespace JMProject.Model
         public string Flag { get; set; }
         public string Name { get; set; }
         public string Invoice { get; set; }
+        public string MxId { get; set; }
+        public string Tjrq { get; set; }
+        public string Tsyqtext { get; set; }
+        public string Shrq { get; set; }
+        public string Shr { get; set; }
+        public string Zzrq { get; set; }
+        public string Zzr { get; set; }
+        public string Yjrq { get; set; }
+        public string Yjr { get; set; }
+        public string Fsrq { get; set; }
+        public string Fsr { get; set; }
+        public string Lsr { get; set; }
+        public string ShrName { get; set; }
+        public string ZzrName { get; set; }
+        public string YjrName { get; set; }
+        public string FsrName { get; set; }
     }
 }

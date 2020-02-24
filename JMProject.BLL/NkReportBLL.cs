@@ -22,7 +22,7 @@ namespace JMProject.BLL
 
 
         #region 隶属关系 NkReport_MJLSGX
-        public List<NkReport_MJLSGX> Select_NkReport_MJLSGX(string Where, string Order,string TableName)
+        public List<NkReport_MJLSGX> Select_NkReport_MJLSGX(string Where, string Order, string TableName)
         {
             if (!string.IsNullOrEmpty(Where))
             {
@@ -43,7 +43,7 @@ namespace JMProject.BLL
         #endregion
 
         #region 归属部门 NkReport_MJBMBS
-        public List<NkReport_MJBMBS> Select_NkReport_MJBMBS(string Where, string Order,string TableName)
+        public List<NkReport_MJBMBS> Select_NkReport_MJBMBS(string Where, string Order, string TableName)
         {
             //归属部门 NkReport_MJBMBS
             //单位预算管理级次 NkReport_MJDWYSJC
@@ -116,6 +116,35 @@ namespace JMProject.BLL
             sp.Add(new SqlParameter("@currentpage", pager.page));
             sp.Add(new SqlParameter("@pagesize", pager.rows));
             return dao.ProExecSelect<View_NkReport>("Proc_Page", sp);
+        }
+
+        public List<View_SysNkReport> ReportSelectAll(string Where, GridPager pager)
+        {
+            string Order = string.Empty;
+            string Table = "View_SysNkReport";
+            string Fields = "[Id],[Zid],[date],[flag],[czr],[FlagName],[CzrName]";
+            if (!string.IsNullOrEmpty(Where))
+            {
+                Where = "Where 1=1 " + Where;
+            }
+            if (!string.IsNullOrEmpty(pager.sort))
+            {
+                Order = "Order by " + pager.sort + " " + pager.order;
+            }
+            else
+            {
+                Order = "Order by Id ASC";
+            }
+
+            pager.totalRows = Convert.ToInt32(dao.GetScalar("select count(*) from " + Table + " " + Where));
+            List<object> sp = new List<object>();
+            sp.Add(new SqlParameter("@Table", Table));
+            sp.Add(new SqlParameter("@Fields", Fields));
+            sp.Add(new SqlParameter("@Where", Where));
+            sp.Add(new SqlParameter("@Order", Order));
+            sp.Add(new SqlParameter("@currentpage", pager.page));
+            sp.Add(new SqlParameter("@pagesize", pager.rows));
+            return dao.ProExecSelect<View_SysNkReport>("Proc_Page", sp);
         }
         #endregion
 

@@ -139,8 +139,7 @@ function reload() {
         flag: $("#ddlflag").combobox("getValue"),
         NkscSBDateS: $("#txtNkscSBDateS").val(),
         NkscSBDateE: $("#txtNkscSBDateE").val(),
-        Uname: $("#userS").combobox("getValue"),
-        IsProgress:'0'
+        Uname: $("#userS").combobox("getValue")
     };
     InitGrid(queryData);
     $('#grid').datagrid('uncheckAll');
@@ -221,14 +220,17 @@ function InitGrid(queryData) {
                             }
                         }
                     }
-                    , { field: '8', title: '提交日期', sortable: false, width: 100 }
-                    , { field: '1', title: '特殊描述', sortable: false, width: 100 }
-                    , { field: '2', title: '审核人', sortable: false, width: 100 }
-                    , { field: '3', title: '审核日期', sortable: false, width: 100 }
-                    , { field: '4', title: '制作人', sortable: false, width: 100 }
-                    , { field: '5', title: '制作日期', sortable: false, width: 100 }
-                    , { field: '6', title: '移交人', sortable: false, width: 100 }
-                    , { field: '7', title: '移交日期', sortable: false, width: 100 }
+                    , { field: 'Tjrq', title: '提交日期', sortable: false, width: 100 }
+                    , { field: 'Tsyqtext', title: '特殊描述', sortable: false, width: 100 }
+                    , { field: 'Shrq', title: '审核日期', sortable: false, width: 100 }
+                    , { field: 'ShrName', title: '审核人', sortable: false, width: 100 }
+                    , { field: 'Zzrq', title: '制作日期', sortable: false, width: 100 }
+                    , { field: 'ZzrName', title: '制作人', sortable: false, width: 100 }
+                    , { field: 'Yjrq', title: '移交日期', sortable: false, width: 100 }
+                    , { field: 'YjrName', title: '移交人', sortable: false, width: 100 }
+                    , { field: 'Fsrq', title: '发送日期', sortable: false, width: 100 }
+                    , { field: 'FsrName', title: '发送人', sortable: false, width: 100 }
+                    , { field: 'Lsr', title: '历史制作人', sortable: false, width: 100 }
                 ]],
         onDblClickRow: function (rowIndex, rowData) {
             $('#grid').datagrid('uncheckAll');
@@ -276,8 +278,7 @@ function ChaHistory() {
 
 function reloadReport(Rid) {
     var queryData = {
-        Id: Rid,
-        IsProgress: '1'
+        Id: Rid
     };
     InitGridReport(queryData);
     $('#gridReport').datagrid('clearSelections');
@@ -285,13 +286,13 @@ function reloadReport(Rid) {
 
 function InitGridReport(queryData) {
     $('#gridReport').datagrid({
-        url: '/NkReport/Report_Data',
+        url: '/NkReport/SysReport_Data',
         width: 1080,
         methord: 'post',
         height: 455,
         fitColumns: false,
         idField: 'Id',
-        sortName: 'Name',
+        sortName: 'date',
         sortOrder: 'desc',
         pagination: true,
         pageSize: 20,
@@ -300,61 +301,10 @@ function InitGridReport(queryData) {
         singleSelect: true, //单选模式
         showFooter: true,  //显示合计行
         queryParams: queryData,
-        frozenColumns: [[
-        //                { field: 'Id', title: '编号', width: 100, halign: 'center' },
-                {field: 'OrderDate', title: '日期', width: 100, halign: 'center' },
-        //                { field: 'CityName', title: '地区', width: 80, halign: 'center' },
-        //        {field: 'Name', title: '客户/发票抬头', width: 170, halign: 'center' },
-                {field: 'ItemNames', title: '合同明细', width: 150, halign: 'center' },
-        ]],
         columns: [[
-                { field: 'InvoiceFlagName', title: '发票状态', width: 70, halign: 'center' },
-                { field: 'PaymentFlagName', title: '回款状态', width: 70, halign: 'center' },
-                { field: 'OutStockFlagName', title: '出库状态', width: 70, halign: 'center' },
-                { field: 'Finshed', title: '已完成', width: 60, halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (row.Name == "合计") {
-                            return "";
-                        }
-                        else if (value) {
-                            return "已完成";
-                        }
-                        else {
-                            return "未完成";
-                        }
-                    }
-                },
-                { field: 'ItemMoney', title: '合计金额', width: 100, align: 'right', halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value != null) {
-                            return parseFloat(value).toFixed(2);
-                        }
-                    }
-                },
-                { field: 'Invoicemoney', title: '开票金额', width: 80, align: 'right', halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value != null) {
-                            return parseFloat(value).toFixed(2);
-                        }
-                    }
-                },
-                { field: 'Receivablemoney', title: '应收金额', width: 80, align: 'right', halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value != null) {
-                            return parseFloat(value).toFixed(2);
-                        }
-                    }
-                },
-                { field: 'Paymentmoney', title: '回款金额', width: 80, align: 'right', halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value != null) {
-                            return parseFloat(value).toFixed(2);
-                        }
-                    }
-                },
-                { field: 'ItemCount', title: '合计数量', width: 70, align: 'right', halign: 'center' },
-                { field: 'OSCount', title: '出库数量', width: 70, align: 'right', halign: 'center' },
-                { field: 'SalerName', title: '业务员', width: 70, halign: 'center' }
+                { field: 'date', title: '操作日期', width: 100, halign: 'center' },
+                { field: 'FlagName', title: '操作状态', width: 70, halign: 'center' },
+                { field: 'CzrName', title: '操作人', width: 70, halign: 'center' }
          ]]
     });
 }

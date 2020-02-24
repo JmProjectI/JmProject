@@ -82,6 +82,7 @@
     <Compile Include="NkReport\NkReport_MJBMBS.cs" />
     <Compile Include="NkReport\NkReport_Progress.cs" />
     <Compile Include="NkReport\View\View_NkReport.cs" />
+    <Compile Include="NkReport\View\View_SysNkReport.cs" />
     <Compile Include="Nksc_Bxyw.cs" />
     <Compile Include="Nksc_cghtsq.cs" />
     <Compile Include="Nksc_fz.cs" />

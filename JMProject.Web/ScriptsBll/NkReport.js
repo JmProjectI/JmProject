@@ -287,9 +287,9 @@ function reloadReport(Rid) {
 function InitGridReport(queryData) {
     $('#gridReport').datagrid({
         url: '/NkReport/SysReport_Data',
-        width: 1080,
+        width: 480,
         methord: 'post',
-        height: 455,
+        height: 555,
         fitColumns: false,
         idField: 'Id',
         sortName: 'date',

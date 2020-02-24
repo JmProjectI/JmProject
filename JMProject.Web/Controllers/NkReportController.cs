@@ -174,7 +174,7 @@ namespace JMProject.Web.Controllers
         public ActionResult SysReport_Data(string Id, GridPager pager)
         {
             NkReportBLL bll = new NkReportBLL();
-            string where = " where Zid='" + Id + "'";
+            string where = " and Zid='" + Id + "'";
 
             IList<View_SysNkReport> list = bll.ReportSelectAll(where, pager);
 

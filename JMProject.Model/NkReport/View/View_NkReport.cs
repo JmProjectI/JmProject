@@ -29,6 +29,7 @@ namespace JMProject.Model
         public string Yjr { get; set; }
         public string Fsrq { get; set; }
         public string Fsr { get; set; }
+        public string Wcrq { get; set; }
         public string Lsr { get; set; }
         public string ShrName { get; set; }
         public string ZzrName { get; set; }

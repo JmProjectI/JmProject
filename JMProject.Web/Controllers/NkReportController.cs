@@ -180,12 +180,12 @@ namespace JMProject.Web.Controllers
             if (!string.IsNullOrEmpty(flag))
             {
                 where += " and Flag='" + flag + "'";
-            } 
-            
+            }
+
             if (!string.IsNullOrEmpty(Uname))
             {
                 where += " and Zzr='" + Uname + "'";
-            }            
+            }
 
             IList<View_NkReport> list = bll.SelectAll(where, pager);
 
@@ -235,26 +235,49 @@ namespace JMProject.Web.Controllers
                     SysNkReport model = new SysNkReport();
                     model.Id = bll.MaxIdSysNk();
                     model.Zid = id;
-                    model.date = "";
-                    model.flag = "";
-                    model.czr = (System.Web.HttpContext.Current.Session["Account"] as AccountModel).Id;
+                    model.date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    model.flag = ""; new DictionaryBLL().GetData("ItemID", " and ItemDesc='" + Convert.ToInt32(flag).ToString("00") + "'");
+                    model.czr = GetAccount().Id;//(System.Web.HttpContext.Current.Session["Account"] as AccountModel).Id;
                     bll.InsertSysNk(model);
                 }
-                else if (flag == "3")//派工
+                else if (flag == "4")//初审
+                {
+                    string Ren = GetAccount().Id;
+                    //修改报告的状态
+                    count = bll.Update("update NkReport set flag='" + flag + "',Shrq='" + DateTime.Now.ToString("yyyy-MM-dd") + "',Shr='" + Ren + "' where id='" + id + "'");
+                    //添加报告历史记录
+                    SysNkReport model = new SysNkReport();
+                    model.Id = bll.MaxIdSysNk();
+                    model.Zid = id;
+                    model.date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    model.flag = new DictionaryBLL().GetNameStr("ItemID", "报告类别", " and ItemDesc='" + Convert.ToInt32(flag).ToString("00") + "'");
+                    model.czr = Ren;
+                    bll.InsertSysNk(model);
+                }
+                else if (flag == "5")//派工
                 {
                     if (string.IsNullOrEmpty(pfName))
                     {
                         return Json(JsonHandler.CreateMessage(0, "请选择派发人员"), JsonRequestBehavior.AllowGet);
                     }
-                    count = bll.Update("update Nksc set flag='" + flag + "',pfr='" + pfName + "' where id='" + id + "'");
+                    //修改报告的状态
+                    count = bll.Update("update NkReport set flag='" + flag + "',Zzrq='"+ DateTime.Now.ToString("yyyy-MM-dd") +"',Zzr='" + pfName + "' where id='" + id + "'");
+                    //添加报告历史记录
+                    SysNkReport model = new SysNkReport();
+                    model.Id = bll.MaxIdSysNk();
+                    model.Zid = id;
+                    model.date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    model.flag = new DictionaryBLL().GetNameStr("ItemID", "报告类别", " and ItemDesc='" + Convert.ToInt32(flag).ToString("00") + "'");
+                    model.czr = GetAccount().Id;
+                    bll.InsertSysNk(model);
                 }
                 else if (flag == "6")//定稿确认
                 {
-                    count = bll.Update("update Nksc set flag='" + flag + "',xyzdsum=" + zdsum + ", bz='" + txtbz + "' where id='" + id + "'");
+                    count = bll.Update("update NkReport set flag='" + flag + "',xyzdsum=" + zdsum + ", bz='" + txtbz + "' where id='" + id + "'");
                 }
                 else if (flag == "8")//装订
                 {
-                    count = bll.Update("update Nksc set flag='" + flag + "',zddate='" + zddate + "',bczdsum=" + bcsum + ", bz='" + txtbz + "' where id='" + id + "'");
+                    count = bll.Update("update NkReport set flag='" + flag + "',zddate='" + zddate + "',bczdsum=" + bcsum + ", bz='" + txtbz + "' where id='" + id + "'");
                 }
                 else if (flag == "10")//已发送PDF
                 {
@@ -266,7 +289,7 @@ namespace JMProject.Web.Controllers
                     {
                         return Json(JsonHandler.CreateMessage(0, "请输入执行人"), JsonRequestBehavior.AllowGet);
                     }
-                    count = bll.Update("update Nksc set NkscDatePDF='" + zddate + "',peoPDF='" + pfName + "' where id='" + id + "'");
+                    count = bll.Update("update NkReport set NkscDatePDF='" + zddate + "',peoPDF='" + pfName + "' where id='" + id + "'");
                 }
                 else if (flag == "11")//手册领取
                 {

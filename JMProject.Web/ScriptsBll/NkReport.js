@@ -30,10 +30,10 @@ function Event() {
         qishen(); //弃审
     });
     $("#btnFlagA").click(function () {
-        //chushen(); //A初审
+        chushen(); //A初审
     });
     $("#btnFlagB").click(function () {
-        //paifa(); //B派工
+        paifa(); //B派工
     });
     $("#btnFlagC").click(function () {
         //wancheng(); //C编制完成
@@ -79,7 +79,7 @@ function bindGroup() {
 
     //派发人
     $('#pfr').combobox({
-        url: '/System/GetComb_Users?All=true',
+        url: '/System/GetComb_Users?All=false',
         valueField: 'Id',
         textField: 'ZsName',
         onLoadSuccess: function (node, data) {
@@ -187,8 +187,7 @@ function InitGrid(queryData) {
         idField: 'id',
         singleSelect: true,
         queryParams: queryData,  //异步查询的参数
-        columns: [
-                [
+        columns: [[
                     { field: 'ck', checkbox: true}   //选择
                     , { field: 'Years', title: '报告年度', sortable: false, width: 60 }
                     , { field: 'Id', title: '报告编号', sortable: false, width: 250,hidden:true }
@@ -238,6 +237,7 @@ function InitGrid(queryData) {
                     , { field: 'YjrName', title: '移交人', sortable: false, width: 100 }
                     , { field: 'Fsrq', title: '发送日期', sortable: false, width: 100 }
                     , { field: 'FsrName', title: '发送人', sortable: false, width: 100 }
+                    , { field: 'Wcrq', title: '完成日期', sortable: false, width: 100 }
                     , { field: 'Lsr', title: '历史制作人', sortable: false, width: 100 }
                 ]],
         onDblClickRow: function (rowIndex, rowData) {
@@ -289,8 +289,8 @@ function InitGridReport(queryData) {
         showFooter: true,  //显示合计行
         queryParams: queryData,
         columns: [[
-                { field: 'date', title: '操作日期', width: 300, halign: 'center' },
-                { field: 'FlagName', title: '操作状态', width: 150, halign: 'center' },
+                { field: 'date', title: '操作日期', width: 150, halign: 'center' },
+                { field: 'FlagName', title: '操作状态', width: 120, halign: 'center' },
                 { field: 'CzrName', title: '操作人', width: 150, halign: 'center' }
          ]]
     });
@@ -310,7 +310,7 @@ function UpdateFlag(flag, postdata) {
         if (result.type == "1") {
             $.messager.show({ title: '系统提示', msg: result.message });
             reload();
-            if (postdata.flag == "3") {
+            if (postdata.flag == "5") {
                 $("#dlg").dialog("close");
             }
             else if (postdata.flag == "6") {
@@ -358,7 +358,7 @@ function qishen() {
         $.messager.confirm('系统提示', '确认要 [弃审] 内控报告吗?', function (yes) {
             if (yes) {
                 var postdata = {
-                    id: row.id
+                    id: row.Id
                     , flag: '1'
                 };
                 UpdateFlag(row.flag, postdata);
@@ -377,8 +377,8 @@ function chushen() {
         $.messager.confirm('系统提示', '确认要 [初审] 内控报告吗?', function (yes) {
             if (yes) {
                 var postdata = {
-                    id: row.id
-                    , flag: '2'
+                    id: row.Id
+                    , flag: '4'
                 };
                 UpdateFlag(row.flag, postdata);
             }
@@ -409,8 +409,8 @@ function save() {
     };
     var row = $("#grid").datagrid("getSelected");
     var postdata = {
-        id: row.id
-        , flag: '3'
+        id: row.Id
+        , flag: '5'
         , pfName: $("input[name='pfr']").val()
     };
     UpdateFlag(row.flag, postdata);

@@ -66,6 +66,14 @@ namespace JMProject.BLL
             return result.ToStringEx();
         }
 
+        public String GetNameStr(String fieldName,string Tname, String _where)
+        {
+            String where = " where DicName='"+ Tname +"' " + _where;
+            String tsql = "select " + fieldName + " from View_Dic" + where;
+            object result = dao.GetScalar(tsql);
+            return result.ToStringEx();
+        }
+
         public List<Dictionary> SelectAll(string Where, string Order)
         {
             if (!string.IsNullOrEmpty(Where))

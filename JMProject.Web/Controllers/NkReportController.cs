@@ -7,6 +7,7 @@ using JMProject.Web.AttributeEX;
 using JMProject.BLL;
 using JMProject.Model.Esayui;
 using JMProject.Model;
+using JMProject.Model.Sys;
 using JMProject.Common;
 
 namespace JMProject.Web.Controllers
@@ -160,10 +161,31 @@ namespace JMProject.Web.Controllers
                 }
                 where += "(" + dqwhere + ")";
             }
+
             if (!string.IsNullOrEmpty(NameS))
             {
                 where += " and Name like '%" + NameS + "%'";
             }
+
+            if (!string.IsNullOrEmpty(NkscSBDateS))
+            {
+                where += " and Tjrq>='" + NkscSBDateS + "'";
+            }
+
+            if (!string.IsNullOrEmpty(NkscSBDateE))
+            {
+                where += " and Tjrq<='" + NkscSBDateE + "'";
+            }
+
+            if (!string.IsNullOrEmpty(flag))
+            {
+                where += " and Flag='" + flag + "'";
+            } 
+            
+            if (!string.IsNullOrEmpty(Uname))
+            {
+                where += " and Zzr='" + Uname + "'";
+            }            
 
             IList<View_NkReport> list = bll.SelectAll(where, pager);
 
@@ -199,14 +221,24 @@ namespace JMProject.Web.Controllers
                 return Json(JsonHandler.CreateMessage(0, "请选择一个内控报告"), JsonRequestBehavior.AllowGet);
             }
 
-            NkscBLL bll = new NkscBLL();
+            //NkscBLL bll = new NkscBLL();
+            NkReportBLL bll = new NkReportBLL();
             try
             {
                 int count = 0;
+                string userID = (System.Web.HttpContext.Current.Session["Account"] as AccountModel).Id;
                 if (flag == "1")//弃审
                 {
                     //修改报告的状态
                     count = bll.Update("update NkReport set Flag='" + flag + "' where id='" + id + "'");
+                    //添加报告历史记录
+                    SysNkReport model = new SysNkReport();
+                    model.Id = bll.MaxIdSysNk();
+                    model.Zid = id;
+                    model.date = "";
+                    model.flag = "";
+                    model.czr = (System.Web.HttpContext.Current.Session["Account"] as AccountModel).Id;
+                    bll.InsertSysNk(model);
                 }
                 else if (flag == "3")//派工
                 {

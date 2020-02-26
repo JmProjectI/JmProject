@@ -1046,13 +1046,6 @@ namespace JMProject.Web.Controllers
                         report.OrderId = model.Id;
                         report.CustomId = model.SaleCustomId;
                         new NkReportBLL().Insert(report);
-
-                        //创建内控报告进度表
-                        NkReport_Progress progress = new NkReport_Progress();
-                        progress.Id = new NkReportBLL().MaxId();
-                        progress.Zid = report.Id;
-                        progress.Tjrq = DateTime.Now.ToString("yyyy-MM-dd");
-                        new NkReportBLL().Insert(progress);
                     }
                     LogHelper.AddLogUser(GetUserId(), "添加订单管理:" + model.Id, Suggestion.Succes, "订单管理");
                     return Json(JsonHandler.CreateMessage(1, Suggestion.Succes), JsonRequestBehavior.AllowGet);
@@ -1997,13 +1990,6 @@ namespace JMProject.Web.Controllers
                         report.OrderId = main.OrderMain.Id;
                         report.CustomId = main.OrderMain.SaleCustomId;
                         tsqls.Add(report.ToString(), null);
-
-                        //创建内控报告进度表
-                        NkReport_Progress progress = new NkReport_Progress();
-                        progress.Id = new NkReportBLL().MaxId();
-                        progress.Zid = report.Id;
-                        progress.Tjrq = DateTime.Now.ToString("yyyy-MM-dd");
-                        tsqls.Add(progress.ToString(), null);
                     }
                     else if (item.ProdectType.StartsWith("0204"))//更新手册
                     {

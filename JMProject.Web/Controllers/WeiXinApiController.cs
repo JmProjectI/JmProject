@@ -201,13 +201,6 @@ namespace JMProject.Web.Controllers
                         report.OrderId = main.OrderMain.Id;
                         report.CustomId = main.OrderMain.SaleCustomId;
                         tsqls.Add(report.ToString(), null);
-
-                        //创建内控报告进度表
-                        NkReport_Progress progress = new NkReport_Progress();
-                        progress.Id = new NkReportBLL().MaxId();
-                        progress.Zid = report.Id;
-                        progress.Tjrq = DateTime.Now.ToString("yyyy-MM-dd");
-                        tsqls.Add(progress.ToString(), null);
                     }
                     else if (item.ProdectType.StartsWith("0204"))//更新手册
                     {

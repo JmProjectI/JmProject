@@ -13,7 +13,7 @@ namespace JMProject.Model
 
         [PrimaryKey]
         public string Id { get; set; }
-        public Guid Zid { get; set; }
+        public string Zid { get; set; }
         public string date { get; set; }
         public string flag { get; set; }
         public string czr { get; set; }

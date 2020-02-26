@@ -80,7 +80,7 @@
     <Compile Include="NkReport\NkReport.cs" />
     <Compile Include="NkReport\NkReport_MJLSGX.cs" />
     <Compile Include="NkReport\NkReport_MJBMBS.cs" />
-    <Compile Include="NkReport\NkReport_Progress.cs" />
+    <Compile Include="NkReport\SysNkReport.cs" />
     <Compile Include="NkReport\View\View_NkReport.cs" />
     <Compile Include="NkReport\View\View_SysNkReport.cs" />
     <Compile Include="Nksc_Bxyw.cs" />

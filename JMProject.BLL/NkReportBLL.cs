@@ -65,7 +65,6 @@ namespace JMProject.BLL
         }
         #endregion
 
-        #region 内控报告列表
         public bool isExist(String _where)
         {
             String where = " where 1=1 " + _where;
@@ -168,12 +167,37 @@ namespace JMProject.BLL
         {
             return dao.Insert<NkReport>(model);
         }
-        #endregion
 
-
-        public int Insert(NkReport_Progress model)
+        public int Update(NkReport model)
         {
-            return dao.Insert<NkReport_Progress>(model);
+            return dao.Update<NkReport>(model);
+        }
+
+        public int Update(string tsql)
+        {
+            return dao.Update(tsql);
+        }
+
+        public string MaxIdSysNk()
+        {
+            string id = "";
+            string date = DateTime.Now.ToString("yyyyMMdd");
+            String tsql = "select max(Id) from SysNkReport";
+            string result = dao.GetScalar(tsql).ToStringEx();
+            if (result == "")
+            {
+                id = "000001";
+            }
+            else
+            {
+                id = (int.Parse(result) + 1).ToString("000000");
+            }
+            return id;
+        }
+        
+        public int InsertSysNk(SysNkReport model)
+        {
+            return dao.Insert<SysNkReport>(model);
         }
     }
 }

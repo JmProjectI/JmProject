@@ -146,7 +146,6 @@ namespace JMProject.BLL
             sp.Add(new SqlParameter("@pagesize", pager.rows));
             return dao.ProExecSelect<View_SysNkReport>("Proc_Page", sp);
         }
-        #endregion
 
         public string MaxId()
         {
@@ -169,6 +168,8 @@ namespace JMProject.BLL
         {
             return dao.Insert<NkReport>(model);
         }
+        #endregion
+
 
         public int Insert(NkReport_Progress model)
         {

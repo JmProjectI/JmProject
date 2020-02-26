@@ -205,7 +205,8 @@ namespace JMProject.Web.Controllers
                 int count = 0;
                 if (flag == "1")//弃审
                 {
-                    count = bll.Update("update Nksc set flag='" + flag + "' where id='" + id + "'");
+                    //修改报告的状态
+                    count = bll.Update("update NkReport set Flag='" + flag + "' where id='" + id + "'");
                 }
                 else if (flag == "3")//派工
                 {

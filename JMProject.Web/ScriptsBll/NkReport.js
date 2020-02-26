@@ -23,13 +23,11 @@ function Event() {
     //查看报告历史工作
     $("#btnGzls").click(function () {
         ChaHistory();
-        //qishen(); //弃审
     });
     
     //手册状态
     $("#btnFlag1").click(function () {
-        
-        //qishen(); //弃审
+        qishen(); //弃审
     });
     $("#btnFlagA").click(function () {
         //chushen(); //A初审
@@ -72,6 +70,15 @@ function bindGroup() {
     
     //业务员
     $('#userS').combobox({
+        url: '/System/GetComb_Users?All=true',
+        valueField: 'Id',
+        textField: 'ZsName',
+        onLoadSuccess: function (node, data) {
+        }
+    });
+
+    //派发人
+    $('#pfr').combobox({
         url: '/System/GetComb_Users?All=true',
         valueField: 'Id',
         textField: 'ZsName',
@@ -130,21 +137,6 @@ function createColumnMenu() {
     }
 }
 
-/*刷新*/
-function reload() {
-    var queryData = {
-        type: 'select',
-        DiQuS: $("#DiQuS").combobox("getValues") + "",
-        NameS: $("#NameS").val(),
-        flag: $("#ddlflag").combobox("getValue"),
-        NkscSBDateS: $("#txtNkscSBDateS").val(),
-        NkscSBDateE: $("#txtNkscSBDateE").val(),
-        Uname: $("#userS").combobox("getValue")
-    };
-    InitGrid(queryData);
-    $('#grid').datagrid('uncheckAll');
-}
-
 function initCloumn() {
     var fields = $('#grid').datagrid('getColumnFields');
     for (var i = 0; i < fields.length; i++) {
@@ -159,6 +151,22 @@ function initCloumn() {
     }
 }
 
+/*刷新内控报告列表*/
+function reload() {
+    var queryData = {
+        type: 'select',
+        DiQuS: $("#DiQuS").combobox("getValues") + "",
+        NameS: $("#NameS").val(),
+        flag: $("#ddlflag").combobox("getValue"),
+        NkscSBDateS: $("#txtNkscSBDateS").val(),
+        NkscSBDateE: $("#txtNkscSBDateE").val(),
+        Uname: $("#userS").combobox("getValue")
+    };
+    InitGrid(queryData);
+    $('#grid').datagrid('uncheckAll');
+}
+
+/*加载内控报告列表*/
 function InitGrid(queryData) {
     $('#grid').datagrid({   //定位到Table标签，Table标签的ID是grid
         url: '/NkReport/Report_Data',   //指向后台的Action来获取当前菜单的信息的Json格式的数据
@@ -253,6 +261,73 @@ function InitGrid(queryData) {
     })
 };
 
+/*刷新内控历史工作列表*/
+function reloadReport(Rid) {
+    var queryData = {
+        Id: Rid
+    };
+    InitGridReport(queryData);
+    $('#gridReport').datagrid('clearSelections');
+};
+
+/*加载内控历史工作列表*/
+function InitGridReport(queryData) {
+    $('#gridReport').datagrid({
+        url: '/NkReport/SysReport_Data',
+        width: 480,
+        methord: 'post',
+        height: 555,
+        fitColumns: false,
+        idField: 'Id',
+        sortName: 'date',
+        sortOrder: 'desc',
+        pagination: true,
+        pageSize: 20,
+        pageList: [15, 20, 30, 40, 50],
+        striped: true, //奇偶行是否区分
+        singleSelect: true, //单选模式
+        showFooter: true,  //显示合计行
+        queryParams: queryData,
+        columns: [[
+                { field: 'date', title: '操作日期', width: 300, halign: 'center' },
+                { field: 'FlagName', title: '操作状态', width: 150, halign: 'center' },
+                { field: 'CzrName', title: '操作人', width: 150, halign: 'center' }
+         ]]
+    });
+}
+
+function UpdateFlag(flag, postdata) {
+    //当不等于弃审时候
+    if (postdata.flag != "1") {
+        //状态装订  且  要修改的状态不为 装订修改、发送PDF 、领取手册
+        if (flag == "7" && postdata.flag != "8") {
+            $.messager.alert('系统提示', '报告已完成，不能操作！', 'warning');
+            return false;
+        }
+    }
+
+    $.post('/NkReport/SysNkReportFlag', postdata, function (result) {
+        if (result.type == "1") {
+            $.messager.show({ title: '系统提示', msg: result.message });
+            reload();
+            if (postdata.flag == "3") {
+                $("#dlg").dialog("close");
+            }
+            else if (postdata.flag == "6") {
+                $("#dlgydg").dialog("close");
+            }
+            else if (postdata.flag == "8") {
+                $("#dlgyzd").dialog("close");
+            }
+            else if (postdata.flag == "10" || postdata.flag == "11") {
+                $("#dlgfslq").dialog("close");
+            }
+        } else {
+            $.messager.alert('系统提示', result.message, 'warning');
+        }
+    }, 'json');
+};
+
 /*查看报告基础信息*/
 function ChaJcXx() {
     var row = $("#grid").datagrid("getSelected");
@@ -276,37 +351,69 @@ function ChaHistory() {
     }
 };
 
-function reloadReport(Rid) {
-    var queryData = {
-        Id: Rid
-    };
-    InitGridReport(queryData);
-    $('#gridReport').datagrid('clearSelections');
+/*弃审*/
+function qishen() {
+    var row = $("#grid").datagrid("getSelected");
+    if (row) {
+        $.messager.confirm('系统提示', '确认要 [弃审] 内控报告吗?', function (yes) {
+            if (yes) {
+                var postdata = {
+                    id: row.id
+                    , flag: '1'
+                };
+                UpdateFlag(row.flag, postdata);
+            }
+        });
+    }
+    else {
+        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
+    }
 };
 
-function InitGridReport(queryData) {
-    $('#gridReport').datagrid({
-        url: '/NkReport/SysReport_Data',
-        width: 480,
-        methord: 'post',
-        height: 555,
-        fitColumns: false,
-        idField: 'Id',
-        sortName: 'date',
-        sortOrder: 'desc',
-        pagination: true,
-        pageSize: 20,
-        pageList: [15, 20, 30, 40, 50],
-        striped: true, //奇偶行是否区分
-        singleSelect: true, //单选模式
-        showFooter: true,  //显示合计行
-        queryParams: queryData,
-        columns: [[
-                { field: 'date', title: '操作日期', width: 100, halign: 'center' },
-                { field: 'FlagName', title: '操作状态', width: 70, halign: 'center' },
-                { field: 'CzrName', title: '操作人', width: 70, halign: 'center' }
-         ]]
-    });
+/*A初审*/
+function chushen() {
+    var row = $("#grid").datagrid("getSelected");
+    if (row) {
+        $.messager.confirm('系统提示', '确认要 [初审] 内控报告吗?', function (yes) {
+            if (yes) {
+                var postdata = {
+                    id: row.id
+                    , flag: '2'
+                };
+                UpdateFlag(row.flag, postdata);
+            }
+        });
+    }
+    else {
+        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
+    }
+};
+
+/*B派工*/
+function paifa() {
+    var row = $("#grid").datagrid("getSelected");
+    if (row) {
+        $("#dlg").dialog("open").dialog('setTitle', '派发用户');
+        $("#Saler").combobox('setValue', '@Model.Saler');
+        //$("input[name='pfr']").val(row.Zzr);
+    }
+    else {
+        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
+    }
+}
+/*B派工保存*/
+function save() {
+    var validate = $("#fm").form('validate');
+    if (validate == false) {
+        return false;
+    };
+    var row = $("#grid").datagrid("getSelected");
+    var postdata = {
+        id: row.id
+        , flag: '3'
+        , pfName: $("input[name='pfr']").val()
+    };
+    UpdateFlag(row.flag, postdata);
 }
 
 /*生成手册*/
@@ -382,102 +489,6 @@ function DownFJ() {
     else {
         $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
     }
-}
-
-function UpdateFlag(flag, postdata) {
-    //当不等于弃审时候
-    if (postdata.flag != "1") {
-        //状态装订  且  要修改的状态不为 装订修改、发送PDF 、领取手册
-        if (flag == "8" && postdata.flag != "9" && postdata.flag != "10" && postdata.flag != "11") {
-            $.messager.alert('系统提示', '手册已装订，不能操作！', 'warning');
-            return false;
-        }
-    }
-
-    $.post('/Nksc/NkscFlag', postdata, function (result) {
-        if (result.type == "1") {
-            $.messager.show({ title: '系统提示', msg: result.message });
-            reload();
-            if (postdata.flag == "3") {
-                $("#dlg").dialog("close");
-            }
-            else if (postdata.flag == "6") {
-                $("#dlgydg").dialog("close");
-            }
-            else if (postdata.flag == "8") {
-                $("#dlgyzd").dialog("close");
-            }
-            else if (postdata.flag == "10" || postdata.flag == "11") {
-                $("#dlgfslq").dialog("close");
-            }
-        } else {
-            $.messager.alert('系统提示', result.message, 'warning');
-        }
-    }, 'json');
-};
-
-/*弃审*/
-function qishen() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $.messager.confirm('系统提示', '确认要 [弃审] 内控手册吗?', function (yes) {
-            if (yes) {
-                var postdata = {
-                    id: row.id
-                    , flag: '1'
-                };
-                UpdateFlag(row.flag, postdata);
-            }
-        });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-};
-
-/*A初审*/
-function chushen() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $.messager.confirm('系统提示', '确认要 [初审] 内控手册吗?', function (yes) {
-            if (yes) {
-                var postdata = {
-                    id: row.id
-                    , flag: '2'
-                };
-                UpdateFlag(row.flag, postdata);
-            }
-        });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-};
-
-/*B派工*/
-function paifa() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $("#dlg").dialog("open").dialog('setTitle', '派发用户');
-        $("input[name='pfr']").val(row.pfr);
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-}
-/*B派工保存*/
-function save() {
-    var validate = $("#fm").form('validate');
-    if (validate == false) {
-        return false;
-    };
-    var row = $("#grid").datagrid("getSelected");
-    var postdata = {
-        id: row.id
-        , flag: '3'
-        , pfName: $("input[name='pfr']").val()
-    };
-    UpdateFlag(row.flag, postdata);
 }
 
 /*C编制完成*/

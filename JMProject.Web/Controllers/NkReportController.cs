@@ -7,6 +7,7 @@ using JMProject.Web.AttributeEX;
 using JMProject.BLL;
 using JMProject.Model.Esayui;
 using JMProject.Model;
+using JMProject.Common;
 
 namespace JMProject.Web.Controllers
 {
@@ -182,6 +183,94 @@ namespace JMProject.Web.Controllers
             return Json(griddata);
         }
 
+        [AuthorizeAttributeEx]
+        [HttpPost]
+        public ActionResult SysNkReportFlag(string id, string flag
+            //派发人 | 执行人
+            , string pfName
+            //协议装订数量  定稿描述
+            , string zdsum, string txtbz
+            //装订日期|发送PDF日期|手册领取日期  装订数量  剩余数量
+            , string zddate, string bcsum, string sysum
+            )
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return Json(JsonHandler.CreateMessage(0, "请选择一个内控报告"), JsonRequestBehavior.AllowGet);
+            }
+
+            NkscBLL bll = new NkscBLL();
+            try
+            {
+                int count = 0;
+                if (flag == "1")//弃审
+                {
+                    count = bll.Update("update Nksc set flag='" + flag + "' where id='" + id + "'");
+                }
+                else if (flag == "3")//派工
+                {
+                    if (string.IsNullOrEmpty(pfName))
+                    {
+                        return Json(JsonHandler.CreateMessage(0, "请选择派发人员"), JsonRequestBehavior.AllowGet);
+                    }
+                    count = bll.Update("update Nksc set flag='" + flag + "',pfr='" + pfName + "' where id='" + id + "'");
+                }
+                else if (flag == "6")//定稿确认
+                {
+                    count = bll.Update("update Nksc set flag='" + flag + "',xyzdsum=" + zdsum + ", bz='" + txtbz + "' where id='" + id + "'");
+                }
+                else if (flag == "8")//装订
+                {
+                    count = bll.Update("update Nksc set flag='" + flag + "',zddate='" + zddate + "',bczdsum=" + bcsum + ", bz='" + txtbz + "' where id='" + id + "'");
+                }
+                else if (flag == "10")//已发送PDF
+                {
+                    if (string.IsNullOrEmpty(zddate))
+                    {
+                        return Json(JsonHandler.CreateMessage(0, "请选择一个日期"), JsonRequestBehavior.AllowGet);
+                    }
+                    if (string.IsNullOrEmpty(pfName))
+                    {
+                        return Json(JsonHandler.CreateMessage(0, "请输入执行人"), JsonRequestBehavior.AllowGet);
+                    }
+                    count = bll.Update("update Nksc set NkscDatePDF='" + zddate + "',peoPDF='" + pfName + "' where id='" + id + "'");
+                }
+                else if (flag == "11")//手册领取
+                {
+                    if (string.IsNullOrEmpty(zddate))
+                    {
+                        return Json(JsonHandler.CreateMessage(0, "请选择一个日期"), JsonRequestBehavior.AllowGet);
+                    }
+                    if (string.IsNullOrEmpty(pfName))
+                    {
+                        return Json(JsonHandler.CreateMessage(0, "请输入执行人"), JsonRequestBehavior.AllowGet);
+                    }
+                    //修改更新记录为 完成状态
+                    bll.Update("update Nksc_Update set UpdateFlag='1' where CustomerID=(select top 1 CustomerID from Nksc where id='" + id + "')");
+                    count = bll.Update("update Nksc set flag='" + flag + "',NkscDateSC='" + zddate + "',peoSC='" + pfName + "' where id='" + id + "'");
+                }
+                else if (flag == "12")//已生成PDF
+                {
+                    count = bll.Update("update Nksc set NkscDateSCPDF='" + DateTime.Now.ToString("yyyy-MM-dd") + "' where id='" + id + "'");
+                }
+                else//2初审 4用户核对中 5编制完成 13待定
+                {
+                    count = bll.Update("update Nksc set flag='" + flag + "' where id='" + id + "'");
+                }
+                if (count > 0)
+                {
+                    return Json(JsonHandler.CreateMessage(1, "操作成功"), JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(JsonHandler.CreateMessage(0, "保存失败，数据无变化"), JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ee)
+            {
+                return Json(JsonHandler.CreateMessage(0, ee.Message), JsonRequestBehavior.AllowGet);
+            }
+        }
         #endregion
     }
 }

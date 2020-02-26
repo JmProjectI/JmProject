@@ -23,6 +23,7 @@ namespace JMProject.Model
             Yjr = "";
             Fsrq = "";
             Fsr = "";
+            Wcrq = "";
             Lsr = "";
         }
 
@@ -89,6 +90,10 @@ namespace JMProject.Model
         /// </summary>
         public string Fsr { get; set; }
         /// <summary>
+        /// 完成日期
+        /// </summary>
+        public string Wcrq { get; set; }
+        /// <summary>
         /// 历史制作人
         /// </summary>
         public string Lsr { get; set; }
@@ -106,14 +111,15 @@ namespace JMProject.Model
             sb.Append(",Tjrq");
             sb.Append(",Tsyqtext");
             sb.Append(",Shrq");
-            sb.Append(",Shr ");
+            sb.Append(",Shr");
             sb.Append(",Zzrq");
-            sb.Append(",Zzr ");
+            sb.Append(",Zzr");
             sb.Append(",Yjrq");
-            sb.Append(",Yjr ");
+            sb.Append(",Yjr");
             sb.Append(",Fsrq");
-            sb.Append(",Fsr ");
-            sb.Append(",Lsr ");
+            sb.Append(",Fsr");
+            sb.Append(",Wcrq");
+            sb.Append(",Lsr");
             sb.Append(") values(");
             sb.Append("'" + OrderId + "'");
             sb.Append(",'" + CustomId + "'");
@@ -130,6 +136,7 @@ namespace JMProject.Model
             sb.Append(",'" + Yjr + "'");
             sb.Append(",'" + Fsrq + "'");
             sb.Append(",'" + Fsr + "'");
+            sb.Append(",'" + Wcrq + "'");
             sb.Append(",'" + Lsr + "'");
             sb.Append(")");
 

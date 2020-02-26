@@ -45,13 +45,13 @@ namespace JMProject.Model
         /// </summary>
         public string Years { get; set; }
         /// <summary>
-        /// 提交日期
-        /// </summary>
-        public string Tjrq { get; set; }
-        /// <summary>
         /// 报告状态
         /// </summary>
         public string Flag { get; set; }
+        /// <summary>
+        /// 提交日期
+        /// </summary>
+        public string Tjrq { get; set; }
         /// <summary>
         /// 特殊描述
         /// </summary>
@@ -102,8 +102,8 @@ namespace JMProject.Model
             sb.Append(",CustomId");
             sb.Append(",Id");
             sb.Append(",Years");
-            sb.Append(",Tjrq");
             sb.Append(",Flag");
+            sb.Append(",Tjrq");
             sb.Append(",Tsyqtext");
             sb.Append(",Shrq");
             sb.Append(",Shr ");

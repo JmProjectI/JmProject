@@ -23,8 +23,7 @@ function Event() {
     //查看报告历史工作
     $("#btnGzls").click(function () {
         ChaHistory();
-    });
-    
+    });    
     //手册状态
     $("#btnFlag1").click(function () {
         qishen(); //弃审
@@ -36,25 +35,23 @@ function Event() {
         paifa(); //B派工
     });
     $("#btnFlagC").click(function () {
-        //wancheng(); //C编制完成
+        tijiao(); //C提交
     });
     $("#btnFlagD").click(function () {
-        //fenfa(); //D用户核对中
+        yijiao(); //D移交客户
     });
     $("#btnFlagE").click(function () {
-        //dinggao(); //E定稿确认
+        fasong(); //E发送报告
     });
     $("#btnFlagF").click(function () {
-        //ZhuangDing(); //F装订完成
-    });
-    $("#btnFlagG").click(function () {
-        //ZDUpdate(); //G装订修改
-    });
-    $("#btnFlagI").click(function () {
-        //ZTUpdate('11'); //I手册已领取
+        lingqu(); //F领取
     });
     $("#btnFlagJ").click(function () {
-        //daiding(); //J待定
+        daiding(); //J待定
+    });
+    //其他
+    $("#btnDesc").click(function () {
+        UpTsyq(); //特殊要求描述
     });
 }
 
@@ -79,6 +76,15 @@ function bindGroup() {
 
     //派发人
     $('#pfr').combobox({
+        url: '/System/GetComb_Users?All=false',
+        valueField: 'Id',
+        textField: 'ZsName',
+        onLoadSuccess: function (node, data) {
+        }
+    });
+
+    //移交人
+    $('#yjr').combobox({
         url: '/System/GetComb_Users?All=false',
         valueField: 'Id',
         textField: 'ZsName',
@@ -220,6 +226,9 @@ function InitGrid(queryData) {
                                 return "移交客户";
                             }
                             else if (value == "9") {
+                                return "已发报告";
+                            }
+                            else if (value == "10") {
                                 return "待定";
                             }
                             else {
@@ -238,6 +247,7 @@ function InitGrid(queryData) {
                     , { field: 'Fsrq', title: '发送日期', sortable: false, width: 100 }
                     , { field: 'FsrName', title: '发送人', sortable: false, width: 100 }
                     , { field: 'Wcrq', title: '完成日期', sortable: false, width: 100 }
+                    , { field: 'bz', title: '描述', sortable: false, width: 100 }
                     , { field: 'Lsr', title: '历史制作人', sortable: false, width: 100 }
                 ]],
         onDblClickRow: function (rowIndex, rowData) {
@@ -300,7 +310,7 @@ function UpdateFlag(flag, postdata) {
     //当不等于弃审时候
     if (postdata.flag != "1") {
         //状态装订  且  要修改的状态不为 装订修改、发送PDF 、领取手册
-        if (flag == "7" && postdata.flag != "8") {
+        if (flag == "7" && postdata.flag != "8" && postdata.flag != "9") {
             $.messager.alert('系统提示', '报告已完成，不能操作！', 'warning');
             return false;
         }
@@ -313,14 +323,11 @@ function UpdateFlag(flag, postdata) {
             if (postdata.flag == "5") {
                 $("#dlg").dialog("close");
             }
-            else if (postdata.flag == "6") {
+            else if (postdata.flag == "7") {
                 $("#dlgydg").dialog("close");
             }
             else if (postdata.flag == "8") {
                 $("#dlgyzd").dialog("close");
-            }
-            else if (postdata.flag == "10" || postdata.flag == "11") {
-                $("#dlgfslq").dialog("close");
             }
         } else {
             $.messager.alert('系统提示', result.message, 'warning');
@@ -361,7 +368,7 @@ function qishen() {
                     id: row.Id
                     , flag: '1'
                 };
-                UpdateFlag(row.flag, postdata);
+                UpdateFlag(row.Flag, postdata);
             }
         });
     }
@@ -380,7 +387,7 @@ function chushen() {
                     id: row.Id
                     , flag: '4'
                 };
-                UpdateFlag(row.flag, postdata);
+                UpdateFlag(row.Flag, postdata);
             }
         });
     }
@@ -394,13 +401,14 @@ function paifa() {
     var row = $("#grid").datagrid("getSelected");
     if (row) {
         $("#dlg").dialog("open").dialog('setTitle', '派发用户');
-        $("#Saler").combobox('setValue', '@Model.Saler');
+        $("#pfr").combobox('setValue', row.Zzr);
         //$("input[name='pfr']").val(row.Zzr);
     }
     else {
         $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
     }
 }
+
 /*B派工保存*/
 function save() {
     var validate = $("#fm").form('validate');
@@ -413,76 +421,19 @@ function save() {
         , flag: '5'
         , pfName: $("input[name='pfr']").val()
     };
-    UpdateFlag(row.flag, postdata);
+    UpdateFlag(row.Flag, postdata);
 }
 
-/*生成手册*/
-function add(stype, B5, x4) {
+/*C提交*/
+function tijiao() {
     var row = $("#grid").datagrid("getSelected");
     if (row) {
-        $.messager.confirm('系统提示', '确认要生成内控手册吗?', function (yes) {
+        $.messager.confirm('系统提示', '确认要 [提交] 内控报告吗?', function (yes) {
             if (yes) {
-                $.ajax({
-                    type: "post",
-                    //url: "/Nksc/BuildWord",
-                    url: "/Word/BuildWord",
-                    data: { id: row.id, stype: stype, B5: B5, x4: x4 },
-                    beforeSend: function () {
-                        $.messager.progress({ title: '系统提示', msg: '正在生成手册，请稍候...<br/>(请勿执行其他操作)' });
-                    },
-                    success: function (result) {
-                        $.messager.progress('close');
-                        if (result.type == "1") {
-                            $.messager.show({ title: '系统提示', msg: result.message });
-                            reload();
-                        } else {
-                            $.messager.alert('系统提示', result.message, 'warning');
-                        }
-                    },
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        $.messager.progress('close');
-                        $.messager.alert('系统提示', '生成失败', 'warning');
-                        // 状态码
-                        console.log(XMLHttpRequest.status);
-                        // 状态
-                        console.log(XMLHttpRequest.readyState);
-                        // 错误信息   
-                        console.log(textStatus);
-                    }
-                });
-            }
-        });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-};
-
-/*生成会议纪要*/
-function create_hyjy() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $.messager.confirm('系统提示', '确认要生成会议纪要吗?', function (yes) {
-            if (yes) {
-                window.location.href = "/Word/BuildWord_Hyjy?id=" + row.id;
-            }
-        });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-};
-
-/*下载附件*/
-function DownFJ() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $.post('/Nksc/DownFJ', { cid: row.CustomerID }, function (result) {
-            if (result.type == "1") {
-                window.location = "../Upload/" + result.message;
-            }
-            else {
-                $.messager.alert('系统提示', result.message, 'warning');
+                $("#fmydg").form("clear");
+                $("#dlgydg").dialog("open").dialog('setTitle', '提交');
+                $("#fmydg").form("load", row);
+                $("#bzid").val(row.bz);
             }
         });
     }
@@ -491,175 +442,60 @@ function DownFJ() {
     }
 }
 
-/*C编制完成*/
-function wancheng() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $.messager.confirm('系统提示', '确认要 [编制完成] 内控手册吗?', function (yes) {
-            if (yes) {
-                var postdata = {
-                    id: row.id
-                    , flag: '5'
-                };
-                UpdateFlag(row.flag, postdata);
-            }
-        });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-}
-
-/*D发送客户*/
-function fenfa() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $.messager.confirm('系统提示', '确认要 [分发] 内控手册吗?', function (yes) {
-            if (yes) {
-                var postdata = {
-                    id: row.id
-                    , flag: '4'
-                };
-                UpdateFlag(row.flag, postdata);
-            }
-        });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-}
-
-/*E定稿确认*/
-function dinggao() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $("#fmydg").form("clear");
-        $("#dlgydg").dialog("open").dialog('setTitle', '定稿');
-        $("#fmydg").form("load", row);
-        $("#bzid").val(row.bz);
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-}
-/*E定稿保存*/
-function saveydg() {
+/*C提交保存*/
+function savetj() {
     var validate = $("#fmydg").form('validate');
     if (validate == false) {
         return false;
     };
     var row = $("#grid").datagrid("getSelected");
     var postdata = {
-        id: row.id
-        , flag: '6'
-        //协议装订数量
-        , zdsum: $("#txtxyzdsum").numberbox("getValue")
+        id: row.Id
+        , flag: '7'
         //定稿描述
         , txtbz: $("#bzid").val()
     };
-    UpdateFlag(row.flag, postdata);
+    UpdateFlag(row.Flag, postdata);
 }
 
-/*F已装订*/
-function ZhuangDing() {
+/*D移交客户*/
+function yijiao() {
     var row = $("#grid").datagrid("getSelected");
     if (row) {
-        $("#fmyzd").form("clear");
-        $("#dlgyzd").dialog("open").dialog('setTitle', '装订');
-        $("#fmyzd").form("load", row);
-        var sy = parseInt(row.xyzdsum) - parseInt(row.bczdsum);
-        $("#txtbzid").val(row.bz);
-        $("#txtzddate").val(today());
+        $("#dlg").dialog("open").dialog('setTitle', '移交客户');
+        $("#yjr").combobox('setValue', row.Yjr);
     }
     else {
         $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
     }
 }
 
-/*F已装订保存*/
-function saveyzd() {
+/*D移交客户保存*/
+function saveyj() {
     var validate = $("#fmyzd").form('validate');
     if (validate == false) {
         return false;
     };
     var row = $("#grid").datagrid("getSelected");
     var postdata = {
-        id: row.id
+        id: row.Id
         , flag: '8'
-        , zddate: $("#txtzddate").val()
-        , bcsum: $("#txtbczdsum").numberbox("getValue")
-        , txtbz: $("#txtbzid").val()
+        , pfName: $("input[name='yjr']").val()
     };
-    UpdateFlag(row.flag, postdata);
+    UpdateFlag(row.Flag, postdata);
 }
 
-/*G装订后有修改*/
-function ZDUpdate() {
+/*E发送报告*/
+function fasong() {
     var row = $("#grid").datagrid("getSelected");
     if (row) {
-        $.messager.confirm('系统提示', '确认要 [装订修改] 内控手册吗?', function (yes) {
+        $.messager.confirm('系统提示', '确认要 [发送] 内控报告吗?', function (yes) {
             if (yes) {
                 var postdata = {
-                    id: row.id
+                    id: row.Id
                     , flag: '9'
                 };
-                UpdateFlag(row.flag, postdata);
-            }
-        });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-}
-
-/* H已发送PDF I手册已领取 */
-function ZTUpdate(ztflag) {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        var title = '';
-        if (ztflag == "10") {
-            title = '已发送PDF';
-        }
-        else if (ztflag == "11") {
-            title = '手册已领取';
-        }
-        $("#fmfslq").form("clear");
-        $("#dlgfslq").dialog("open").dialog('setTitle', title);
-        $("#fmfslq").form("load", row);
-        $("#Hidden_fslqflag").val(ztflag);
-        $("#txtfslqdate").val(today());
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-}
-/* H已发送PDF I手册已领取 保存 */
-function savefslq() {
-    var validate = $("#fmfslq").form('validate');
-    if (validate == false) {
-        return false;
-    };
-    var row = $("#grid").datagrid("getSelected");
-    var postdata = {
-        id: row.id
-        , flag: $("#Hidden_fslqflag").val()
-        , pfName: $("#txtfslqPeo").val()
-        , zddate: $("#txtfslqdate").val()
-    };
-    UpdateFlag(row.flag, postdata);
-}
-
-/*J待定*/
-function daiding() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $.messager.confirm('系统提示', '确认要 [待定] 内控手册吗?', function (yes) {
-            if (yes) {
-                var postdata = {
-                    id: row.id
-                    , flag: '13'
-                };
-                UpdateFlag(row.flag, postdata);
+                UpdateFlag(row.Flag, postdata);
             }
         });
     }
@@ -668,47 +504,17 @@ function daiding() {
     }
 };
 
-/*已生成PDF*/
-function ZDUpdatePDF() {
+/*F领取*/
+function lingqu() {
     var row = $("#grid").datagrid("getSelected");
     if (row) {
-        $.messager.confirm('系统提示', '确认要 [已生成PDF] 内控手册吗?', function (yes) {
+        $.messager.confirm('系统提示', '确认要 [领取] 内控报告吗?', function (yes) {
             if (yes) {
                 var postdata = {
-                    id: row.id
-                    , flag: '12'
+                    id: row.Id
+                    , flag: 'F'
                 };
-                UpdateFlag(row.flag, postdata);
-            }
-        });
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-}
-
-/*弃审问题反馈0  已处理问题反馈2*/
-function NkReport_wtfkFlag(flag) {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        text = '';
-        if (flag == "0") {
-            if (row.wtfkFlag == "0") {
-                $.messager.alert('系统提示', '还未提交问题反馈，无须弃审!', 'warning');
-                return;
-            }
-            text = '确认要 [弃审问题反馈] 吗?如果之前反馈问题已修改，清先单击 [已处理问题反馈] 后再 [弃审问题反馈]';
-        }
-        else if (flag == "2") {
-            if (row.wtfkFlag != "1") {
-                $.messager.alert('系统提示', '只能处理已反馈数据!', 'warning');
-                return;
-            }
-            text = '确认要 [已处理问题反馈] 吗?';
-        }
-        $.messager.confirm('系统提示', text, function (yes) {
-            if (yes) {
-                $.post('/Nksc/NkReport_Wtfk_Flag', { id: row.id, flag: flag }, function (result) {
+                $.post('/NkReport/SysNkReportFlag', postdata, function (result) {
                     if (result.type == "1") {
                         $.messager.show({ title: '系统提示', msg: result.message });
                         reload();
@@ -722,36 +528,6 @@ function NkReport_wtfkFlag(flag) {
     else {
         $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
     }
-}
-
-/*获取反馈文档*/
-function getWtfk(id, UserName) {
-    $("#ulfile").empty();
-    $("#dlgFkwd").dialog("open").dialog('setTitle', '反馈文档列表');
-    $.post('/Nksc/NkReport_Wtfk', { id: id }, function (result) {
-        if (result.length > 0) {
-            $.each(result, function (index, item) {
-                var text = '';
-                var html = '';
-                if (item.flags == "0") {
-                    text = '未提交';
-                    html = '<li>(' + text + ') ' + item.wtFile + '</li>';
-                }
-                else if (item.flags == "1") {
-                    text = '已提交';
-                    html = '<li>(' + text + ') <a href="../DownWTFK/' + UserName + '/' + item.wtFile + '">' + item.wtFile + '</a></li>';
-                }
-                else if (item.flags == "2") {
-                    text = '已处理';
-                    html = '<li>(' + text + ') ' + item.wtFile + '</li>';
-                }
-
-                $("#ulfile").append(html);
-            });
-        } else {
-            //$.messager.alert('系统提示', '获取失败', 'warning');
-        }
-    }, 'json');
 }
 
 /*特殊要求描述*/
@@ -773,12 +549,12 @@ function savetsyq() {
     };
 
     var postData = {
-        id: $("#grid").datagrid("getSelected").id
+        id: $("#grid").datagrid("getSelected").Id
         , TsyqName: $("#tsyqid").val()
     };
 
     //异步实现添加信息
-    $.post("/Nksc/UpdateTsyq", postData, function (result) {
+    $.post("/NkReport/UpdateTsyq", postData, function (result) {
         if (result.type == "1") {
             $.messager.show({ title: '系统提示', msg: result.message });
             $("#dlgtsyq").dialog("close");
@@ -789,224 +565,21 @@ function savetsyq() {
     });
 }
 
-/* 导出 */
-function DaoC() {
-    window.location.href = "/Nksc/DaoCExcel?DiQuS=" + $("#DiQuS").combobox("getValues") + "" + "&NameS=" + $("#NameS").val()
-                    + "&flag=" + $("#ddlflag").combobox("getValue") + "&fkflag=" + $("#fkflagid").combobox("getValue")
-                    + "&NkscDateS=" + $("#txtNkscDateS").val() + "&NkscDateE=" + $("#txtNkscDateE").val()
-                    + "&NkscSBDateS=" + $("#txtNkscSBDateS").val() + "&NkscSBDateE=" + $("#txtNkscSBDateE").val()
-                    + "&fkpdfflag=" + $("#dllfkpdfflag").combobox("getValue")
-                    + "&IsUpdate=" + $("#dllisupdate").combobox("getValue")
-                    + "&riqiS=" + $("#txtStart").val() + "&riqiE=" + $("#txtEnd").val();
-}
-
-/* 加印手册 */
-function jiayin() {
+/*J待定*/
+function daiding() {
     var row = $("#grid").datagrid("getSelected");
     if (row) {
-        $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleOrder?AddType=True&CId=" + row.CustomerID + "&nktype=2'></iframe>");
-        $("#modalwindow").window({ title: '创建合同-加印手册', width: 1150, height: 510, iconCls: 'icon-add' }).window('open');
+        $.messager.confirm('系统提示', '确认要 [待定] 内控报告吗?', function (yes) {
+            if (yes) {
+                var postdata = {
+                    id: row.Id
+                    , flag: '10'
+                };
+                UpdateFlag(row.flag, postdata);
+            }
+        });
     }
     else {
         $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
     }
-}
-
-/* 更新手册 */
-function gengxin() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Sale/Create_SaleOrder?AddType=True&CId=" + row.CustomerID + "&nktype=3'></iframe>");
-        $("#modalwindow").window({ title: '创建合同-更新手册', width: 1150, height: 510, iconCls: 'icon-add' }).window('open');
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-}
-
-/* 检查单位 */
-function jianchadw() {
-    var row = $("#grid").datagrid("getSelected");
-    if (row) {
-        var title = '检查单位';
-        $("#fmjcdw").form("clear");
-        $("#dlgjcdw").dialog("open").dialog('setTitle', title);
-        $("#fmjcdw").form("load", row);
-    }
-    else {
-        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
-    }
-
-}
-
-/* 检查单位保存 */
-function savejcdw() {
-    var validate = $("#fmjcdw").form('validate');
-    if (validate == false) {
-        return false;
-    };
-    var row = $("#grid").datagrid("getSelected");
-    var postData = {
-        id: row.id
-        , jcnf: $("#txtjcnf").val()
-        , CustomerID: row.CustomerID
-    };
-    //异步实现添加信息
-    $.post("/Nksc/InsertJcdw", postData, function (result) {
-        if (result.type == "1") {
-            $.messager.show({ title: '系统提示', msg: result.message });
-            $("#dlgjcdw").dialog("close");
-            reload();
-        } else {
-            $.messager.alert('系统提示', result.message, 'warning');
-        }
-    });
-}
-
-function ShowSale(Cid, Cname) {
-    $("#dlgOrder").dialog("open").dialog('setTitle', Cname + ' 合同明细');
-    reloadOrder(Cid);
-}
-
-function reloadOrder(Cid) {
-    var queryData = {
-        SaleCustomId: Cid
-    };
-    InitGridOrder(queryData);
-    $('#gridOrder').datagrid('clearSelections');
-};
-
-function InitGridOrder(queryData) {
-    $('#gridOrder').datagrid({
-        url: '/Sale/GetData_SaleOrder',
-        width: 1080,
-        methord: 'post',
-        height: 455,
-        fitColumns: false,
-        idField: 'Id',
-        sortName: 'OrderDate',
-        sortOrder: 'desc',
-        pagination: true,
-        pageSize: 20,
-        pageList: [15, 20, 30, 40, 50],
-        striped: true, //奇偶行是否区分
-        singleSelect: true, //单选模式
-        showFooter: true,  //显示合计行
-        queryParams: queryData,
-        frozenColumns: [[
-        //                { field: 'Id', title: '编号', width: 100, halign: 'center' },
-                {field: 'OrderDate', title: '日期', width: 100, halign: 'center' },
-        //                { field: 'CityName', title: '地区', width: 80, halign: 'center' },
-        //        {field: 'Name', title: '客户/发票抬头', width: 170, halign: 'center' },
-                {field: 'ItemNames', title: '合同明细', width: 150, halign: 'center' },
-        ]],
-        columns: [[
-                { field: 'InvoiceFlagName', title: '发票状态', width: 70, halign: 'center' },
-                { field: 'PaymentFlagName', title: '回款状态', width: 70, halign: 'center' },
-                { field: 'OutStockFlagName', title: '出库状态', width: 70, halign: 'center' },
-                { field: 'Finshed', title: '已完成', width: 60, halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (row.Name == "合计") {
-                            return "";
-                        }
-                        else if (value) {
-                            return "已完成";
-                        }
-                        else {
-                            return "未完成";
-                        }
-                    }
-                },
-                { field: 'ItemMoney', title: '合计金额', width: 100, align: 'right', halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value != null) {
-                            return parseFloat(value).toFixed(2);
-                        }
-                    }
-                },
-                { field: 'Invoicemoney', title: '开票金额', width: 80, align: 'right', halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value != null) {
-                            return parseFloat(value).toFixed(2);
-                        }
-                    }
-                },
-                { field: 'Receivablemoney', title: '应收金额', width: 80, align: 'right', halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value != null) {
-                            return parseFloat(value).toFixed(2);
-                        }
-                    }
-                },
-                { field: 'Paymentmoney', title: '回款金额', width: 80, align: 'right', halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value != null) {
-                            return parseFloat(value).toFixed(2);
-                        }
-                    }
-                },
-                { field: 'ItemCount', title: '合计数量', width: 70, align: 'right', halign: 'center' },
-                { field: 'OSCount', title: '出库数量', width: 70, align: 'right', halign: 'center' },
-                { field: 'SalerName', title: '业务员', width: 70, halign: 'center' }
-         ]]
-    });
-}
-
-function ShowUpdate(Cid) {
-    $("#dlgUpdate").dialog("open").dialog('setTitle', '更新记录');
-    $('#gridUpdate').datagrid({
-        url: '/Nksc/GetData_NkscUpdate',
-        width: 480,
-        methord: 'post',
-        height: 255,
-        fitColumns: false,
-        idField: 'Id',
-        sortName: 'NkscDate',
-        sortOrder: 'desc',
-        pagination: true,
-        pageSize: 20,
-        pageList: [15, 20, 30, 40, 50],
-        striped: true, //奇偶行是否区分
-        singleSelect: true, //单选模式
-        showFooter: false,  //显示合计行
-        queryParams: { CustomerID: Cid },
-        columns: [[
-                { field: 'opt', title: '操作', width: 100, align: 'center', halign: 'center',
-                    formatter: function (value, row, index) {
-                        if (row.UpdateFlag == "0") {
-                            var d = '<a href="#" mce_href="#" onclick="delUpdate(\'' + row.id + '\',\'' + Cid + '\')">取消更新</a> ';
-                            return d;
-                        }
-                    }
-                },
-                { field: 'NkscDate', title: '更新日期', width: 80, halign: 'center' },
-                { field: 'versionS', title: '更新前版本', width: 80, halign: 'center' },
-                { field: 'versionE', title: '更新后版本', width: 80, halign: 'center' },
-                { field: 'UpdateFlag', title: '已完成', width: 80, halign: 'center'
-                    , formatter: function (value, row, index) {
-                        if (value == "1") {
-                            return "已完成";
-                        }
-                        else {
-                            return "未完成";
-                        }
-                    }
-                }
-         ]]
-    });
-}
-
-function delUpdate(id, Cid) {
-    $.messager.confirm('系统提示', '确认要取消更新吗？', function (r) {
-        if (r) {
-            $.post("/Nksc/Delete_NkscUpdate?id=" + id, function (data) {
-                if (data.type == 1) {
-                    ShowUpdate(Cid);
-                }
-                else {
-                    $.messageBox5s('系统提示', data.message);
-                }
-            }, "json");
-        }
-    });
 };

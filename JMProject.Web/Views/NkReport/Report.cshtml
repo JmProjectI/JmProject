@@ -72,7 +72,8 @@
                     <option value="6">二次修改</option>
                     <option value="7">已完成</option>
                     <option value="8">移交客户</option>
-                    <option value="9">待定</option>
+                    <option value="9">已发报告</option>
+                    <option value="10">待定</option>
                     <option value="1;2;3;4;5;6">未完成</option>
                 </select>
             </td>
@@ -95,12 +96,14 @@
     <!-- 手册状态 -->
     @Html.ToolButton("btnFlag1", "", "弃审", false)
     @Html.ToolButton("btnFlagA", "", "初审", false)
-    @Html.ToolButton("btnFlagB", "", "派工", true)
-    @Html.ToolButton("btnFlagC", "", "领取", false)
-    @Html.ToolButton("btnFlagD", "", "提交", false)
-    @Html.ToolButton("btnFlagE", "", "二次修改", true)
-    @Html.ToolButton("btnFlagF", "", "发给客户", false)
+    @Html.ToolButton("btnFlagB", "", "派工", false)
+    @Html.ToolButton("btnFlagC", "", "提交", false)
+    @Html.ToolButton("btnFlagD", "", "移交客户", false)
+    @Html.ToolButton("btnFlagE", "", "发送报告", true)
+    @Html.ToolButton("btnFlagF", "", "领取", true)
     @Html.ToolButton("btnFlagJ", "", "待定", perm, "FlagJ", true)
+    <!-- 其他 -->
+    @Html.ToolButton("btnDesc", "", "特殊描述", perm, "Desc", false)
 </div>
 <table id="grid"></table>
 <!--派工-->
@@ -124,10 +127,48 @@
         保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlg').dialog('close')"
             iconcls="icon-cancel">取消</a>
 </div>
-<!--反馈文档列表-->
-<div id="dlgFkwd" class="easyui-dialog" style="width: 500px; height: 400px; padding: 10px 20px;" closed="true">
-    <ul id="ulfile" style="list-style-type: none;padding-left:0px;">
-    </ul>
+<!--提交/完成-->
+<div id="dlgydg" class="easyui-dialog" style="width: 600px; height: 335px; padding: 10px 20px;"
+    closed="true" buttons="#dlgydg-buttons">
+    <form id="fmydg" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter" style="height: 240px;">
+        <tr>
+            <td class="dec">
+                描述
+            </td>
+            <td class="con" style="vertical-align: top;">
+                <textarea id="bzid" name="nkbgbz" rows="15" class="easyui-validatebox" style="height: 225px;
+                    width: 410px; font-size: 14px;"></textarea>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlgydg-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="savetj()" iconcls="icon-save">
+        保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgydg').dialog('close')"
+            iconcls="icon-cancel">取消</a>
+</div>
+<!--移交客户-->
+<div id="dlgyzd" class="easyui-dialog" style="width: 600px; height: 380px; padding: 10px 20px;"
+    closed="true" buttons="#dlgyzd-buttons">
+    <form id="fmyzd" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter" style="height: 285px;">
+        <tr>
+            <td class="dec">
+                移交人
+            </td>
+            <td class="con">
+                <input id="yjr" name="yjr" class="easyui-combobox" style="width: 200px;" editable="false" />
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlgyzd-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveyj()" iconcls="icon-save">
+        保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgyzd').dialog('close')"
+            iconcls="icon-cancel">取消</a>
 </div>
 <!--特殊要求描述-->
 <div id="dlgtsyq" class="easyui-dialog" style="width: 600px; height: 370px; padding: 10px 20px;"
@@ -151,74 +192,10 @@
         保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgtsyq').dialog('close')"
             iconcls="icon-cancel">取消</a>
 </div>
-<!--已定稿-->
-<div id="dlgydg" class="easyui-dialog" style="width: 600px; height: 370px; padding: 10px 20px;"
-    closed="true" buttons="#dlgydg-buttons">
-    <form id="fmydg" method="post">
-    <table cellpadding="0" cellspacing="0" class="enter" style="height: 275px;">
-        <tr>
-            <td class="dec">
-                协议装订数量
-            </td>
-            <td class="con" style="vertical-align: middle;">
-                <input id="txtxyzdsum" name="xyzdsum" class="easyui-numberbox" required="true" data-options="min:0" />
-            </td>
-        </tr>
-        <tr>
-            <td class="dec">
-                备注
-            </td>
-            <td class="con" style="vertical-align: top;">
-                <textarea id="bzid" name="nkscbz" rows="15" class="easyui-validatebox" style="height: 225px;
-                    width: 410px; font-size: 14px;"></textarea>
-            </td>
-        </tr>
-    </table>
-    </form>
-</div>
-<div id="dlgydg-buttons">
-    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveydg()" iconcls="icon-save">
-        保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgydg').dialog('close')"
-            iconcls="icon-cancel">取消</a>
-</div>
-<!--已装订-->
-<div id="dlgyzd" class="easyui-dialog" style="width: 600px; height: 380px; padding: 10px 20px;"
-    closed="true" buttons="#dlgyzd-buttons">
-    <form id="fmyzd" method="post">
-    <table cellpadding="0" cellspacing="0" class="enter" style="height: 285px;">
-        <tr>
-            <td class="dec">
-                装订日期
-            </td>
-            <td class="con" style="vertical-align: middle;">
-                <input id="txtzddate" name="zddate" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
-                    style="font-size: 12px;" />
-            </td>
-        </tr>
-        <tr>
-            <td class="dec">
-                总装订数量
-            </td>
-            <td class="con" style="vertical-align: middle;">
-                <input id="txtbczdsum" name="bczdsum" class="easyui-numberbox" required="true" data-options="min:0" />
-            </td>
-        </tr>
-        <tr>
-            <td class="dec">
-                备注
-            </td>
-            <td class="con" style="vertical-align: top;">
-                <textarea id="txtbzid" name="nkscbz" rows="9" class="easyui-validatebox" style="height: 160px;
-                    width: 410px; font-size: 14px;"></textarea>
-            </td>
-        </tr>
-    </table>
-    </form>
-</div>
-<div id="dlgyzd-buttons">
-    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveyzd()" iconcls="icon-save">
-        保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgyzd').dialog('close')"
-            iconcls="icon-cancel">取消</a>
+<!--反馈文档列表-->
+<div id="dlgFkwd" class="easyui-dialog" style="width: 500px; height: 400px; padding: 10px 20px;" closed="true">
+    <ul id="ulfile" style="list-style-type: none;padding-left:0px;">
+    </ul>
 </div>
 <!-- H已发送PDF  I手册已领取 -->
 <div id="dlgfslq" class="easyui-dialog" style="width: 400px; height: 200px; padding: 10px 20px;" closed="true" buttons="#dlgfslq-buttons">

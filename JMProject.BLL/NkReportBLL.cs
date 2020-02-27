@@ -92,7 +92,7 @@ namespace JMProject.BLL
             string Order = string.Empty;
             string Table = "View_NkReport";
             string Fields = "[OrderId],[CustomId],[Id],[Years],[Flag],[Name],[Invoice],[Tjrq],[Tsyqtext],[Shrq],[Shr],"
-                + "[Zzrq],[Zzr],[Yjrq],[Yjr],[Fsrq],[Fsr],[Wcrq],[Lsr],[ShrName],[ZzrName],[YjrName],[FsrName]";
+                + "[Zzrq],[Zzr],[Yjrq],[Yjr],[Fsrq],[Fsr],[Wcrq],[Lsr],[bz],[ShrName],[ZzrName],[YjrName],[FsrName]";
             if (!string.IsNullOrEmpty(Where))
             {
                 Where = "Where 1=1 " + Where;
@@ -146,6 +146,13 @@ namespace JMProject.BLL
             return dao.ProExecSelect<View_SysNkReport>("Proc_Page", sp);
         }
 
+        public DataTable Select(string Zid, string Where)
+        {
+            string where = " where 1=1 " + Where;
+            string sql = "select " + Zid + " from NkReport " + where;
+            return dao.Select(sql);
+        }
+
         public string MaxId()
         {
             string id = "";
@@ -194,7 +201,7 @@ namespace JMProject.BLL
             }
             return id;
         }
-        
+
         public int InsertSysNk(SysNkReport model)
         {
             return dao.Insert<SysNkReport>(model);

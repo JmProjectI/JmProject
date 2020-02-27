@@ -25,6 +25,7 @@ namespace JMProject.Model
             Fsr = "";
             Wcrq = "";
             Lsr = "";
+            bz = "";
         }
 
         #region
@@ -97,6 +98,10 @@ namespace JMProject.Model
         /// 历史制作人
         /// </summary>
         public string Lsr { get; set; }
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string bz { get; set; }
         #endregion
 
         public override string ToString()
@@ -120,6 +125,7 @@ namespace JMProject.Model
             sb.Append(",Fsr");
             sb.Append(",Wcrq");
             sb.Append(",Lsr");
+            sb.Append(",bz");
             sb.Append(") values(");
             sb.Append("'" + OrderId + "'");
             sb.Append(",'" + CustomId + "'");
@@ -138,6 +144,7 @@ namespace JMProject.Model
             sb.Append(",'" + Fsr + "'");
             sb.Append(",'" + Wcrq + "'");
             sb.Append(",'" + Lsr + "'");
+            sb.Append(",'" + bz + "'");
             sb.Append(")");
 
             return sb.ToString();

@@ -237,7 +237,8 @@ function InitGrid(queryData) {
                         }
                     }
                     , { field: 'Tjrq', title: '提交日期', sortable: false, width: 100 }
-                    , { field: 'Tsyqtext', title: '特殊描述', sortable: false, width: 100 }
+                    , { field: 'bz', title: '描述', sortable: false, width: 200 }
+                    , { field: 'Tsyqtext', title: '特殊描述', sortable: false, width: 200 }
                     , { field: 'Shrq', title: '审核日期', sortable: false, width: 100 }
                     , { field: 'ShrName', title: '审核人', sortable: false, width: 100 }
                     , { field: 'Zzrq', title: '制作日期', sortable: false, width: 100 }
@@ -247,8 +248,7 @@ function InitGrid(queryData) {
                     , { field: 'Fsrq', title: '发送日期', sortable: false, width: 100 }
                     , { field: 'FsrName', title: '发送人', sortable: false, width: 100 }
                     , { field: 'Wcrq', title: '完成日期', sortable: false, width: 100 }
-                    , { field: 'bz', title: '描述', sortable: false, width: 100 }
-                    , { field: 'Lsr', title: '历史制作人', sortable: false, width: 100 }
+                    , { field: 'Lsr', title: '历史制作人', sortable: false, width: 150 }
                 ]],
         onDblClickRow: function (rowIndex, rowData) {
             $('#grid').datagrid('uncheckAll');

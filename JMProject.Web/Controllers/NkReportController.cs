@@ -266,6 +266,10 @@ namespace JMProject.Web.Controllers
                     //修改报告的状态
                     count = bll.Update("update NkReport set flag='" + flag + "',Zzrq='" + DateTime.Now.ToString("yyyy-MM-dd") + "',Zzr='" + pfName + "' where id='" + id + "'");
                 }
+                else if (flag == "3")//资料不全
+                {
+                    count = bll.Update("update NkReport set flag='" + flag + "', bz='" + txtbz + "' where id='" + id + "'");
+                }
                 else if (flag == "7")//提交、完成
                 {
                     count = bll.Update("update NkReport set flag='" + flag + "', bz='" + txtbz + "' where id='" + id + "'");

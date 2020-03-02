@@ -95,6 +95,7 @@
     @Html.ToolButton("btnGzls", "", "查看历史工作", true)
     <!-- 手册状态 -->
     @Html.ToolButton("btnFlag1", "", "弃审", false)
+    @Html.ToolButton("btnFlag3", "", "资料不全", false)
     @Html.ToolButton("btnFlagA", "", "初审", false)
     @Html.ToolButton("btnFlagB", "", "派工", false)
     @Html.ToolButton("btnFlagC", "", "提交", false)
@@ -126,6 +127,26 @@
     <a href="javascript:void(0)" class="easyui-linkbutton" onclick="save()" iconcls="icon-save">
         保存</a> <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlg').dialog('close')"
             iconcls="icon-cancel">取消</a>
+</div>
+<!-- 资料不全 -->
+<div id="dlgzlbq" class="easyui-dialog" style="width: 600px; height: 335px; padding: 10px 20px;" closed="true" buttons="#dlgzlbq-buttons">
+    <form id="fmfzlbq" method="post">
+    <table cellpadding="0" cellspacing="0" class="enter">
+        <tr>
+            <td class="dec">
+                描述
+            </td>
+            <td class="con" style="vertical-align: middle;">
+                <textarea id="txtzlbq" name="txtzlbq" class="easyui-vlidatebox" required="true" style="height: 225px;
+                    width: 410px; font-size: 14px;"/></textarea>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="dlgzlbq-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="savezlbq()" iconcls="icon-save">保存</a> 
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgzlbq').dialog('close')" iconcls="icon-cancel">取消</a>
 </div>
 <!--提交/完成-->
 <div id="dlgydg" class="easyui-dialog" style="width: 600px; height: 335px; padding: 10px 20px;"
@@ -196,34 +217,6 @@
 <div id="dlgFkwd" class="easyui-dialog" style="width: 500px; height: 400px; padding: 10px 20px;" closed="true">
     <ul id="ulfile" style="list-style-type: none;padding-left:0px;">
     </ul>
-</div>
-<!-- H已发送PDF  I手册已领取 -->
-<div id="dlgfslq" class="easyui-dialog" style="width: 400px; height: 200px; padding: 10px 20px;" closed="true" buttons="#dlgfslq-buttons">
-    <form id="fmfslq" method="post">
-    <table cellpadding="0" cellspacing="0" class="enter">
-        <tr>
-            <td class="dec">
-                日期
-            </td>
-            <td class="con" style="vertical-align: middle;">
-                <input id="txtfslqdate" name="fslqdate" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="font-size: 12px;" required="true" />
-                <input id="Hidden_fslqflag" type="hidden" />
-            </td>
-        </tr>
-        <tr>
-            <td class="dec">
-                执行人
-            </td>
-            <td class="con" style="vertical-align: middle;">
-                <input id="txtfslqPeo" name="fslqPeo" class="easyui-vlidatebox" required="true"/>
-            </td>
-        </tr>
-    </table>
-    </form>
-</div>
-<div id="dlgfslq-buttons">
-    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="savefslq()" iconcls="icon-save">保存</a> 
-    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#dlgfslq').dialog('close')" iconcls="icon-cancel">取消</a>
 </div>
 <!-- 检查单位 -->
 <div id="dlgjcdw" class="easyui-dialog" style="width: 400px; height: 200px; padding: 10px 20px;" closed="true" buttons="#dlgjcdw-buttons">

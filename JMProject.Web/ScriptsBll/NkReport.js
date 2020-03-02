@@ -28,6 +28,9 @@ function Event() {
     $("#btnFlag1").click(function () {
         qishen(); //弃审
     });
+    $("#btnFlag3").click(function () {
+        buquan(); //资料不全
+    }); 
     $("#btnFlagA").click(function () {
         chushen(); //A初审
     });
@@ -320,7 +323,10 @@ function UpdateFlag(flag, postdata) {
         if (result.type == "1") {
             $.messager.show({ title: '系统提示', msg: result.message });
             reload();
-            if (postdata.flag == "5") {
+            if (postdata.flag == "3") {
+                $("#dlgzlbq").dialog("close");
+            }
+            else if (postdata.flag == "5") {
                 $("#dlg").dialog("close");
             }
             else if (postdata.flag == "7") {
@@ -376,6 +382,36 @@ function qishen() {
         $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
     }
 };
+
+//资料不全
+function buquan(){
+    var row = $("#grid").datagrid("getSelected");
+    if (row) {
+        $("#fmfzlbq").form("clear");
+        $("#dlgzlbq").dialog("open").dialog('setTitle', '资料不全');
+        $("#fmfzlbq").form("load", row);
+        $("#txtzlbq").val(row.bz);
+    }
+    else {
+        $.messager.alert('系统提示', '请勾选要操作的行!', 'warning');
+    }
+}
+
+/*资料不全保存*/
+function savezlbq() {
+    var validate = $("#fmfzlbq").form('validate');
+    if (validate == false) {
+        return false;
+    };
+    var row = $("#grid").datagrid("getSelected");
+    var postdata = {
+        id: row.Id
+        , flag: '3'
+        //定稿描述
+        , txtbz: $("#txtzlbq").val()
+    };
+    UpdateFlag(row.Flag, postdata);
+}
 
 /*A初审*/
 function chushen() {

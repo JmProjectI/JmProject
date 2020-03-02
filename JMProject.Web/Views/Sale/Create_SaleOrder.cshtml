@@ -143,6 +143,44 @@
         });
     };
 
+    function savedata(rows) {
+        if ($("#CreateForm").form('validate')) {
+            var postData = {
+                Id: $("input[name='Id']").val()
+                , OrderDate: $("input[name='OrderDate']").val()
+                , SaleCustomId: $("input[name='SaleCustomId']").val()
+                , AccountId: $("input[name='AccountId']").val()
+                , OrderType: $("input[name='OrderType']").val()
+                , Saler: $("input[name='Saler']").val()
+                , Remake: $("input[name='Remake']").val()
+                , Products: JSON.stringify(rows)
+                , UserId: $("input[name='UserId']").attr("Uid")
+                , Enclosure: $("input[name='Enclosure']").val()
+                , VId: $("#VId").val()
+                , AddType: $("#AddType").val()
+            };
+
+            $.ajax({
+                url: "/Sale/Create_SaleOrder",
+                type: "Post",
+                data: postData,
+                dataType: "json",
+                success: function (data) {
+                    if (data.type == 1) {
+                        window.parent.frameReturnByMes(data.message);
+                        window.parent.frameReturnByReload(false);
+                        window.parent.frameReturnByClose()
+                        return true;
+                    }
+                    else {
+                        window.parent.frameReturnByMes(data.message);
+                        return false;
+                    }
+                }
+            });
+        }
+    }
+
     $(function () {
         InitWebUpload();
 
@@ -164,40 +202,21 @@
                 window.parent.frameReturnByMes('请添加商品');
                 return false;
             }
-            if ($("#CreateForm").form('validate')) {
-                var postData = {
-                    Id: $("input[name='Id']").val()
-                    , OrderDate: $("input[name='OrderDate']").val()
-                    , SaleCustomId: $("input[name='SaleCustomId']").val()
-                    , AccountId: $("input[name='AccountId']").val()
-                    , OrderType: $("input[name='OrderType']").val()
-                    , Saler: $("input[name='Saler']").val()
-                    , Remake: $("input[name='Remake']").val()
-                    , Products: JSON.stringify(rows)
-                    , UserId: $("input[name='UserId']").attr("Uid")
-                    , Enclosure: $("input[name='Enclosure']").val()
-                    , VId: $("#VId").val()
-                    , AddType: $("#AddType").val()
-                };
 
-                $.ajax({
-                    url: "/Sale/Create_SaleOrder",
-                    type: "Post",
-                    data: postData,
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.type == 1) {
-                            window.parent.frameReturnByMes(data.message);
-                            window.parent.frameReturnByReload(false);
-                            window.parent.frameReturnByClose()
-                        }
-                        else {
-                            window.parent.frameReturnByMes(data.message);
-                        }
+            var accid = $("input[name='AccountId']").val();
+            if (accid == "") {
+                $.messager.confirm('系统提示', '是否已签合同，如果“是”请选择账户后再次保存，否则继续保存合同?', function (yes) {
+                    if (!yes) {
+                        return savedata(rows);
+                    }
+                    else {
+                        return false;
                     }
                 });
             }
-            return false;
+            else {
+                return savedata(rows);
+            }
         });
 
         /*返回*/

@@ -847,7 +847,7 @@ namespace JMProject.Web.Controllers
             };
             return Json(json);
         }
-        
+
         [SupportFilter(ActionName = "CUD")]
         public ActionResult Create_SaleOrder(View_SaleOrder result, string CId, string nktype, string VId = "", bool AddType = false)
         {
@@ -3663,6 +3663,23 @@ namespace JMProject.Web.Controllers
         public JsonResult Create_SaleOTS(string Id, string Flag)
         {
             SaleOrderBLL bll = new SaleOrderBLL();
+            //判断订单是否出库  01  03需要判断
+            DataTable dt = bll.GetData("*", " and OrderId='" + Id + "'", "SaleOrderItem");
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    string TypeId = dt.Rows[i]["ProdectType"].ToString().Substring(0, 2);
+                    if (TypeId == "01" || TypeId == "03")
+                    {
+                        FinOutStockBLL osbll = new FinOutStockBLL();
+                        if (osbll.GetStockItemCount(" and SaleOrderItemId='" + dt.Rows[i]["ItemId"].ToStringEx() + "'") < 1)
+                        {
+                            return Json(JsonHandler.CreateMessage(0, "请先出库后，再推送开发票！"), JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                }
+            }
             //修改订单的状态
             string TsDate = "";
             if (Flag == "1")

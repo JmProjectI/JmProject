@@ -97,9 +97,12 @@
             }
             $('#grid').datagrid('clearSelections');
             var rows = $('#grid').datagrid('getRows');
-            if (rows == null || rows.length < 1) {
-                window.parent.frameReturnByMes('请添加模块');
-                return false;
+            var TypeId = $("input[name='ProductId']").val();
+            if (TypeId.substring(0, 2) == "01") {
+                if (rows == null || rows.length < 1) {
+                    window.parent.frameReturnByMes('请添加模块');
+                    return false;
+                }
             }
             if ($("#CreateForm").form('validate')) {
                 var postData = {

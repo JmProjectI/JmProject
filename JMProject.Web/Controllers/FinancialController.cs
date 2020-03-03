@@ -654,15 +654,32 @@ namespace JMProject.Web.Controllers
                 return Json(JsonHandler.CreateMessage(0, "经手人 不允许为空"), JsonRequestBehavior.AllowGet);
             }
 
-            if (string.IsNullOrEmpty(model.PkeyStart) || string.IsNullOrEmpty(model.PkeyEnd))
-            {
-                return Json(JsonHandler.CreateMessage(0, "序列号段 不允许为空"), JsonRequestBehavior.AllowGet);
-            }
-
             List<FinOrderItem> ListItem = ParseFromJson<List<FinOrderItem>>(Products);
-            if (ListItem.Count < 1)
+            string TypeId = model.ProductId.Substring(0, 2);
+
+            if (TypeId == "01")
             {
-                return Json(JsonHandler.CreateMessage(0, "请添加商品"), JsonRequestBehavior.AllowGet);
+                if (string.IsNullOrEmpty(model.PkeyStart) || string.IsNullOrEmpty(model.PkeyEnd))
+                {
+                    return Json(JsonHandler.CreateMessage(0, "序列号段 不允许为空"), JsonRequestBehavior.AllowGet);
+                }
+
+                if (ListItem.Count < 1)
+                {
+                    return Json(JsonHandler.CreateMessage(0, "请添加商品"), JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(model.PkeyStart))
+                {
+                    return Json(JsonHandler.CreateMessage(0, "数量不允许为空"), JsonRequestBehavior.AllowGet);
+                }
+
+                if (string.IsNullOrEmpty(model.PkeyEnd))
+                {
+                    return Json(JsonHandler.CreateMessage(0, "单位不允许为空"), JsonRequestBehavior.AllowGet);
+                }
             }
             //暂时允许为0
             //for (int i = 0; i < ListItem.Count; i++)
@@ -724,59 +741,100 @@ namespace JMProject.Web.Controllers
                 }
                 #endregion
 
-                //获取序列号段的个数
-                int PkeyCount = Convert.ToInt32(model.PkeyEnd) - Convert.ToInt32(model.PkeyStart);
-                //库存明细表ID
-                string maxKCId = "";
-                //循环序列号的个数(插入库存主表和明细表)
-                for (int j = 0; j <= PkeyCount; j++)
+                if (TypeId == "01")
                 {
-                    string Pkey = (Convert.ToInt32(model.PkeyStart) + j).ToString();
-
-                    //库存管理主表(插入数据)
-                    string sqlProduct = "";
-                    if (string.IsNullOrEmpty(maxproID))
+                    //获取序列号段的个数
+                    int PkeyCount = Convert.ToInt32(model.PkeyEnd) - Convert.ToInt32(model.PkeyStart);
+                    //库存明细表ID
+                    string maxKCId = "";
+                    //循环序列号的个数(插入库存主表和明细表)
+                    for (int j = 0; j <= PkeyCount; j++)
                     {
-                        maxproID = pbll.Maxid(model.ProductId);
-                    }
-                    else
-                    {
-                        maxproID = (int.Parse(maxproID) + 1).ToString("000000000000");
-                    }
-                    sqlProduct = "insert into FinProduct values('" + model.ProductId + "','" + maxproID + "','" + MkName.TrimEnd('、') + "','" + model.Id + "',0,'"
-                        + Pkey + "','" + SumMoney + "','" + CbMoney + "',0,'1',0,'1','')";
-                    tsqls.Add(sqlProduct, null);
+                        string Pkey = (Convert.ToInt32(model.PkeyStart) + j).ToString();
 
-                    string sqlProductItem = "INSERT INTO FinProductItem([ItemID],[ProId],[ModularID],[CbMoney],[JcMoney],[CsCount],[AddCount]"
-                        + ",[AddMoney],[SumCount],[sumMoney]) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')";
-
-                    for (int k = 0; k < ListItem.Count; k++)//循环模块数
-                    {
-                        FinOrderItem item = ListItem[k];
-                        //日期
-                        string D = DateTime.Now.ToString("yyyyMMdd");
-                        //入库单明细表(插入数据)
-                        if (string.IsNullOrEmpty(maxKCId))
+                        //库存管理主表(插入数据)
+                        string sqlProduct = "";
+                        if (string.IsNullOrEmpty(maxproID))
                         {
-                            maxKCId = pibll.Max_FinProductItem(D);
+                            maxproID = pbll.Maxid(model.ProductId);
                         }
                         else
                         {
-                            maxKCId = D + (int.Parse(maxKCId.Substring(8)) + 1).ToString("000000");
+                            maxproID = (int.Parse(maxproID) + 1).ToString("000000000000");
                         }
+                        sqlProduct = "insert into FinProduct values('" + model.ProductId + "','" + maxproID + "','" + MkName.TrimEnd('、') + "','" + model.Id + "',0,'"
+                            + Pkey + "','" + SumMoney + "','" + CbMoney + "',0,'1',0,'1','')";
+                        tsqls.Add(sqlProduct, null);
 
-                        string sqltext = string.Format(sqlProductItem, new object[] { maxKCId, maxproID, item.ModularID, item.CbMoney,item.JcMoney
+                        string sqlProductItem = "INSERT INTO FinProductItem([ItemID],[ProId],[ModularID],[CbMoney],[JcMoney],[CsCount],[AddCount]"
+                            + ",[AddMoney],[SumCount],[sumMoney]) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')";
+
+                        for (int k = 0; k < ListItem.Count; k++)//循环模块数
+                        {
+                            FinOrderItem item = ListItem[k];
+                            //日期
+                            string D = DateTime.Now.ToString("yyyyMMdd");
+                            //入库单明细表(插入数据)
+                            if (string.IsNullOrEmpty(maxKCId))
+                            {
+                                maxKCId = pibll.Max_FinProductItem(D);
+                            }
+                            else
+                            {
+                                maxKCId = D + (int.Parse(maxKCId.Substring(8)) + 1).ToString("000000");
+                            }
+
+                            string sqltext = string.Format(sqlProductItem, new object[] { maxKCId, maxproID, item.ModularID, item.CbMoney,item.JcMoney
                             ,item.CsCount, item.AddCount, item.AddMoney, item.SumCount, item.sumMoney });
-                        tsqls.Add(sqltext, null);
+                            tsqls.Add(sqltext, null);
 
-                        //if (pbll.isExist("and TypeId='" + model.ProductId + "'"))// and Name='" + item.TypeName + "' and Pkey='" + item.Pkey + "'
-                        //{
-                        //sqlProduct = "update FinProduct set stock=stock+1 where TypeId='" + model.ProductId + "'";// and Name='" + item.TypeName + "' and Pkey='" + item.Pkey + "'
-                        //}
-                        //else
-                        //{
-                        //[TypeId],[Id],[Name],[Spec],[Ucount],[Pkey],[Marketprice],[Costprice],[InitialCount],[InCount],[OutCount],[stock],[Remake]
-                        //}
+                            //if (pbll.isExist("and TypeId='" + model.ProductId + "'"))// and Name='" + item.TypeName + "' and Pkey='" + item.Pkey + "'
+                            //{
+                            //sqlProduct = "update FinProduct set stock=stock+1 where TypeId='" + model.ProductId + "'";// and Name='" + item.TypeName + "' and Pkey='" + item.Pkey + "'
+                            //}
+                            //else
+                            //{
+                            //[TypeId],[Id],[Name],[Spec],[Ucount],[Pkey],[Marketprice],[Costprice],[InitialCount],[InCount],[OutCount],[stock],[Remake]
+                            //}
+                        }
+                    }
+                }
+                else
+                {
+                    string ProId = pbll.GetNameStr("Id", " and TypeId='" + model.ProductId + "'");
+                    if (ProId == "")
+                    {
+                        FinProductTypeBLL tbll = new FinProductTypeBLL();
+                        if (string.IsNullOrEmpty(maxproID))
+                        {
+                            maxproID = pbll.Maxid(model.ProductId);
+                        }
+                        else
+                        {
+                            maxproID = (int.Parse(maxproID) + 1).ToString("000000000000");
+                        }
+                        //产品类别名称
+                        string typename = tbll.GetNameStr("Name", " and Id='" + model.ProductId + "'");
+                        //数量
+                        string Count = model.PkeyStart;
+                        //市场价
+                        string Money = model.PkeyEnd;
+
+                        //插入语句
+                        string sqlProduct = "insert into FinProduct([TypeId],[Id],[Name],[Spec],[Ucount],[Pkey],[Marketprice],[Costprice],[InitialCount],[InCount],[OutCount]"
+                            + ",[stock],[Remake]) values('" + model.ProductId + "','" + maxproID + "','" + typename + "','" + model.Id + "',0,'','" + Money + "',0.00,0,'"
+                            + Count + "',0,'" + Count + "','')";
+                        //执行
+                        tsqls.Add(sqlProduct, null);
+                    }
+                    else
+                    {
+                        //数量
+                        string Count = model.PkeyStart;
+                        //市场价
+                        string Money = model.PkeyEnd;
+                        string tsql = "update FinProduct set Marketprice='" + Money + "',InCount=InCount+" + Count + ",stock=stock+" + Count + " where Id='" + ProId + "'";
+                        tsqls.Add(tsql, null);
                     }
                 }
                 if (bll.Tran(tsqls))
@@ -1284,7 +1342,7 @@ namespace JMProject.Web.Controllers
             }
             return File(str, "attachment;filename=" + filename + ".xls");
         }
-        
+
         #endregion
 
         #region 待开发票
@@ -1861,6 +1919,23 @@ namespace JMProject.Web.Controllers
             FinOrderInvoiceBLL bll = new FinOrderInvoiceBLL();
             if (AddType)
             {
+                ////判断订单是否出库  01  03需要判断
+                //DataTable dt = bll.GetData("*", " and OrderId='" + model.OrderId + "'", "SaleOrderItem");
+                //if (dt.Rows.Count > 0)
+                //{
+                //    for (int i = 0; i < dt.Rows.Count; i++)
+                //    {
+                //        string TypeId = dt.Rows[i]["ProdectType"].ToString().Substring(0, 2);
+                //        if (TypeId == "01" || TypeId == "03")
+                //        {
+                //            FinOutStockBLL osbll = new FinOutStockBLL();
+                //            if (osbll.GetStockItemCount(" and SaleOrderItemId='" + dt.Rows[i]["ItemId"].ToStringEx() + "'") < 1)
+                //            {
+                //                return Json(JsonHandler.CreateMessage(0, "请先出库后，再推送开发票！"), JsonRequestBehavior.AllowGet);
+                //            }
+                //        }
+                //    }
+                //}
                 //创建
                 model.Id = bll.Maxid(DateTime.Now.ToString("yyyyMMdd"));
                 if (bll.Insert(model) > 0)

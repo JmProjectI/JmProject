@@ -6991,7 +6991,6 @@
     <Content Include="ScriptsBll\NkscPhoto_fj.js" />
     <Content Include="ScriptsBll\NkReport.js" />
     <Content Include="UserPDF\null.jpg" />
-    <Content Include="DownFile\pdf阅读器.exe" />
     <Content Include="fav.ico" />
     <Content Include="FlexPaper\12.swf" />
     <Content Include="FlexPaper\FlexPaperViewer.swf" />
@@ -7871,6 +7870,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DBbackFile\" />
+    <Folder Include="DownFile\" />
     <Folder Include="FileSaleOrder\" />
     <Folder Include="GDimg\" />
     <Folder Include="UploadSaleVisit\" />

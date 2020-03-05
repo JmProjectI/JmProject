@@ -205,7 +205,8 @@
 
             var accid = $("input[name='AccountId']").val();
             if (accid == "") {
-                $.messager.confirm('系统提示', '是否已签合同，如果“是”请选择账户后再次保存，否则继续保存合同?', function (yes) {
+                $.messager.defaults = { ok: "是", cancel: "否",width:300 };
+                $.messager.confirm('系统提示', '是否已签合同，如果“是”请选择账户后再次保存，选择“否”则继续保存合同?', function (yes) {
                     if (!yes) {
                         return savedata(rows);
                     }

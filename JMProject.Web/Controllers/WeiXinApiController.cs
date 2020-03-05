@@ -330,97 +330,103 @@ namespace JMProject.Web.Controllers
                 if (string.IsNullOrEmpty(CusId.ToStringEx()))//不存在(改革后单位名称)
                 {
                     //查询客户编号(按改革前单位名称查询)
-                    string SaleCusId = bll.GetStrName("ID", " where Name='" + model.OldCusName + "' and Code='" + model.OldCusCode + "'");
-
+                    string SaleCusId = bll.GetStrName("ID", " where Name='" + model.OldCusName + "'");
                     //判断绑定单位是否存在(改革前单位名称)
                     if (string.IsNullOrEmpty(SaleCusId.ToStringEx()))//不存在(改革前单位名称)
                     {
-                        return Json(JsonHandler.CreateMessage(0, "未找到要注册的客户信息"), JsonRequestBehavior.AllowGet);
+                        return Json(JsonHandler.CreateMessage(0, "改革前开票单位全称不存在"), JsonRequestBehavior.AllowGet);
                     }
-                    else//存在(改革前单位名称)
+
+                    string Code = bll.GetStrName("Code", " where ID='" + SaleCusId + "'");
+                    if (!string.IsNullOrEmpty(Code.ToStringEx()))
                     {
-                        SaleWeiXin swx = new SaleWeiXin();
-                        string ID = wx.MaxId(DateTime.Now.ToString("yyyyMMdd"));
-                        swx.ID = ID;//编号
-                        swx.CusId = SaleCusId;//单位编号
-                        swx.OpenId = model.OpenId;//微信OpenId
-                        swx.IsCus = "0";//老客户
-
-                        try
+                        if (Code != model.OldCusCode)
                         {
-                            string Zid = "";
-                            if (model.Invoice.ToStringEx() != "")
-                            {
-                                Zid += ",Invoice='" + model.Invoice + "'";
-                            }
-                            if (model.Lxr.ToStringEx() != "")
-                            {
-                                Zid += ",Lxr='" + model.Lxr + "'";
-                            }
-                            if (model.Phone.ToStringEx() != "")
-                            {
-                                Zid += ",Phone='" + model.Phone + "'";
-                            }
-                            if (model.Address.ToStringEx() != "")
-                            {
-                                Zid += ",Address='" + model.Address + "'";
-                            }
-                            if (model.Lxr.ToStringEx() != "" && model.Phone.ToStringEx() != "")
-                            {
-                                Zid += ",Remark=Remark+'  '+Lxr+'  '+Phone";
-                            }
-                            else if (model.Lxr.ToStringEx() != "" && model.Phone.ToStringEx() == "")
-                            {
-                                Zid += ",Remark=Remark+'  '+Lxr";
-                            }
-                            else if (model.Lxr.ToStringEx() == "" && model.Phone.ToStringEx() != "")
-                            {
-                                Zid += ",Remark=Remark+'  '+Phone";
-                            }
-                            int count = bll.Update("update SaleCustom set Name='" + model.CusName + "',Code='" + model.CusCode + "'" +
-                                Zid + " where ID='" + SaleCusId + "'");
-                            //绑定微信
-                            wx.Insert(swx);
-                            return Json(JsonHandler.CreateMessage(1, SaleCusId), JsonRequestBehavior.AllowGet);
+                            return Json(JsonHandler.CreateMessage(0, "改革前社会统一信用代码不存在"), JsonRequestBehavior.AllowGet);
                         }
-                        catch (Exception ex)
-                        {
-                            return Json(JsonHandler.CreateMessage(0, ex.Message), JsonRequestBehavior.AllowGet);
-                        }
-                        #region
-                        ////查询此微信号是否绑定过单位（客户编号）
-                        //string SaleId = wx.GetNameStr("Zid", " and OpenId='" + _openId + "'");
-
-                        //if (!string.IsNullOrEmpty(SaleId))//此微信已绑定
-                        //{
-                        //    if (SaleId == SaleCusId)//此微信号绑定的单位与当前绑定的单位相同
-                        //    {
-                        //        return Json(JsonHandler.CreateMessage(0, "此微信已绑定过本单位，无需要再次绑定！"), JsonRequestBehavior.AllowGet);
-                        //    }
-                        //    else//此微信号绑定的单位与当前绑定的单位不相同
-                        //    {
-                        //        return Json(JsonHandler.CreateMessage(0, "此微信已绑定其他单位，不可绑定多个单位！"), JsonRequestBehavior.AllowGet);
-                        //    }
-                        //}
-                        //else//此微信未绑定
-                        //{
-                        //    //查询此单位是否已绑定微信
-                        //    string OpenID = wx.GetNameStr("OpenId", " and Zid='" + SaleCusId + "'");
-
-                        //    if (!string.IsNullOrEmpty(OpenID))//此单位已绑定
-                        //    {
-                        //        if (OpenID == _openId)//此单位绑定的微信与当前绑定的微信相同
-                        //        {
-                        //            return Json(JsonHandler.CreateMessage(0, "此微信已绑定过本单位，无需要再次绑定！"), JsonRequestBehavior.AllowGet);
-                        //        }
-                        //        else//此单位绑定的微信与当前绑定的微信不相同
-                        //        {
-                        //            return Json(JsonHandler.CreateMessage(0, "此单位已绑定其他微信，不可绑定多个微信！"), JsonRequestBehavior.AllowGet);
-                        //        }
-                        //    }
-                        //}
-                        #endregion
                     }
+                    //存在(改革前单位名称)
+                    SaleWeiXin swx = new SaleWeiXin();
+                    string ID = wx.MaxId(DateTime.Now.ToString("yyyyMMdd"));
+                    swx.ID = ID;//编号
+                    swx.CusId = SaleCusId;//单位编号
+                    swx.OpenId = model.OpenId;//微信OpenId
+                    swx.IsCus = "0";//老客户
+
+                    try
+                    {
+                        string Zid = "";
+                        if (model.Invoice.ToStringEx() != "")
+                        {
+                            Zid += ",Invoice='" + model.Invoice + "'";
+                        }
+                        if (model.Lxr.ToStringEx() != "")
+                        {
+                            Zid += ",Lxr='" + model.Lxr + "'";
+                        }
+                        if (model.Phone.ToStringEx() != "")
+                        {
+                            Zid += ",Phone='" + model.Phone + "'";
+                        }
+                        if (model.Address.ToStringEx() != "")
+                        {
+                            Zid += ",Address='" + model.Address + "'";
+                        }
+                        if (model.Lxr.ToStringEx() != "" && model.Phone.ToStringEx() != "")
+                        {
+                            Zid += ",Remark=Remark+'  '+Lxr+'  '+Phone";
+                        }
+                        else if (model.Lxr.ToStringEx() != "" && model.Phone.ToStringEx() == "")
+                        {
+                            Zid += ",Remark=Remark+'  '+Lxr";
+                        }
+                        else if (model.Lxr.ToStringEx() == "" && model.Phone.ToStringEx() != "")
+                        {
+                            Zid += ",Remark=Remark+'  '+Phone";
+                        }
+                        int count = bll.Update("update SaleCustom set Name='" + model.CusName + "',Code='" + model.CusCode + "'" +
+                            Zid + " where ID='" + SaleCusId + "'");
+                        //绑定微信
+                        wx.Insert(swx);
+                        return Json(JsonHandler.CreateMessage(1, SaleCusId), JsonRequestBehavior.AllowGet);
+                    }
+                    catch (Exception ex)
+                    {
+                        return Json(JsonHandler.CreateMessage(0, ex.Message), JsonRequestBehavior.AllowGet);
+                    }
+                    #region
+                    ////查询此微信号是否绑定过单位（客户编号）
+                    //string SaleId = wx.GetNameStr("Zid", " and OpenId='" + _openId + "'");
+
+                    //if (!string.IsNullOrEmpty(SaleId))//此微信已绑定
+                    //{
+                    //    if (SaleId == SaleCusId)//此微信号绑定的单位与当前绑定的单位相同
+                    //    {
+                    //        return Json(JsonHandler.CreateMessage(0, "此微信已绑定过本单位，无需要再次绑定！"), JsonRequestBehavior.AllowGet);
+                    //    }
+                    //    else//此微信号绑定的单位与当前绑定的单位不相同
+                    //    {
+                    //        return Json(JsonHandler.CreateMessage(0, "此微信已绑定其他单位，不可绑定多个单位！"), JsonRequestBehavior.AllowGet);
+                    //    }
+                    //}
+                    //else//此微信未绑定
+                    //{
+                    //    //查询此单位是否已绑定微信
+                    //    string OpenID = wx.GetNameStr("OpenId", " and Zid='" + SaleCusId + "'");
+
+                    //    if (!string.IsNullOrEmpty(OpenID))//此单位已绑定
+                    //    {
+                    //        if (OpenID == _openId)//此单位绑定的微信与当前绑定的微信相同
+                    //        {
+                    //            return Json(JsonHandler.CreateMessage(0, "此微信已绑定过本单位，无需要再次绑定！"), JsonRequestBehavior.AllowGet);
+                    //        }
+                    //        else//此单位绑定的微信与当前绑定的微信不相同
+                    //        {
+                    //            return Json(JsonHandler.CreateMessage(0, "此单位已绑定其他微信，不可绑定多个微信！"), JsonRequestBehavior.AllowGet);
+                    //        }
+                    //    }
+                    //}
+                    #endregion
                 }
                 else//存在(改革后单位名称)
                 {
@@ -1087,7 +1093,13 @@ namespace JMProject.Web.Controllers
                 #endregion
 
                 SaleOrderBLL obll = new SaleOrderBLL();
+                SaleCustomerBLL cbll = new SaleCustomerBLL();
+                NkscBLL bll = new NkscBLL();
                 obll.Update("update SaleOrder set Flag=" + Flag + " where Id='" + OrderId + "'");
+
+                //查询内控手册编号
+                string NkscId = bll.GetNameStr("id", " and CustomerID='" + cbll.GetStrName("SaleCustomId", " and Id='" + OrderId + "'") + "'");
+                obll.Update("update Nksc set flag=1 where Id='" + NkscId + "'");
                 return Json(JsonHandler.CreateMessage(1, ""), JsonRequestBehavior.AllowGet);//返回订单编号
             }
             catch (Exception ex)

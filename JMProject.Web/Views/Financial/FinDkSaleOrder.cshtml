@@ -137,6 +137,9 @@
                 }
                 $("#modalwindow").html("<iframe width='100%' height='98%' scrolling='no' frameborder='0' src='/Financial/Create_FinOrderInvoice?OrderId=" + row.Id + "&AddType=True'></iframe>");
                 $("#modalwindow").window({ title: '开票', width: 680, height: 340, iconCls: 'icon-edit' }).window('open');
+                if (row.OutStockFlagName == "未出库") {
+                    frameReturnByMesAlert(row.Name + " [" + row.ItemNames + "] 未出库");
+                }
             } else { $.messageBox5s('@Suggestion.Tip', '@Suggestion.PlaseChoose'); }
         });
 

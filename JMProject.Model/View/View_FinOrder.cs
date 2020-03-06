@@ -25,7 +25,7 @@ namespace JMProject.Model.View
 
         public String ZsName { get; set; }
 
-        //public int ItemCount { get; set; }
+        public String TypeName { get; set; }
         public decimal ItemMoney { get; set; }
 
     }

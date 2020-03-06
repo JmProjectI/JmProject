@@ -104,7 +104,7 @@ namespace JMProject.BLL
         {
             string Order = string.Empty;
             string Table = "View_FinOrder";
-            string Fields = "[Id],[OrderDate],[SupplierId],[Name],[UserId],[ZsName],[Remake],[ItemMoney]";
+            string Fields = "[Id],[OrderDate],[SupplierId],[Name],[UserId],[ZsName],[Remake],[TypeName],[ItemMoney]";
             if (!string.IsNullOrEmpty(Where))
             {
                 Where = "Where 1=1 " + Where;
